@@ -37,7 +37,9 @@ public class SwaggerConfiguration {
     @Bean
     public Docket api10() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("sso-user-service-api-1.0").select()
-            .apis(RequestHandlerSelectors.basePackage("com.karumien.cloud.perf.api")).paths(PathSelectors.regex("/sso/.*")).build()
+            .apis(RequestHandlerSelectors.basePackage("com.karumien.cloud.sso.api"))
+            .paths(PathSelectors.regex("/users.*"))
+            .build()
             .produces(Collections.singleton(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .apiInfo(new ApiInfoBuilder().version("1.0").title("SSO User Service API Documentation")
             .description("Methods for User API Service.").build());

@@ -13,11 +13,13 @@ basePath: /api/sso
 schemes:
   - http
 paths:
-  /user:
+  /users:
     post:
       summary: Create user
       description: Create user in target SSO
       operationId: createUser
+      tags:
+        - user
       parameters:
         - in: body
           name: user
@@ -29,11 +31,13 @@ paths:
           description: Successfully created
           schema:
             $ref: '#/definitions/UserBaseInfo'
-  /user/{id}:
+  /users/{id}:
     get:
       summary: "Get detail of the given user"
       description: "Method returns detail information about user."
       operationId: "getUser"
+      tags:
+        - user
       parameters:
         - name: id
           in: path
@@ -42,15 +46,34 @@ paths:
           type: string       
       responses:
         '200':
-          description: Successfully created
+          description: Successfully returned user's info
           schema:
             $ref: '#/definitions/UserBaseInfo'
+        '404':
+          description: Not found
+  /users/{id}:
+    delete:
+      summary: "Remove user"
+      description: "Remove user"
+      operationId: "deleteUser"
+      tags:
+        - user
+        - delete
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by User Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully removed user
         '404':
           description: Not found
 definitions:
   UserBaseInfo:
     type: object
-    description: "Basic information about CRM contact (person or department)"
+    description: "Basic information about User"
     required:
       - lastName
       - firstName
@@ -61,11 +84,11 @@ definitions:
         description: Unique ID 
       lastName:
         type: string
-        description: "last name/ surname of the contact"
+        description: "Last name/ surname of the contact"
         maxLength: 50
       firstName:
         type: string
-        description: "first name of the contact"
+        description: "First name of the contact"
         maxLength: 50
       username:
         type: string
