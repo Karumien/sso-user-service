@@ -18,26 +18,33 @@ paths:
       summary: Create user
       description: Create user in target SSO
       operationId: createUser
-      tags:
-        - user
       parameters:
         - in: body
           name: user
           description: The user to create
           schema:
             $ref: '#/definitions/UserBaseInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
       responses:
         '201':
           description: Successfully created
           schema:
             $ref: '#/definitions/UserBaseInfo'
+            example:
+              id: 6287994b-0245-4ca7-8eb4-777230b2f91f
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
   /users/{id}:
     get:
       summary: "Get detail of the given user"
       description: "Method returns detail information about user."
       operationId: "getUser"
-      tags:
-        - user
       parameters:
         - name: id
           in: path
@@ -51,14 +58,9 @@ paths:
             $ref: '#/definitions/UserBaseInfo'
         '404':
           description: Not found
-  /users/{id}:
     delete:
-      summary: "Remove user"
-      description: "Remove user"
+      summary: "Remove existing user"
       operationId: "deleteUser"
-      tags:
-        - user
-        - delete
       parameters:
         - name: id
           in: path
@@ -67,7 +69,7 @@ paths:
           type: string       
       responses:
         '200':
-          description: Successfully removed user
+          description: Successfully removed existing user
         '404':
           description: Not found
 definitions:
