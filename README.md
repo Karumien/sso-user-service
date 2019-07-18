@@ -1,2 +1,1 @@
-# ew-sso-user-service
-EW SSO User Service
+# SSO User API Service

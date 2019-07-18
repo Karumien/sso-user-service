@@ -1,0 +1,83 @@
+swagger: '2.0'
+info:
+  description: REST API for SSO User Service
+  version: '1.0'
+  termsOfService: 'http://www.karumien.com/terms/'
+  contact:
+    email: info@karumien.com
+  title: User Service Service
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /api/sso
+schemes:
+  - http
+paths:
+  /user:
+    post:
+      summary: Create user
+      description: Create user in target SSO
+      operationId: createUser
+      parameters:
+        - in: body
+          name: user
+          description: The user to create
+          schema:
+            $ref: '#/definitions/UserBaseInfo'
+      responses:
+        '201':
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/UserBaseInfo'
+  /user/{id}:
+    get:
+      summary: "Get detail of the given user"
+      description: "Method returns detail information about user."
+      operationId: "getUser"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by User Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/UserBaseInfo'
+        '404':
+          description: Not found
+definitions:
+  UserBaseInfo:
+    type: object
+    description: "Basic information about CRM contact (person or department)"
+    required:
+      - lastName
+      - firstName
+      - email
+    properties:
+      id:
+        type: string
+        description: Unique ID 
+      lastName:
+        type: string
+        description: "last name/ surname of the contact"
+        maxLength: 50
+      firstName:
+        type: string
+        description: "first name of the contact"
+        maxLength: 50
+      username:
+        type: string
+        description: "Nick name of person for game"
+        maxLength: 50
+      email:
+        type: string
+        description: "Primary email (used for username if empty)"
+        maxLength: 100
+    example:
+      id: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      lastName: Novak
+      firstName: Karel
+      username: KajaN
+      email: KajaN@eurowag.com

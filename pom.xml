@@ -1,0 +1,346 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.6.RELEASE</version>
+        <relativePath/>
+    </parent>
+	
+	<groupId>com.karumien.cloud.sso</groupId>
+	<artifactId>sso-user-service</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>SSO User API Service</name>
+	<description>SSO User Microservice over KeyCloak Admin API</description>
+	
+	<scm>
+        <connection>https://github.com/Karumien/sso-user-service.git</connection>
+        <developerConnection>https://github.com/Karumien/sso-user-service.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+	
+	<properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <swagger.input>src/main/resources/sso-user-api.yaml</swagger.input>
+        <swagger.package>com.karumien.cloud.sso.api</swagger.package>
+        
+        <docker.repository.url>cloud.docker.com/repository/docker/karumien</docker.repository.url>
+        <docker.tag>latest</docker.tag>
+		
+		<logstash-logback.version>6.0</logstash-logback.version>
+		<commons-io.version>2.6</commons-io.version>
+		<keycloak.version>6.0.1</keycloak.version>
+		
+		<maven-bundle-plugin.version>4.2.0</maven-bundle-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
+        <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
+        <maven-license-plugin.version>1.9.0</maven-license-plugin.version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
+        <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
+    </properties>
+	
+	<developers>
+        <developer>
+            <id>miroslav.svoboda</id>
+            <name>Miroslav Svoboda</name>
+            <email>miroslav.svoboda@karumien.com</email>
+            <url>https://www.linkedin.com/in/imsvoboda/</url>
+            <organization>Karumien s.r.o.</organization>
+            <organizationUrl>http://www.karumien.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <properties>
+                <picUrl>https://www.gravatar.com/avatar/de16f0919f18dd59aecabfb0b98ae762</picUrl>
+            </properties>
+        </developer>
+        <developer>
+			<id>viliam.litavec</id>
+			<name>Viliam Litavec</name>
+			<email>viliam.litavec@karumien.com</email>
+            <url>https://www.linkedin.com/in/vl-b5978393/</url>
+            <organization>Karumien s.r.o.</organization>
+            <organizationUrl>http://www.karumien.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+            <properties>
+                <picUrl>https://www.gravatar.com/avatar/eaa4704721b5bd598aa335e3f8267c69</picUrl>
+            </properties>
+		</developer>
+    </developers>
+    
+	<licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.slf4j.org/license.html</url>
+            <comments>
+                The portion of LogstashBasicMarker.java that has been copied from 
+                org.slf4j.helpers.BasicMarker is released under the MIT License.
+            </comments>
+        </license>
+    </licenses>
+    
+	<dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-undertow</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+        </dependency>
+		 <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
+        </dependency>
+	    <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-spring</artifactId>
+        </dependency>
+        <dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>		
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
+            <version>3.6.3.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jackson2-provider</artifactId>
+            <version>3.6.3.Final</version>
+        </dependency>
+        
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web-services</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
+		</dependency>
+			
+        <!-- dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency-->
+
+		<dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+		  <groupId>org.modelmapper.extensions</groupId>
+		  <artifactId>modelmapper-spring</artifactId>
+		  <version>2.3.0</version>
+		</dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+
+		<dependency>
+		    <groupId>net.logstash.logback</groupId>
+		    <artifactId>logstash-logback-encoder</artifactId>
+		    <version>${logstash-logback.version}</version>
+		</dependency>
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>	
+				
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+	</dependencies>
+	
+	<build>
+        <plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+	                <excludeDevtools>false</excludeDevtools>
+	                <executable>true</executable>
+	            </configuration>
+			</plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.10</version>
+                <configuration>
+                    <repository>${docker.repository.url}/${project.artifactId}</repository>
+                    <buildArgs>
+                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+                    </buildArgs>
+                    <tag>${docker.tag}</tag>
+                    <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>${maven-license-plugin.version}</version>
+                <configuration>
+                    <header>license-header.txt</header>
+                    <strictCheck>true</strictCheck>
+                    <aggregate>true</aggregate>
+                    <encoding>UTF-8</encoding>
+                    <failIfMissing>true</failIfMissing>
+                    <skipExistingHeaders>true</skipExistingHeaders>
+                    <includes>
+                        <include>**/src/main/java/**</include>
+                        <include>**/src/test/java/**</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-codegen-maven-plugin</artifactId>
+                <version>2.3.1</version>
+                <executions>
+                    <execution> 
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${swagger.input}</inputSpec>
+                            <language>spring</language>
+                            <library>spring-mvc</library>
+                            <modelNameSuffix>DTO</modelNameSuffix>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <java8>true</java8>
+                                <useTags>false</useTags>
+                                <apiPackage>${swagger.package}.handler</apiPackage>
+                                <modelPackage>${swagger.package}.model</modelPackage>
+                                <invokerPackage>${swagger.package}.handler</invokerPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <serializableModel>true</serializableModel>
+                                <verbose>true</verbose>
+                                <debugOperations>true</debugOperations>
+                                <useBeanValidation>true</useBeanValidation>
+                                <hasMore>true</hasMore>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+        	<plugins>
+        		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        		<plugin>
+        			<groupId>org.eclipse.m2e</groupId>
+        			<artifactId>lifecycle-mapping</artifactId>
+        			<version>1.0.0</version>
+        			<configuration>
+        				<lifecycleMappingMetadata>
+        					<pluginExecutions>
+        						<pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.mycila.maven-license-plugin</groupId>
+                                        <artifactId>maven-license-plugin</artifactId>
+                                        <versionRange>[${maven-license-plugin.version},)</versionRange>
+                                        <goals>
+                                            <goal>format</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+        						<pluginExecution>
+        							<pluginExecutionFilter>
+        								<groupId>io.swagger</groupId>
+        								<artifactId>
+        									swagger-codegen-maven-plugin
+        								</artifactId>
+        								<versionRange>
+        									[2.3.1,)
+        								</versionRange>
+        								<goals>
+        									<goal>generate</goal>
+        								</goals>
+        							</pluginExecutionFilter>
+        							<action>
+        								<ignore></ignore>
+        							</action>
+        						</pluginExecution>
+        					</pluginExecutions>
+        				</lifecycleMappingMetadata>
+        			</configuration>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
+    </build>
+
+</project>

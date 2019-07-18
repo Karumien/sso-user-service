@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+      password: dummy
+    zookeeper:
+      discovery:
+        enabled: false
+      enabled: false
+  sleuth:
+    enabled: false
+  zipkin:
+    enabled: false
+eureka:
+  client:
+    enabled: false

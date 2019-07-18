@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework" level="INFO"/>
+
+    <!-- Logstash-Configuration -->
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--  destination>elk:4560</destination-->
+		<destination>192.168.99.100:5000</destination>
+        <!-- encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"service_name":"SpringBootLogger"}</customFields>
+            <fieldNames>
+                <message>log_message</message>
+            </fieldNames>
+        </encoder>
+        <keepAliveDuration>5 minutes</keepAliveDuration-->
+    	<encoder
+			class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+			<providers>
+				<mdc /> <!-- MDC variables on the Thread will be written as JSON fields -->
+				<context /> <!--Outputs entries from logback's context -->
+				<version /> <!-- Logstash json format version, the @version field in the output -->
+				<logLevel />
+				<loggerName />
+				<pattern>
+					<pattern>
+						{ "serviceName": "sso-user-service" }
+					</pattern>
+				</pattern>
+				<threadName />
+				<message />
+				<logstashMarkers />
+				<stackTrace />
+			</providers>
+		</encoder>
+        
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="logstash" />
+    </root>
+
+</configuration>

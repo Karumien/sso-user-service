@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: sso-user-service
+  profiles:
+    include: microservice
+server:  
+  undertow:
+    worker-threads: 500
+  port: ${PORT:2205}
+keycloak:
+  server-url: http://sso.karumien.com/auth
+  realm: eurowag
+  username: karadmin
+  password: xara2002
+  client-id: admin-cli
+ 
