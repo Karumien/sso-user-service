@@ -8,9 +8,15 @@ server:
     worker-threads: 500
   port: ${PORT:2205}
 keycloak:
-  server-url: http://sso.karumien.com/auth
+  auth-server-url: http://sso.karumien.com/auth
   realm: eurowag
   username: karadmin
   password: xara2002
-  client-id: admin-cli
+  client-id: admin-cli 
+#keycloak:
+#  auth-server-url: http://sso.karumien.com/auth
+#  resource: admin-cli
+#  realm: eurowag
+#  public-client: true
+#  principal-attribute: karadmin
  

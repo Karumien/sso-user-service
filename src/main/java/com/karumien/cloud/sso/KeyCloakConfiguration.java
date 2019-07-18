@@ -21,8 +21,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class KeyCloakConfiguration {
 
-    @Value("${keycloak.server-url}")
-    private String SERVER_URL;
+    @Value("${keycloak.auth-server-url}")
+    private String ADMIN_SERVER_URL;
 
     @Value("${keycloak.username}")
     private String USERNAME;
@@ -35,6 +35,7 @@ public class KeyCloakConfiguration {
 
     @Bean
     public Keycloak getKeyCloak() {
-        return KeycloakBuilder.builder().serverUrl(SERVER_URL).realm("master").username(USERNAME).password(PASSWORD).clientId(CLIENT_ID).build();
+        return KeycloakBuilder.builder().serverUrl(ADMIN_SERVER_URL).realm("master")
+                .username(USERNAME).password(PASSWORD).clientId(CLIENT_ID).build();
     }
 }
