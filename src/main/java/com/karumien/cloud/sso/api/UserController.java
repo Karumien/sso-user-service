@@ -14,7 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.UsersApi;
+import com.karumien.cloud.sso.api.model.CredentialsDTO;
+import com.karumien.cloud.sso.api.model.PolicyDTO;
 import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
+import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.service.UserService;
 
 /**
@@ -44,6 +47,35 @@ public class UserController implements UsersApi {
     public ResponseEntity<Void> deleteUser(String id) {
         userService.deleteUser(id);
         return new ResponseEntity<Void>(HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<PolicyDTO> getPasswordPolicy() {
+        return new ResponseEntity<>(userService.getPasswordPolicy(), HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<PolicyDTO> createUserCredentials(String id, @Valid CredentialsDTO credentials) {
+        try {
+            userService.createUserCredentials(id, credentials);
+        } catch (PolicyPasswordException e) {
+            return new ResponseEntity<>(userService.getPasswordPolicy(), HttpStatus.NOT_ACCEPTABLE);
+        }
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<UserBaseInfoDTO> getUser(String id) {
+        return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK);
     }
     
 }

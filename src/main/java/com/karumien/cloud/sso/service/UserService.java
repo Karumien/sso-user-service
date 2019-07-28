@@ -8,6 +8,8 @@ package com.karumien.cloud.sso.service;
 
 import javax.validation.Valid;
 
+import com.karumien.cloud.sso.api.model.CredentialsDTO;
+import com.karumien.cloud.sso.api.model.PolicyDTO;
 import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
 
 /**
@@ -30,7 +32,34 @@ public interface UserService {
     /**
      * Delete user in target SSO.
      * 
-     * @param id unique user id
+     * @param id
+     *            unique user id
      */
     void deleteUser(String id);
+
+    /**
+     * Returns configuration of Password Policy
+     * 
+     * @return {@link PolicyDTO} configuration of Password Policy
+     */
+    PolicyDTO getPasswordPolicy();
+
+    /**
+     * Create/update user credentials
+     * 
+     * @param id
+     *            unique user id
+     * @param credentials
+     *            new credentials for user
+     */
+    void createUserCredentials(String id, CredentialsDTO credentials);
+
+    /**
+     * Return base information about user by {@code id}.
+     * 
+     * @param id
+     *            unique user id
+     * @return {@link UserBaseInfoDTO}
+     */
+    UserBaseInfoDTO getUser(String id);
 }

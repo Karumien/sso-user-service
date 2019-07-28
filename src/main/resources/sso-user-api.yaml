@@ -71,7 +71,49 @@ paths:
         '200':
           description: Successfully removed existing user
         '404':
-          description: Not found
+          description: User Not found
+  /users/{id}/credentials:
+    post:
+      summary: "Create user credentials"
+      description: "Method to create user credentials for given customer"
+      operationId: "createUserCredentials"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by User Unique ID
+          required: true
+          type: string       
+        - in: body
+          name: credentials
+          description: The Credentials for user to create/change
+          schema:
+            $ref: '#/definitions/Credentials'
+            example:
+              username: "midie"
+              password: "#123456."
+      responses:
+        '201':
+          description: "User creadentials has been created"
+          schema:
+            $ref: '#/definitions/Policy'      
+        '404':
+          description: User Not found
+          schema:
+            $ref: '#/definitions/Policy'      
+        '406':
+          description: Can't create user's credentials - becase Policy Settings    
+          schema:
+            $ref: '#/definitions/Policy'      
+  /users/password/policy:
+    get:
+      summary: "Returns Password Policy for users"
+      description: "Method for get user's password policy"
+      operationId: "getPasswordPolicy"
+      responses:
+        '200':
+          description: "Password Policy Settings"
+          schema:
+            $ref: '#/definitions/Policy'      
 definitions:
   UserBaseInfo:
     type: object
@@ -83,7 +125,7 @@ definitions:
     properties:
       id:
         type: string
-        description: Unique ID 
+        description: User's Unique ID 
       lastName:
         type: string
         description: "Last name/ surname of the contact"
@@ -106,3 +148,70 @@ definitions:
       firstName: Karel
       username: KajaN
       email: KajaN@eurowag.com
+  Credentials:
+    type: object
+    description: "Object for setting of user credential"
+    properties:
+      temporary:
+        type: boolean
+#        required: false
+        description: "Temporary - need reset after first login"
+      password:
+        type: string
+        example: "#123456."
+        maxLength: 50
+#        required: true
+  Policy:
+    type: object
+    description: "Configuration object for Password Policy"
+    properties:
+      value:
+        type: string
+        description: "Full policy description"
+      minSpecialChars:
+        type: integer
+        description: "Minimum use special chars in password"
+        example: "1"       
+      minUpperCase: 
+        type: integer
+        description: "Minimum use upper case chars in password"
+        example: "1"
+      minLength:
+        type: integer
+        description: "Minimum password length"
+        example: "8"
+      notUseUsername:
+        type: boolean
+        description: "Use username in password"
+        example: "true"
+      passwordHistory:
+        type: integer
+        description: "Use same password from history"
+        example: "3"
+      minLowerCase:
+        type: integer
+        description: "Minimum use lower case chars in password"
+        example: "1"
+      minDigits:
+        type: integer
+        description: "Minimum use digits in password"
+        example: "1"
+      passwordExpireDays:
+        type: integer
+        description: "Password expire in days"
+        example: "365"
+      hashAlgorithm:
+        type: string
+        description: "Hash algorithm for password encode"
+        example: "pbkdf2-sha256"
+      hashIterations:
+        type: integer
+        description: "Hash iterations for password encode"
+        example: "27500"
+      passwordBlacklist:
+        type: boolean
+        description: "Use blacklist for passwords"
+      regexPattern:
+        type: string
+        description: "REGEX pattern for password validation"
+        example: ".*"

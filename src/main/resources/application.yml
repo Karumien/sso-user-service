@@ -1,8 +1,21 @@
 spring:
   application:
     name: sso-user-service
+  main:
+#    banner-mode: false
+    log-startup-info: false
+    allow-bean-definition-overriding: true
   profiles:
     include: microservice
+  jackson:
+    serialization:
+      indent_output: true
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+    mapper:
+      default-view-inclusion: true     
 server:  
   undertow:
     worker-threads: 500
@@ -12,7 +25,7 @@ keycloak:
   realm: eurowag
   username: karadmin
   password: xara2002
-  client-id: admin-cli 
+  client-id: admin-cli
 #keycloak:
 #  auth-server-url: http://sso.karumien.com/auth
 #  resource: admin-cli

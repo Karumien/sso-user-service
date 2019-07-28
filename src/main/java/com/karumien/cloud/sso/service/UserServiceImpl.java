@@ -10,16 +10,23 @@ import java.net.URI;
 import java.util.Optional;
 
 import javax.validation.Valid;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.karumien.cloud.sso.api.model.CredentialsDTO;
+import com.karumien.cloud.sso.api.model.PolicyDTO;
 import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
+import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.exceptions.UserDuplicateException;
+import com.karumien.cloud.sso.exceptions.UserNotFoundException;
 
 /**
  * Implementation {@link UserService} for managing {@link PerformanceData} entity.
@@ -36,48 +43,45 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private Keycloak keycloak;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteUser(String id) {
         keycloak.realm(REALM).users().delete(id);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public UserBaseInfoDTO createUser(@Valid UserBaseInfoDTO userBaseInfo) {
-
-        // CredentialRepresentation credential = new CredentialRepresentation();
-        // credential.setType(CredentialRepresentation.PASSWORD);
-        // credential.setValue(password);
-
+        
         UserRepresentation user = new UserRepresentation();
         user.setUsername(Optional.ofNullable(userBaseInfo.getUsername()).orElse(userBaseInfo.getEmail()));
         user.setFirstName(userBaseInfo.getFirstName());
         user.setLastName(userBaseInfo.getLastName());
         user.setId(userBaseInfo.getId());
+        
+        // TODO: extract email as new method
         user.setEmail(userBaseInfo.getEmail());
-        // user.setEmailVerified(emailVerified);
+        // TODO: user.setEmailVerified(emailVerified);
         user.setEnabled(true);
 
         // user.singleAttribute("customAttribute", "customAttribute");
         // user.setCredentials(Arrays.asList(credential));
 
         Response response = keycloak.realm(REALM).users().create(user);
+        
         userBaseInfo.setId(getCreatedId(response));
-
-        // UserRepresentation createdUser = keycloak.realm(REALM).users().get(userBaseInfo.getId());
         userBaseInfo.setUsername(user.getUsername());
-
-        // Reset password
-        // CredentialRepresentation newCredential = new CredentialRepresentation();
-        // UserResource userResource = getInstance().realm(REALM).users().get(createdId);
-        // newCredential.setType(CredentialRepresentation.PASSWORD);
-        // newCredential.setValue(password);
-        // newCredential.setTemporary(false);
-        // userResource.resetPassword(newCredential);
-        // return HttpStatus.CREATED.value();
 
         return userBaseInfo;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getCreatedId(Response response) {
         URI location = response.getLocation();
 
@@ -95,5 +99,95 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PolicyDTO getPasswordPolicy() {
+
+        String policyDescription = keycloak.realm(REALM).toRepresentation().getPasswordPolicy();
+        
+        PolicyDTO policy = new PolicyDTO();
+        policy.setValue(policyDescription);
+        policy.setHashAlgorithm(extract("hashAlgorithm", policyDescription, String.class));
+        policy.setMinSpecialChars(extract("specialChars", policyDescription, Integer.class));
+        policy.setMinUpperCase(extract("upperCase", policyDescription, Integer.class));
+        policy.setMinLowerCase(extract("lowerCase", policyDescription, Integer.class));
+        policy.setPasswordHistory(extract("passwordHistory", policyDescription, Integer.class));
+        policy.setMinDigits(extract("digits", policyDescription, Integer.class));
+        policy.setHashIterations(extract("hashIterations", policyDescription, Integer.class));
+
+        if (extract("passwordBlacklist", policyDescription, String.class) != null) {
+            policy.setPasswordBlacklist(true);
+        }
+
+        if (extract("notUsername", policyDescription, String.class) != null) {
+            policy.setNotUseUsername(true);
+        }
+
+        policy.setRegexPattern(extract("regexPattern", policyDescription, String.class));
+        policy.setPasswordExpireDays(extract("forceExpiredPasswordChange", policyDescription, Integer.class));
+        policy.setMinLength(extract("length", policyDescription, Integer.class));
+        
+        return policy;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T extract(String code, String policyDescription, Class<T> clazz) {
+
+        if (policyDescription == null || !policyDescription.contains(code)) {
+            return null;
+        }
+        
+        String extractedValue = policyDescription.substring(policyDescription.indexOf(code) + code.length() + 1);
+        extractedValue = extractedValue.substring(0, extractedValue.indexOf(")"));
+        
+        if (Integer.class.equals(clazz)) {
+            return (T) Integer.valueOf(extractedValue);
+        }
+        
+        return (T) extractedValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createUserCredentials(String id, CredentialsDTO newCredentials) {
+
+        CredentialRepresentation newCredential = new CredentialRepresentation();
+        // TODO: empty password simple validation?
+        UserResource userResource = keycloak.realm(REALM).users().get(id);
+        newCredential.setType(CredentialRepresentation.PASSWORD);
+        newCredential.setValue(newCredentials.getPassword());
+        newCredential.setTemporary(Boolean.TRUE.equals(newCredential.isTemporary()));
+
+        try {
+            userResource.resetPassword(newCredential);
+        } catch (BadRequestException e) {
+            e.printStackTrace();
+            throw new PolicyPasswordException(newCredentials.getPassword());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserBaseInfoDTO getUser(String id) {
+
+        UserResource userResource = Optional.ofNullable(keycloak.realm(REALM).users().get(id)).orElseThrow(() -> new UserNotFoundException(id));
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        
+        // TODO: Orica Mapper
+        UserBaseInfoDTO user = new UserBaseInfoDTO();
+        user.setId(userRepresentation.getId());
+        user.setFirstName(userRepresentation.getFirstName());
+        user.setLastName(userRepresentation.getLastName());
+        user.setUsername(userRepresentation.getUsername());
+        user.setEmail(userRepresentation.getEmail());
+                
+        return user;
+    }
 
 }
