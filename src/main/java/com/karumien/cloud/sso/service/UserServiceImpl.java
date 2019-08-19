@@ -29,7 +29,7 @@ import com.karumien.cloud.sso.exceptions.UserDuplicateException;
 import com.karumien.cloud.sso.exceptions.UserNotFoundException;
 
 /**
- * Implementation {@link UserService} for managing {@link PerformanceData} entity.
+ * Implementation {@link UserService} for identity management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
  * @since 1.0, 10. 6. 2019 22:07:27

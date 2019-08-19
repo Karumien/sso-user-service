@@ -28,7 +28,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         
-        <swagger.input>src/main/resources/sso-user-api.yaml</swagger.input>
+        <user-api-swagger.input>src/main/resources/sso-user-api.yaml</user-api-swagger.input>
+        <auth-api-swagger.input>src/main/resources/sso-auth-api.yaml</auth-api-swagger.input>
         <swagger.package>com.karumien.cloud.sso.api</swagger.package>
         
         <docker.repository.url>cloud.docker.com/repository/docker/karumien</docker.repository.url>
@@ -263,11 +264,39 @@
                 <version>2.3.1</version>
                 <executions>
                     <execution> 
+                        <id>user-api-swagger</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${swagger.input}</inputSpec>
+                            <inputSpec>${user-api-swagger.input}</inputSpec>
+                            <language>spring</language>
+                            <library>spring-mvc</library>
+                            <modelNameSuffix>DTO</modelNameSuffix>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <generateSupportingFiles>false</generateSupportingFiles>
+                                <java8>true</java8>
+                                <useTags>false</useTags>
+                                <apiPackage>${swagger.package}.handler</apiPackage>
+                                <modelPackage>${swagger.package}.model</modelPackage>
+                                <invokerPackage>${swagger.package}.handler</invokerPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <serializableModel>true</serializableModel>
+                                <verbose>true</verbose>
+                                <debugOperations>true</debugOperations>
+                                <useBeanValidation>true</useBeanValidation>
+                                <hasMore>true</hasMore>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution> 
+                        <id>auth-api-swagger</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${auth-api-swagger.input}</inputSpec>
                             <language>spring</language>
                             <library>spring-mvc</library>
                             <modelNameSuffix>DTO</modelNameSuffix>

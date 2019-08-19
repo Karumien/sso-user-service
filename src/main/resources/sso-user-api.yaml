@@ -5,11 +5,11 @@ info:
   termsOfService: 'http://www.karumien.com/terms/'
   contact:
     email: info@karumien.com
-  title: User Service Service
+  title: User Service
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-basePath: /api/sso
+basePath: /ew-sso/v1
 schemes:
   - http
 paths:

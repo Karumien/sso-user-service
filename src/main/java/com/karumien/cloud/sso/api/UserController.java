@@ -26,7 +26,7 @@ import com.karumien.cloud.sso.service.UserService;
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 18. 7. 2019 11:15:51 
  */
-@RestController
+@RestController(value = "user-service")
 public class UserController implements UsersApi {
 
     @Autowired

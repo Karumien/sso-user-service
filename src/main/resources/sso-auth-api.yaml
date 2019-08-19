@@ -1,0 +1,135 @@
+swagger: '2.0'
+info:
+  description: REST API for SSO User Service
+  version: '1.0'
+  termsOfService: 'http://www.karumien.com/terms/'
+  contact:
+    email: info@karumien.com
+  title: Authentication Service
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /ew-sso/v1
+schemes:
+  - http
+paths:
+  /auth/public_key:
+    get:
+      summary: Retrieve Realm PublicKey
+      operationId: publicKey
+      produces:
+        - text/plain
+      responses:
+        200:
+          description: Retrieve PublicKey of Realm
+  /auth/login:
+    post:
+      summary: Retrieve Authorization Token
+      description: Authenticate and get Token
+      operationId: login
+#      consumes:
+#        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: user
+          description: The user to create
+          schema:
+            $ref: '#/definitions/AuthorizationRequest'
+      responses:
+        201:
+          description: Successfully Login and Token return
+          schema:
+            $ref: '#/definitions/AuthorizationResponse'
+  /auth/logout:
+    post:
+      summary: Logout of Authenticated User
+      description: Logout of Authenticated user, only grant_type refresh_token is supported.
+      operationId: logout
+#      consumes:
+#        - application/x-www-form-urlencoded
+      parameters:
+        - in: body
+          name: user
+          description: The user to create
+          schema:
+            $ref: '#/definitions/AuthorizationRequest'
+      responses:
+        204:
+          description: "Successful Logout"
+definitions:
+  GrantType:
+    type: string
+    description: Type of Bearer
+    enum:
+      - password
+      - client_credentials
+      - refresh_token
+  AuthorizationRequest:
+    type: object
+    required:
+      - grant_type
+    properties:
+      grant_type:
+        $ref: '#/definitions/GrantType'
+      username:
+        type: string
+        maxLength: 100
+        description: Identity ID of user - required for grant_type of type password.
+      password:
+        type: string
+        maxLength: 100
+        description: User's password - required for grant_type of type password.
+      client_id:
+        type: string
+        maxLength: 250
+        description: Client Id - required for grant_type of type client_credentials.
+      client_secret:
+        type: string
+        maxLength: 250
+        description: Client Secret - required for grant_type of type client_credentials.
+      refresh_token:
+        type: string
+        maxLength: 4000
+        description: Refresh Token for Access Token renewal process - required for grant_type of refresh_token.
+    example:
+      password:
+        grant_type: password
+        identity: user@ew.com
+        secret: heslo123
+      client_credentials:
+        grant_type: client_credentials
+        client_id: admin-cli
+        client_secret: uewrutzewre
+      refresh_token:
+        grant_type: refresh_token
+        refresh_token: uyewiryerweiruew
+  AuthorizationResponse:
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - expires_in
+        - token_type
+      properties:
+        access_token:
+          type: string
+          maxLength: 4000
+          description: Access Token Representation
+        refresh_token:
+          type: string
+          maxLength: 4000
+          description: Refresh Token Representation
+        expires_in:
+          type: integer
+          description: Access Token expiration in seconds
+        refresh_expires_in:
+          type: integer
+          description: Refresh Token expiration in seconds
+        token_type:
+          type: string
+          description: Base type of token
+      example:
+        access_token: rewrsthhgfh
+        refresh_token: a3sdwer3twe
+        expires_in: 3600
+        token_type: Bearer
