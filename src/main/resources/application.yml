@@ -27,8 +27,8 @@ server:
   undertow:
     worker-threads: 500
   port: ${PORT:2205}
-#  servlet:
-#    contextPath: /ew-sso-api
+  servlet:
+    contextPath: /ew-sso-api
 keycloak:
   auth-server-url: http://ew-sso-dev.westeurope.cloudapp.azure.com/auth
   realm: eurowag
@@ -41,4 +41,6 @@ keycloak:
 #  realm: eurowag
 #  public-client: true
 #  principal-attribute: karadmin
+security:
+  ignored: /swagger-resources/**
  
