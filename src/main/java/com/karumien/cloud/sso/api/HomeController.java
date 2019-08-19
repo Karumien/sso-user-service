@@ -28,10 +28,10 @@ public class HomeController {
     @Autowired
     private InfoService infoService;
 
-    @RequestMapping(value = "/")
-    public String index() {
-        return "redirect:swagger-ui.html";
-    }
+//    @RequestMapping(value = "/")
+//    public String index() {
+//        return "redirect:swagger-ui.html";
+//    }
     
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public ResponseEntity<VersionInfoDTO> getVersionInfo() {

@@ -1,9 +1,0 @@
-spring:
-  application:
-    name: ais
-  cloud:
-    config:
-      uri: http://config-server:8888
-      fail-fast: true
-      password: heslo123
-      username: configuser

@@ -16,10 +16,19 @@ spring:
     default-property-inclusion: non_null
     mapper:
       default-view-inclusion: true     
+#springfox:
+#  documentation:
+#    auto-startup: true
+#    swagger:
+#      v2:
+#        home: /api/v2/docs
+#        host: ew-sso-dev.westeurope.cloudapp.azure.com
 server:  
   undertow:
     worker-threads: 500
   port: ${PORT:2205}
+#  servlet:
+#    contextPath: /ew-sso-api
 keycloak:
   auth-server-url: http://ew-sso-dev.westeurope.cloudapp.azure.com/auth
   realm: eurowag
