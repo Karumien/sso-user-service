@@ -13,7 +13,7 @@ import com.karumien.cloud.sso.api.model.PolicyDTO;
 import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
 
 /**
- * Service for managing {@link PerformanceData} entity.
+ * Service provides scenarios for user's management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
  * @since 1.0, 10. 7. 2019 22:07:27

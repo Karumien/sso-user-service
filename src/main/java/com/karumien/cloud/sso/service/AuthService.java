@@ -6,12 +6,10 @@
  */
 package com.karumien.cloud.sso.service;
 
-import javax.validation.constraints.Size;
-
 import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
 
 /**
- * Service for managing {@link PerformanceData} entity.
+ * Service provides scenatios for authentication's tokens management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
  * @since 1.0, 10. 7. 2019 22:07:27

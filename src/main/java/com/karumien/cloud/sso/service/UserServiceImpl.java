@@ -29,7 +29,7 @@ import com.karumien.cloud.sso.exceptions.UserDuplicateException;
 import com.karumien.cloud.sso.exceptions.UserNotFoundException;
 
 /**
- * Implementation {@link UserService} for identity management.
+ * Implementation of {@link UserService} for identity management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
  * @since 1.0, 10. 6. 2019 22:07:27
@@ -38,7 +38,7 @@ import com.karumien.cloud.sso.exceptions.UserNotFoundException;
 public class UserServiceImpl implements UserService {
 
     @Value("${keycloak.realm}")
-    private String REALM;
+    private String realm;
 
     @Autowired
     private Keycloak keycloak;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void deleteUser(String id) {
-        keycloak.realm(REALM).users().delete(id);
+        keycloak.realm(realm).users().delete(id);
     }
 
     /**
@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
         // user.singleAttribute("customAttribute", "customAttribute");
         // user.setCredentials(Arrays.asList(credential));
 
-        Response response = keycloak.realm(REALM).users().create(user);
+        Response response = keycloak.realm(realm).users().create(user);
         
         userBaseInfo.setId(getCreatedId(response));
         userBaseInfo.setUsername(user.getUsername());
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PolicyDTO getPasswordPolicy() {
 
-        String policyDescription = keycloak.realm(REALM).toRepresentation().getPasswordPolicy();
+        String policyDescription = keycloak.realm(realm).toRepresentation().getPasswordPolicy();
         
         PolicyDTO policy = new PolicyDTO();
         policy.setValue(policyDescription);
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
 
         CredentialRepresentation newCredential = new CredentialRepresentation();
         // TODO: empty password simple validation?
-        UserResource userResource = keycloak.realm(REALM).users().get(id);
+        UserResource userResource = keycloak.realm(realm).users().get(id);
         newCredential.setType(CredentialRepresentation.PASSWORD);
         newCredential.setValue(newCredentials.getPassword());
         newCredential.setTemporary(Boolean.TRUE.equals(newCredential.isTemporary()));
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserBaseInfoDTO getUser(String id) {
 
-        UserResource userResource = Optional.ofNullable(keycloak.realm(REALM).users().get(id)).orElseThrow(() -> new UserNotFoundException(id));
+        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(id)).orElseThrow(() -> new UserNotFoundException(id));
         UserRepresentation userRepresentation = userResource.toRepresentation();
         
         // TODO: Orica Mapper

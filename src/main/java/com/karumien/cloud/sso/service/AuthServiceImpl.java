@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
 
 /**
- * Implementation {@link AuthService} for authentication tokens management.
+ * Implementation of {@link AuthService} for authentication tokens management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
  * @since 1.0, 13. 8. 2019 22:07:27
@@ -33,15 +33,15 @@ import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
 public class AuthServiceImpl implements AuthService {
 
     @Value("${keycloak.realm}")
-    private String REALM;
+    private String realm;
 
     @Value("${keycloak.auth-server-url}")
-    private String ADMIN_SERVER_URL;
+    private String adminServerUrl;
     
     @Autowired
-    private Keycloak keycloak;
+    protected Keycloak keycloak;
 
-    private static PublicKey toPublicKey(String publicKeyString) {
+    protected static PublicKey toPublicKey(String publicKeyString) {
         try {
           byte[] publicBytes = Base64.getDecoder().decode(publicKeyString);
           X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
@@ -72,19 +72,25 @@ public class AuthServiceImpl implements AuthService {
         ObjectMapper om = new ObjectMapper();
         Map<String, Object> realmInfo;
         try {
-            realmInfo = om.readValue(new URL(ADMIN_SERVER_URL).openStream(), Map.class);
+            realmInfo = om.readValue(new URL(adminServerUrl).openStream(), Map.class);
             return (String) realmInfo.get("public_key");
         } catch (Exception e) {
             throw new IllegalStateException("Can't retreive public key");
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void logoutByToken(String token) {
         // TODO Auto-generated method stub
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AuthorizationResponseDTO loginByUsernamePassword(String username, String password) {
         // TODO Auto-generated method stub

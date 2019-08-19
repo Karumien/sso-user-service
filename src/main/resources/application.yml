@@ -1,6 +1,6 @@
 spring:
   application:
-    name: sso-user-service
+    name: ew-sso-api
   main:
 #    banner-mode: false
     log-startup-info: false
