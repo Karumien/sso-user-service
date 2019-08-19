@@ -20,13 +20,16 @@ import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.service.UserService;
 
+import io.swagger.annotations.Api;
+
 /**
  * REST Controller for User Service (API).
  * 
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 18. 7. 2019 11:15:51 
  */
-@RestController(value = "user-service")
+@RestController
+@Api(value = "User Service", description = "REST API for User Service", tags = { "User Service" })
 public class UserController implements UsersApi {
 
     @Autowired

@@ -36,13 +36,13 @@ public class SwaggerConfiguration {
      */
     @Bean
     public Docket api10() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("sso-user-service-api-1.0").select()
+        return new Docket(DocumentationType.SWAGGER_2).groupName("ew-sso-api-1.0").select()
             .apis(RequestHandlerSelectors.basePackage("com.karumien.cloud.sso.api"))
-            .paths(PathSelectors.regex("/users.*"))
+            .paths(PathSelectors.regex("/[users|auth].*"))
             .build()
             .produces(Collections.singleton(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .apiInfo(new ApiInfoBuilder().version("1.0").title("SSO User Service API Documentation")
-            .description("Methods for User API Service.").build());
+            .apiInfo(new ApiInfoBuilder().version("1.0").title("Eurowag SSO API Documentation")
+            .description("Services of EW SSO API.").build());
     }
 
 }

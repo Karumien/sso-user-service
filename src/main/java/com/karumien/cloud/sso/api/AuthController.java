@@ -19,13 +19,16 @@ import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
 import com.karumien.cloud.sso.api.model.GrantTypeDTO;
 import com.karumien.cloud.sso.service.AuthService;
 
+import io.swagger.annotations.Api;
+
 /**
  * REST Controller for User Service (API).
  * 
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 13. 8. 2019 11:15:51 
  */
-@RestController(value = "auth-service")
+@RestController
+@Api(value = "Authentication Service", description = "REST API for Authentication Service", tags = { "Authentication Service" })
 public class AuthController implements AuthApi  {
 
     @Autowired
