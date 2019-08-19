@@ -21,9 +21,9 @@ server:
     worker-threads: 500
   port: ${PORT:2205}
 keycloak:
-  auth-server-url: http://sso.karumien.com/auth
+  auth-server-url: http://ew-sso-dev.westeurope.cloudapp.azure.com/auth
   realm: eurowag
-  username: karadmin
+  username: wagadmin
   password: xara2002
   client-id: admin-cli
 #keycloak:
