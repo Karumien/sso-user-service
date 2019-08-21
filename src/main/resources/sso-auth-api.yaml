@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-basePath: /ew-sso/v1
+basePath: /api/v1/sso
 schemes:
   - http
 paths:
@@ -121,9 +121,11 @@ definitions:
           description: Refresh Token Representation
         expires_in:
           type: integer
+          format: int64
           description: Access Token expiration in seconds
         refresh_expires_in:
           type: integer
+          format: int64
           description: Refresh Token expiration in seconds
         token_type:
           type: string

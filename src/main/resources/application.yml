@@ -2,7 +2,6 @@ spring:
   application:
     name: ew-sso-api
   main:
-#    banner-mode: false
     log-startup-info: false
     allow-bean-definition-overriding: true
   profiles:
@@ -16,31 +15,16 @@ spring:
     default-property-inclusion: non_null
     mapper:
       default-view-inclusion: true     
-#springfox:
-#  documentation:
-#    auto-startup: true
-#    swagger:
-#      v2:
-#        home: /api/v2/docs
-#        host: ew-sso-dev.westeurope.cloudapp.azure.com
 server:  
   undertow:
     worker-threads: 500
   port: ${PORT:2205}
   servlet:
-    contextPath: /ew-sso-api
+    contextPath: ${CONTEXT_PATH:/api/v1/sso}
 keycloak:
   auth-server-url: http://ew-sso-dev.westeurope.cloudapp.azure.com/auth
   realm: eurowag
   username: wagadmin
   password: xara2002
   client-id: admin-cli
-#keycloak:
-#  auth-server-url: http://sso.karumien.com/auth
-#  resource: admin-cli
-#  realm: eurowag
-#  public-client: true
-#  principal-attribute: karadmin
-security:
-  ignored: /swagger-resources/**
  

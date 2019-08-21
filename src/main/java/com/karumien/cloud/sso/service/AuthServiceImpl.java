@@ -16,6 +16,8 @@ import java.util.Base64;
 import java.util.Map;
 
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.token.TokenManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -93,8 +95,18 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponseDTO loginByUsernamePassword(String username, String password) {
-        // TODO Auto-generated method stub
-        return null;
+        TokenManager tokenManager = KeycloakBuilder.builder()
+                .serverUrl(adminServerUrl).realm(realm)
+                .username(username).password(password).build()
+                .tokenManager();
+
+        AuthorizationResponseDTO auth = new AuthorizationResponseDTO();
+        auth.setAccessToken(tokenManager.getAccessToken().getToken());
+        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
+        auth.setRefreshToken(tokenManager.refreshToken().getToken());
+        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
+        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
+        return auth;
     }
 
     @Override
