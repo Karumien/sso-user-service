@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
-import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 
 /**
  * Implementation of {@link AuthService} for authentication tokens management.
@@ -90,7 +89,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void logoutByToken(String token) {
-        throw new UnsupportedApiOperationException();
+        keycloak.tokenManager().invalidate(token);
     }
 
     /**
@@ -137,7 +136,16 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponseDTO loginByToken(String refreshToken) {
-        throw new UnsupportedApiOperationException();
+        TokenManager tokenManager = 
+                Keycloak.getInstance(adminServerUrl, realm, clientId, refreshToken).tokenManager();
+
+        AuthorizationResponseDTO auth = new AuthorizationResponseDTO();
+        auth.setAccessToken(tokenManager.getAccessToken().getToken());
+        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
+        auth.setRefreshToken(tokenManager.refreshToken().getToken());
+        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
+        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
+        return auth;        
     }
 
 }
