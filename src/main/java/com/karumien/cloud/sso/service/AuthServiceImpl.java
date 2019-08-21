@@ -41,6 +41,9 @@ public class AuthServiceImpl implements AuthService {
     @Value("${keycloak.auth-server-url}")
     private String adminServerUrl;
     
+    @Value("${keycloak.client-id}")
+    private String clientId;
+    
     @Autowired
     protected Keycloak keycloak;
 
@@ -96,7 +99,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthorizationResponseDTO loginByUsernamePassword(String username, String password) {
         TokenManager tokenManager = KeycloakBuilder.builder()
-                .serverUrl(adminServerUrl).realm(realm)
+                .serverUrl(adminServerUrl)
+                .realm(realm).clientId(clientId)
                 .username(username).password(password).build()
                 .tokenManager();
 
