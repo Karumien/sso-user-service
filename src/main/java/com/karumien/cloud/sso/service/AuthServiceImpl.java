@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
+import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 
 /**
  * Implementation of {@link AuthService} for authentication tokens management.
@@ -86,8 +87,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void logoutByToken(String token) {
-        // TODO Auto-generated method stub
-        
+        throw new UnsupportedApiOperationException("Not implemented now.");
     }
 
     /**
@@ -109,16 +109,31 @@ public class AuthServiceImpl implements AuthService {
         return auth;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AuthorizationResponseDTO loginByClientCredentials(String clientId, String clientSecret) {
-        // TODO Auto-generated method stub
-        return null;
+        TokenManager tokenManager = KeycloakBuilder.builder()
+                .serverUrl(adminServerUrl).realm(realm)
+                .clientId(clientId).clientSecret(clientSecret).build()
+                .tokenManager();
+
+        AuthorizationResponseDTO auth = new AuthorizationResponseDTO();
+        auth.setAccessToken(tokenManager.getAccessToken().getToken());
+        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
+        auth.setRefreshToken(tokenManager.refreshToken().getToken());
+        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
+        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
+        return auth;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AuthorizationResponseDTO loginByToken(String refreshToken) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Not implemented now.");
     }
 
 }
