@@ -25,7 +25,7 @@ import java.util.jar.Manifest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.karumien.cloud.sso.api.model.VersionInfoDTO;
+import com.karumien.cloud.sso.api.model.VersionInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,9 +84,9 @@ public class InfoServiceImpl implements InfoService {
      * {@inheritDoc}
      */
     @Override
-    public VersionInfoDTO getVersionInfo() {
+    public VersionInfo getVersionInfo() {
         List<Attributes> values = loadManifestFiles();
-        return VersionInfoDTO.builder()
+        return VersionInfo.builder()
                 .attributes(values).application(getApplicationVersion(applicationName, values)).build();
     }
 

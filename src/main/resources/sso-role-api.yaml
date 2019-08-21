@@ -1,0 +1,94 @@
+swagger: '2.0'
+info:
+  description: REST API for SSO Role Service
+  version: '1.0'
+  termsOfService: 'http://www.karumien.com/terms/'
+  contact:
+    email: info@karumien.com
+  title: Role Service
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /api/v1/sso
+schemes:
+  - http
+paths:
+  /roles:
+    post:
+      summary: Create role
+      description: Create role in target SSO
+      operationId: createRole
+      parameters:
+        - in: body
+          name: role
+          description: The role to create
+          schema:
+            $ref: '#/definitions/RoleBaseInfo'
+      responses:
+        '201':
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/RoleBaseInfo'
+  /roles/{id}:
+    get:
+      summary: "Get detail of the given role"
+      description: "Method returns detail information about role."
+      operationId: "getRole"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by role Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned role's info
+          schema:
+            $ref: '#/definitions/RoleBaseInfo'
+        '404':
+          description: Not found
+    delete:
+      summary: "Remove existing role"
+      operationId: "deleteRole"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by role Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully removed existing role
+        '404':
+          description: role Not found
+definitions:
+  RoleBaseInfo:
+    type: object
+    description: "Basic information about Role"
+    required:
+      - name
+    properties:
+      id:
+        type: string
+        description: Role Unique ID 
+      name:
+        type: string
+        description: "Role name"
+        maxLength: 50
+      description:
+        type: string
+        description: "Role description"
+        maxLength: 255
+      clientId:
+        type: string
+        maxLength: 250
+        description: Client Id (for client roles)
+      clientRole:
+        type: boolean
+        description: "Identify Client Role (not realm role)"
+    example:
+      id: fd65248c-f3aa-4310-8fcf-91eacdd324xx
+      name: First Role
+      description: Role description
+      clientId: 9abedf80-7413-4751-9b73-84d07a32e11c
+      clientRole: true9abedf80-7413-4751-9b73-84d07a32e11c

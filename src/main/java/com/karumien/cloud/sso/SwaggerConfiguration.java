@@ -38,7 +38,7 @@ public class SwaggerConfiguration {
     public Docket api10() {
         return new Docket(DocumentationType.SWAGGER_2).groupName("ew-sso-api-1.0").select()
             .apis(RequestHandlerSelectors.basePackage("com.karumien.cloud.sso.api"))
-            .paths(PathSelectors.regex("/[users|auth].*"))
+            .paths(PathSelectors.regex("/[users|auth|customers|drivers|roles|version].*"))
             .build()
             .produces(Collections.singleton(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .apiInfo(new ApiInfoBuilder().version("1.0").title("Eurowag SSO API Documentation")

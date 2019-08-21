@@ -21,15 +21,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.karumien.cloud.sso.api.model.CredentialsDTO;
-import com.karumien.cloud.sso.api.model.PolicyDTO;
-import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
+import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.UserBaseInfo;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.exceptions.UserDuplicateException;
 import com.karumien.cloud.sso.exceptions.UserNotFoundException;
 
 /**
- * Implementation of {@link UserService} for identity management.
+ * Implementation {@link UserService} for identity management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
  * @since 1.0, 10. 6. 2019 22:07:27
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserBaseInfoDTO createUser(@Valid UserBaseInfoDTO userBaseInfo) {
+    public UserBaseInfo createUser(@Valid UserBaseInfo userBaseInfo) {
         
         UserRepresentation user = new UserRepresentation();
         user.setUsername(Optional.ofNullable(userBaseInfo.getUsername()).orElse(userBaseInfo.getEmail()));
@@ -103,11 +103,11 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PolicyDTO getPasswordPolicy() {
+    public Policy getPasswordPolicy() {
 
         String policyDescription = keycloak.realm(realm).toRepresentation().getPasswordPolicy();
         
-        PolicyDTO policy = new PolicyDTO();
+        Policy policy = new Policy();
         policy.setValue(policyDescription);
         policy.setHashAlgorithm(extract("hashAlgorithm", policyDescription, String.class));
         policy.setMinSpecialChars(extract("specialChars", policyDescription, Integer.class));
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public void createUserCredentials(String id, CredentialsDTO newCredentials) {
+    public void createUserCredentials(String id, Credentials newCredentials) {
 
         CredentialRepresentation newCredential = new CredentialRepresentation();
         // TODO: empty password simple validation?
@@ -174,13 +174,13 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserBaseInfoDTO getUser(String id) {
+    public UserBaseInfo getUser(String id) {
 
         UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(id)).orElseThrow(() -> new UserNotFoundException(id));
         UserRepresentation userRepresentation = userResource.toRepresentation();
         
         // TODO: Orica Mapper
-        UserBaseInfoDTO user = new UserBaseInfoDTO();
+        UserBaseInfo user = new UserBaseInfo();
         user.setId(userRepresentation.getId());
         user.setFirstName(userRepresentation.getFirstName());
         user.setLastName(userRepresentation.getLastName());

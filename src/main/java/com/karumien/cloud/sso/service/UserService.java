@@ -8,9 +8,9 @@ package com.karumien.cloud.sso.service;
 
 import javax.validation.Valid;
 
-import com.karumien.cloud.sso.api.model.CredentialsDTO;
-import com.karumien.cloud.sso.api.model.PolicyDTO;
-import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
+import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.UserBaseInfo;
 
 /**
  * Service provides scenarios for user's management.
@@ -25,9 +25,9 @@ public interface UserService {
      * 
      * @param user
      *            user specification
-     * @return {@link UserBaseInfoDTO} changes after entity save
+     * @return {@link UserBaseInfo} changes after entity save
      */
-    UserBaseInfoDTO createUser(@Valid UserBaseInfoDTO user);
+    UserBaseInfo createUser(@Valid UserBaseInfo user);
 
     /**
      * Delete user in target SSO.
@@ -40,9 +40,9 @@ public interface UserService {
     /**
      * Returns configuration of Password Policy
      * 
-     * @return {@link PolicyDTO} configuration of Password Policy
+     * @return {@link Policy} configuration of Password Policy
      */
-    PolicyDTO getPasswordPolicy();
+    Policy getPasswordPolicy();
 
     /**
      * Create/update user credentials
@@ -52,14 +52,14 @@ public interface UserService {
      * @param credentials
      *            new credentials for user
      */
-    void createUserCredentials(String id, CredentialsDTO credentials);
+    void createUserCredentials(String id, Credentials credentials);
 
     /**
      * Return base information about user by {@code id}.
      * 
      * @param id
      *            unique user id
-     * @return {@link UserBaseInfoDTO}
+     * @return {@link UserBaseInfo}
      */
-    UserBaseInfoDTO getUser(String id);
+    UserBaseInfo getUser(String id);
 }

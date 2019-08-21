@@ -6,7 +6,7 @@
  */
 package com.karumien.cloud.sso.service;
 
-import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
+import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 
 /**
  * Service provides scenatios for authentication's tokens management.
@@ -31,10 +31,10 @@ public interface AuthService {
      */
     void logoutByToken(String token);
 
-    AuthorizationResponseDTO loginByUsernamePassword(String username, String password);
+    AuthorizationResponse loginByUsernamePassword(String username, String password);
 
-    AuthorizationResponseDTO loginByClientCredentials(String clientId, String clientSecret);
+    AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret);
 
-    AuthorizationResponseDTO loginByToken(String refreshToken);
+    AuthorizationResponse loginByToken(String refreshToken);
 
 }

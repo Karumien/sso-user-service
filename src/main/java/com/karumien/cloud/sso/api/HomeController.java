@@ -13,8 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.karumien.cloud.sso.api.model.VersionInfoDTO;
+import com.karumien.cloud.sso.api.model.VersionInfo;
 import com.karumien.cloud.sso.service.InfoService;
+
+import io.swagger.annotations.Api;
 
 /**
  * Home redirection to swagger api documentation.
@@ -23,6 +25,7 @@ import com.karumien.cloud.sso.service.InfoService;
  * @since 1.0, 15. 7. 2019 21:27:49
  */
 @Controller
+@Api(value = "Version Info Service", description = "REST API for Version Info Service", tags = { "Version Info Service" })
 public class HomeController {
     
     @Autowired
@@ -34,7 +37,7 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public ResponseEntity<VersionInfoDTO> getVersionInfo() {
+    public ResponseEntity<VersionInfo> getVersionInfo() {
         return new ResponseEntity<>(infoService.getVersionInfo(), HttpStatus.OK);
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
+import com.karumien.cloud.sso.api.model.UserBaseInfo;
 import com.karumien.cloud.sso.service.UserService;
 
 @RunWith(SpringRunner.class)
@@ -33,12 +33,12 @@ public class UserServiceTest {
     @Test
     public void createAccount() throws Exception {
         
-        UserBaseInfoDTO user = new UserBaseInfoDTO();
+        UserBaseInfo user = new UserBaseInfo();
         user.setFirstName("Ladislav");
         user.setLastName("Stary");
         user.setEmail("stary@seznam.cz");
         
-        UserBaseInfoDTO userCreated = userService.createUser(user);
+        UserBaseInfo userCreated = userService.createUser(user);
         Assert.assertEquals(user.getFirstName(), userCreated.getFirstName());
         Assert.assertEquals(user.getLastName(), userCreated.getLastName());
         Assert.assertEquals(user.getEmail(), userCreated.getEmail());

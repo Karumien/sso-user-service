@@ -6,7 +6,7 @@
  */
 package com.karumien.cloud.sso.service;
 
-import com.karumien.cloud.sso.api.model.VersionInfoDTO;
+import com.karumien.cloud.sso.api.model.VersionInfo;
 
 /**
  * Service provides informations from Manifest.MF file.
@@ -19,6 +19,6 @@ public interface InfoService {
     String IMPL_TITLE = "Implementation-Title";
     String IMPL_VERSION = "Implementation-Version";
     
-    VersionInfoDTO getVersionInfo();
+    VersionInfo getVersionInfo();
     
 }

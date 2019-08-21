@@ -21,7 +21,7 @@ import lombok.Data;
 
 @Builder
 @Data
-public class VersionInfoDTO {
+public class VersionInfo {
 
     private List<Attributes> attributes;
     

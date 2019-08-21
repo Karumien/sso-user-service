@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
+import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 
 /**
  * Implementation of {@link AuthService} for authentication tokens management.
@@ -96,14 +96,14 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponseDTO loginByUsernamePassword(String username, String password) {
+    public AuthorizationResponse loginByUsernamePassword(String username, String password) {
         TokenManager tokenManager = KeycloakBuilder.builder()
                 .serverUrl(adminServerUrl)
                 .realm(realm).clientId(clientId)
                 .username(username).password(password).build()
                 .tokenManager();
 
-        AuthorizationResponseDTO auth = new AuthorizationResponseDTO();
+        AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
         auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
         auth.setRefreshToken(tokenManager.refreshToken().getToken());
@@ -116,13 +116,13 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponseDTO loginByClientCredentials(String clientId, String clientSecret) {
+    public AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret) {
         TokenManager tokenManager = KeycloakBuilder.builder()
                 .serverUrl(adminServerUrl).realm(realm)
                 .clientId(clientId).clientSecret(clientSecret).build()
                 .tokenManager();
 
-        AuthorizationResponseDTO auth = new AuthorizationResponseDTO();
+        AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
         auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
         auth.setRefreshToken(tokenManager.refreshToken().getToken());
@@ -135,11 +135,11 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponseDTO loginByToken(String refreshToken) {
+    public AuthorizationResponse loginByToken(String refreshToken) {
         TokenManager tokenManager = 
                 Keycloak.getInstance(adminServerUrl, realm, clientId, refreshToken).tokenManager();
 
-        AuthorizationResponseDTO auth = new AuthorizationResponseDTO();
+        AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
         auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
         auth.setRefreshToken(tokenManager.refreshToken().getToken());

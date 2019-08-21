@@ -14,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AuthApi;
-import com.karumien.cloud.sso.api.model.AuthorizationRequestDTO;
-import com.karumien.cloud.sso.api.model.AuthorizationResponseDTO;
-import com.karumien.cloud.sso.api.model.GrantTypeDTO;
+import com.karumien.cloud.sso.api.model.AuthorizationRequest;
+import com.karumien.cloud.sso.api.model.AuthorizationResponse;
+import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.service.AuthService;
 
 import io.swagger.annotations.Api;
@@ -47,12 +47,12 @@ public class AuthController implements AuthApi  {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<AuthorizationResponseDTO> login(@Valid AuthorizationRequestDTO user) {
+    public ResponseEntity<AuthorizationResponse> login(@Valid AuthorizationRequest user) {
         if (user.getGrantType() == null) {
             throw new IllegalArgumentException("grant_type can't be emoty");
         }
         
-        AuthorizationResponseDTO response = null;
+        AuthorizationResponse response = null;
 
         switch (user.getGrantType()) {
         case REFRESH_TOKEN:
@@ -72,9 +72,9 @@ public class AuthController implements AuthApi  {
     }
     
     @Override
-    public ResponseEntity<Void> logout(@Valid AuthorizationRequestDTO user) {
+    public ResponseEntity<Void> logout(@Valid AuthorizationRequest user) {
     
-        if (user.getGrantType() != GrantTypeDTO.REFRESH_TOKEN) {
+        if (user.getGrantType() != GrantType.REFRESH_TOKEN) {
             throw new IllegalArgumentException("Use grant_type refresh_token for logout");
         }
         

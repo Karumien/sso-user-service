@@ -14,9 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.UsersApi;
-import com.karumien.cloud.sso.api.model.CredentialsDTO;
-import com.karumien.cloud.sso.api.model.PolicyDTO;
-import com.karumien.cloud.sso.api.model.UserBaseInfoDTO;
+import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.UserBaseInfo;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.service.UserService;
 
@@ -39,7 +39,7 @@ public class UserController implements UsersApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<UserBaseInfoDTO> createUser(@Valid UserBaseInfoDTO user) {
+    public ResponseEntity<UserBaseInfo> createUser(@Valid UserBaseInfo user) {
         return new ResponseEntity<>(userService.createUser(user), HttpStatus.CREATED);
     }
 
@@ -56,7 +56,7 @@ public class UserController implements UsersApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<PolicyDTO> getPasswordPolicy() {
+    public ResponseEntity<Policy> getPasswordPolicy() {
         return new ResponseEntity<>(userService.getPasswordPolicy(), HttpStatus.OK);
     }
     
@@ -64,7 +64,7 @@ public class UserController implements UsersApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<PolicyDTO> createUserCredentials(String id, @Valid CredentialsDTO credentials) {
+    public ResponseEntity<Policy> createUserCredentials(String id, @Valid Credentials credentials) {
         try {
             userService.createUserCredentials(id, credentials);
         } catch (PolicyPasswordException e) {
@@ -77,7 +77,7 @@ public class UserController implements UsersApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<UserBaseInfoDTO> getUser(String id) {
+    public ResponseEntity<UserBaseInfo> getUser(String id) {
         return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK);
     }
     
