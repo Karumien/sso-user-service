@@ -22,9 +22,9 @@ server:
   servlet:
     contextPath: ${CONTEXT_PATH:/api/v1/sso}
 keycloak:
-  auth-server-url: http://ew-sso-dev.westeurope.cloudapp.azure.com/auth
-  realm: eurowag
-  username: wagadmin
-  password: xara2002
-  client-id: admin-cli
+  auth-server-url: ${KEYCLOAK_AUTH_URL:http://ew-sso-dev.westeurope.cloudapp.azure.com/auth}
+  realm: ${KEYCLOAK_REALM:eurowag}
+  username: ${KEYCLOAK_USER:wagadmin}
+  password: ${KEYCLOAK_PASSWORD:xara2002}
+  client-id: ${KEYCLOAK_CLIENT_ID:admin-cli}
  
