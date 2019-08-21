@@ -21,6 +21,7 @@ public class UnsupportedApiOperationException extends UnsupportedOperationExcept
     private static final long serialVersionUID = 1L;
 
     public UnsupportedApiOperationException() {
+        super("Not implemented now.");
     }
 
     public UnsupportedApiOperationException(String message) {

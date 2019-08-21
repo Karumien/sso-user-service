@@ -87,7 +87,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public void logoutByToken(String token) {
-        throw new UnsupportedApiOperationException("Not implemented now.");
+        throw new UnsupportedApiOperationException();
     }
 
     /**
@@ -133,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponseDTO loginByToken(String refreshToken) {
-        throw new UnsupportedOperationException("Not implemented now.");
+        throw new UnsupportedApiOperationException();
     }
 
 }
