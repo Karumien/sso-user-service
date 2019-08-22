@@ -62,4 +62,20 @@ public interface UserService {
      * @return {@link UserBaseInfo}
      */
     UserBaseInfo getUser(String id);
+
+    /**
+     * Impersonate user by specified {@code id}.
+     * 
+     * @param id
+     *            unique user id
+     */
+    void impersonateUser(String id);
+
+    /**
+     * Logout all sessions of user by specified {@code id}.
+     * 
+     * @param id
+     *            unique user id
+     */
+    void logoutUser(String id);
 }

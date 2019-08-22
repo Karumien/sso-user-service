@@ -81,4 +81,22 @@ public class UserController implements UsersApi {
         return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> impersonateUser(String id) {
+        userService.impersonateUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> logoutUser(String id) {
+        userService.logoutUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
 }

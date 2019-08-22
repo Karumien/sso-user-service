@@ -103,7 +103,39 @@ paths:
         '406':
           description: Can't create user's credentials - becase Policy Settings    
           schema:
-            $ref: '#/definitions/Policy'      
+            $ref: '#/definitions/Policy'
+  /users/{id}/impersonate:
+    post:
+      summary: "Impersonate user"
+      description: "Method for impersonation of specified user"
+      operationId: "impersonateUser"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by User Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: "User has been impersonated"
+        '404':
+          description: User Not found
+  /users/{id}/logout:
+    post:
+      summary: "Logout user's session"
+      description: "Method for imersonation of specified user"
+      operationId: "logoutUser"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by User Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: "User has been logged out of all sessions"
+        '404':
+          description: User Not found
   /users/password/policy:
     get:
       summary: "Returns Password Policy for users"

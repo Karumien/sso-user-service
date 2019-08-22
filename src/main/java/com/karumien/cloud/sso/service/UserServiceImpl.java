@@ -56,23 +56,24 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserBaseInfo createUser(@Valid UserBaseInfo userBaseInfo) {
-        
+
         UserRepresentation user = new UserRepresentation();
         user.setUsername(Optional.ofNullable(userBaseInfo.getUsername()).orElse(userBaseInfo.getEmail()));
         user.setFirstName(userBaseInfo.getFirstName());
         user.setLastName(userBaseInfo.getLastName());
         user.setId(userBaseInfo.getId());
-        
+
         // TODO: extract email as new method
         user.setEmail(userBaseInfo.getEmail());
         // TODO: user.setEmailVerified(emailVerified);
         user.setEnabled(true);
 
+
         // user.singleAttribute("customAttribute", "customAttribute");
         // user.setCredentials(Arrays.asList(credential));
 
         Response response = keycloak.realm(realm).users().create(user);
-        
+
         userBaseInfo.setId(getCreatedId(response));
         userBaseInfo.setUsername(user.getUsername());
 
@@ -106,7 +107,7 @@ public class UserServiceImpl implements UserService {
     public Policy getPasswordPolicy() {
 
         String policyDescription = keycloak.realm(realm).toRepresentation().getPasswordPolicy();
-        
+
         Policy policy = new Policy();
         policy.setValue(policyDescription);
         policy.setHashAlgorithm(extract("hashAlgorithm", policyDescription, String.class));
@@ -128,7 +129,7 @@ public class UserServiceImpl implements UserService {
         policy.setRegexPattern(extract("regexPattern", policyDescription, String.class));
         policy.setPasswordExpireDays(extract("forceExpiredPasswordChange", policyDescription, Integer.class));
         policy.setMinLength(extract("length", policyDescription, Integer.class));
-        
+
         return policy;
     }
 
@@ -138,14 +139,14 @@ public class UserServiceImpl implements UserService {
         if (policyDescription == null || !policyDescription.contains(code)) {
             return null;
         }
-        
+
         String extractedValue = policyDescription.substring(policyDescription.indexOf(code) + code.length() + 1);
         extractedValue = extractedValue.substring(0, extractedValue.indexOf(")"));
-        
+
         if (Integer.class.equals(clazz)) {
             return (T) Integer.valueOf(extractedValue);
         }
-        
+
         return (T) extractedValue;
     }
 
@@ -178,7 +179,7 @@ public class UserServiceImpl implements UserService {
 
         UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(id)).orElseThrow(() -> new UserNotFoundException(id));
         UserRepresentation userRepresentation = userResource.toRepresentation();
-        
+
         // TODO: Orica Mapper
         UserBaseInfo user = new UserBaseInfo();
         user.setId(userRepresentation.getId());
@@ -186,8 +187,26 @@ public class UserServiceImpl implements UserService {
         user.setLastName(userRepresentation.getLastName());
         user.setUsername(userRepresentation.getUsername());
         user.setEmail(userRepresentation.getEmail());
-                
+
         return user;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void impersonateUser(String id) {
+        Optional.ofNullable(keycloak.realm(realm).users().get(id))
+            .orElseThrow(() -> new UserNotFoundException(id)).impersonate();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void logoutUser(String id) {
+        Optional.ofNullable(keycloak.realm(realm).users().get(id))
+            .orElseThrow(() -> new UserNotFoundException(id)).logout();
     }
 
 }
