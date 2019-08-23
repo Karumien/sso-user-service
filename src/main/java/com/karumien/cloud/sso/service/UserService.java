@@ -78,4 +78,13 @@ public interface UserService {
      *            unique user id
      */
     void logoutUser(String id);
+
+    /**
+     * Check exist user by username.
+     * 
+     * @param username
+     *            username for serach
+     * @return boolean {@code true} when user with given username exists
+     */
+    boolean isUserExists(String username);
 }

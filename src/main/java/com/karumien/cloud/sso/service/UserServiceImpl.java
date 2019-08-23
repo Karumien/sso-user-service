@@ -209,4 +209,12 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new UserNotFoundException(id)).logout();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isUserExists(String username) {
+        return !keycloak.realm(realm).users().search(username).isEmpty();
+    }
+    
 }
