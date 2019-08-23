@@ -8,12 +8,14 @@ package com.karumien.cloud.sso.api;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.RolesApi;
 import com.karumien.cloud.sso.api.model.RoleBaseInfo;
-import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
+import com.karumien.cloud.sso.service.RoleService;
 
 import io.swagger.annotations.Api;
 
@@ -27,12 +29,15 @@ import io.swagger.annotations.Api;
 @Api(value = "Role Service", description = "REST API for Role Service", tags = { "Role Service" })
 public class RoleController implements RolesApi {   
     
+	@Autowired
+    private RoleService roleService;
+	
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<RoleBaseInfo> createRole(@Valid RoleBaseInfo role) {
-        throw new UnsupportedApiOperationException();
+        return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
     }
     
     /**
@@ -40,7 +45,8 @@ public class RoleController implements RolesApi {
      */
     @Override
     public ResponseEntity<Void> deleteRole(String id) {
-        throw new UnsupportedApiOperationException();
+    	roleService.deleteRole(); 
+    	return new ResponseEntity<>(HttpStatus.OK);
     }
     
     /**
@@ -48,6 +54,6 @@ public class RoleController implements RolesApi {
      */
     @Override
     public ResponseEntity<RoleBaseInfo> getRole(String id) {
-        throw new UnsupportedApiOperationException();
+    	return new ResponseEntity<>(roleService.getRoleBaseOnId(id), HttpStatus.OK);
     }
 }
