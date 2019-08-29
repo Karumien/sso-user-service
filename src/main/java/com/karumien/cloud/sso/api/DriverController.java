@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.DriversApi;
-import com.karumien.cloud.sso.api.model.DriverBaseInfo;
-import com.karumien.cloud.sso.api.model.DriverPIN;
+import com.karumien.cloud.sso.api.model.DriverInfo;
+import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 
 import io.swagger.annotations.Api;
@@ -32,7 +32,7 @@ public class DriverController implements DriversApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<DriverBaseInfo> createDriver(@Valid DriverBaseInfo driver) {
+    public ResponseEntity<DriverInfo> createDriver(@Valid DriverInfo driver) {
         throw new UnsupportedApiOperationException();
     }
     
@@ -40,7 +40,7 @@ public class DriverController implements DriversApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createDriverPIN(String id, @Valid DriverPIN pin) {
+    public ResponseEntity<Void> createDriverPin(String id, @Valid DriverPin pin) {
         throw new UnsupportedApiOperationException();
     }
     

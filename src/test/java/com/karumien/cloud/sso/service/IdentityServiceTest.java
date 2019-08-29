@@ -14,38 +14,41 @@
 package com.karumien.cloud.sso.service;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.karumien.cloud.sso.api.model.UserBaseInfo;
-import com.karumien.cloud.sso.service.UserService;
+import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.service.IdentityService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class UserServiceTest {
+@Ignore
+public class IdentityServiceTest {
 
     @Autowired
-    private UserService userService;
+    private IdentityService userService;
 
     @Test
     public void createAccount() throws Exception {
         
-        UserBaseInfo user = new UserBaseInfo();
-        user.setFirstName("Ladislav");
-        user.setLastName("Stary");
-        user.setEmail("stary@seznam.cz");
+        IdentityInfo identity = new IdentityInfo();
+        identity.setCrmContactId("CRM00001");
+        identity.setFirstName("Ladislav");
+        identity.setLastName("Stary");
+        identity.setEmail("stary@seznam.cz");
         
-        UserBaseInfo userCreated = userService.createUser(user);
-        Assert.assertEquals(user.getFirstName(), userCreated.getFirstName());
-        Assert.assertEquals(user.getLastName(), userCreated.getLastName());
-        Assert.assertEquals(user.getEmail(), userCreated.getEmail());
-        Assert.assertNotNull(userCreated.getId());
+        IdentityInfo userCreated = userService.createIdentity(identity);
+        Assert.assertEquals(identity.getFirstName(), userCreated.getFirstName());
+        Assert.assertEquals(identity.getLastName(), userCreated.getLastName());
+        Assert.assertEquals(identity.getEmail(), userCreated.getEmail());
+        Assert.assertNotNull(userCreated.getCrmContactId());
         Assert.assertNotNull(userCreated.getUsername());
         Assert.assertEquals(userCreated.getEmail(), userCreated.getUsername());
         
-        userService.deleteUser(user.getId());
+        userService.deleteIdentity(identity.getCrmContactId());
     }
 }

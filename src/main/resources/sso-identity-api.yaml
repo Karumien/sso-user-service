@@ -1,29 +1,29 @@
 swagger: '2.0'
 info:
-  description: REST API for SSO User Service
+  description: EW REST API for SSO - Identity Service
   version: '1.0'
   termsOfService: 'http://www.karumien.com/terms/'
-  contact:
+  Identity:
     email: info@karumien.com
-  title: User Service
+  title: Identity Service
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-basePath: /api/v1/sso
+basePath: /api/v1/iam
 schemes:
   - http
 paths:
-  /users:
+  /identities:
     post:
-      summary: Create user
-      description: Create user in target SSO
-      operationId: createUser
+      summary: Create Identity
+      description: Create Identity in target SSO
+      operationId: createIdentity
       parameters:
         - in: body
-          name: user
-          description: The user to create
+          name: identity
+          description: The Identity to create
           schema:
-            $ref: '#/definitions/UserBaseInfo'
+            $ref: '#/definitions/IdentityInfo'
             example:
               lastName: Novak
               firstName: Karel
@@ -33,59 +33,59 @@ paths:
         '201':
           description: Successfully created
           schema:
-            $ref: '#/definitions/UserBaseInfo'
+            $ref: '#/definitions/IdentityInfo'
             example:
-              id: 6287994b-0245-4ca7-8eb4-777230b2f91f
+              crmContactId: 6287994b-0245-4ca7-8eb4-777230b2f91f
               lastName: Novak
               firstName: Karel
               username: KajaN
               email: KajaN@eurowag.com
-  /users/{id}:
+  /identities/{crmContactId}:
     get:
-      summary: "Get detail of the given user"
-      description: "Method returns detail information about user."
-      operationId: "getUser"
+      summary: "Get detail of the given Identity"
+      description: "Method returns detail information about Identity."
+      operationId: getIdentity
       parameters:
-        - name: id
+        - name: crmContactId
           in: path
-          description: Filtering by User Unique ID
+          description: Filtering by Identity unique CRM ID
           required: true
           type: string       
       responses:
         '200':
-          description: Successfully returned user's info
+          description: Successfully returned Identity's info
           schema:
-            $ref: '#/definitions/UserBaseInfo'
+            $ref: '#/definitions/IdentityInfo'
         '404':
           description: Not found
     delete:
-      summary: "Remove existing user"
-      operationId: "deleteUser"
+      summary: "Remove existing Identity"
+      operationId: deleteIdentity
       parameters:
         - name: id
           in: path
-          description: Filtering by User Unique ID
+          description: Filtering by Identity Unique ID
           required: true
           type: string       
       responses:
         '200':
-          description: Successfully removed existing user
+          description: Successfully removed existing Identity
         '404':
-          description: User Not found
-  /users/{id}/credentials:
+          description: Identity Not found
+  /identities/{crmContactId}/credentials:
     post:
-      summary: "Create user credentials"
-      description: "Method to create user credentials for given customer"
-      operationId: "createUserCredentials"
+      summary: "Create Identity credentials"
+      description: "Method to create Identity credentials for given customer"
+      operationId: createIdentityCredentials
       parameters:
-        - name: id
+        - name: crmContactId
           in: path
-          description: Filtering by User Unique ID
+          description: Filtering by Identity unique CRM ID
           required: true
           type: string       
         - in: body
           name: credentials
-          description: The Credentials for user to create/change
+          description: The Credentials for Identity to create/change
           schema:
             $ref: '#/definitions/Credentials'
             example:
@@ -93,53 +93,53 @@ paths:
               password: "#123456."
       responses:
         '201':
-          description: "User creadentials has been created"
+          description: "Identity creadentials has been created"
           schema:
             $ref: '#/definitions/Policy'      
         '404':
-          description: User Not found
+          description: Identity Not found
           schema:
             $ref: '#/definitions/Policy'      
         '406':
-          description: Can't create user's credentials - becase Policy Settings    
+          description: Can't create Identity's credentials - becase Policy Settings    
           schema:
             $ref: '#/definitions/Policy'
-  /users/{id}/impersonate:
+  /identities/{crmContactId}/impersonate:
     post:
-      summary: "Impersonate user"
-      description: "Method for impersonation of specified user"
-      operationId: "impersonateUser"
+      summary: "Impersonate Identity"
+      description: "Method for impersonation of specified Identity"
+      operationId: "impersonateIdentity"
       parameters:
-        - name: id
+        - name: crmContactId
           in: path
-          description: Filtering by User Unique ID
+          description: Filtering by Identity unique CRM ID
           required: true
           type: string       
       responses:
         '200':
-          description: "User has been impersonated"
+          description: "Identity has been impersonated"
         '404':
-          description: User Not found
-  /users/{id}/logout:
+          description: Identity Not found
+  /identities/{crmContactId}/logout:
     post:
-      summary: "Logout user's session"
-      description: "Method for imersonation of specified user"
-      operationId: "logoutUser"
+      summary: "Logout Identity's session"
+      description: "Method for logout session of specified Identity"
+      operationId: "logoutIdentity"
       parameters:
-        - name: id
+        - name: icrmContactId
           in: path
-          description: Filtering by User Unique ID
+          description: Filtering by Identity unique CRM ID
           required: true
           type: string       
       responses:
         '200':
-          description: "User has been logged out of all sessions"
+          description: "Identity has been logged out of all sessions"
         '404':
-          description: User Not found
-  /users/password/policy:
+          description: Identity Not found
+  /identities/password/policy:
     get:
-      summary: "Returns Password Policy for users"
-      description: "Method for get user's password policy"
+      summary: "Returns Password Policy for Identities"
+      description: "Method for get Identity's password policy"
       operationId: "getPasswordPolicy"
       responses:
         '200':
@@ -147,24 +147,23 @@ paths:
           schema:
             $ref: '#/definitions/Policy'      
 definitions:
-  UserBaseInfo:
+  IdentityInfo:
     type: object
-    description: "Basic information about User"
+    description: "Basic information about Identity"
     required:
-      - lastName
-      - firstName
-      - email
+      - crmContactId
+      - username
     properties:
-      id:
+      crmContactId:
         type: string
-        description: User's Unique ID 
+        description: Identity's Unique ID 
       lastName:
         type: string
-        description: "Last name/ surname of the contact"
+        description: "Last name/ surname of the Identity"
         maxLength: 50
       firstName:
         type: string
-        description: "First name of the contact"
+        description: "First name of the Identity"
         maxLength: 50
       username:
         type: string
@@ -172,17 +171,25 @@ definitions:
         maxLength: 50
       email:
         type: string
-        description: "Primary email (used for username if empty)"
+        description: "Primary email used primary for password reset"
+        maxLength: 100
+      phone:
+        type: string
+        description: "Phone used primary for OTP"
+        maxLength: 30
+      contactEmail:
+        type: string
+        description: "Contact email - can be company global"
         maxLength: 100
     example:
-      id: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      crmContactId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       lastName: Novak
       firstName: Karel
       username: KajaN
       email: KajaN@eurowag.com
   Credentials:
     type: object
-    description: "Object for setting of user credential"
+    description: "Object for setting of Identity credential"
     properties:
       temporary:
         type: boolean

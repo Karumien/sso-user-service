@@ -28,10 +28,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         
-        <user-api-swagger.input>src/main/resources/sso-user-api.yaml</user-api-swagger.input>
+        <user-api-swagger.input>src/main/resources/sso-identity-api.yaml</user-api-swagger.input>
         <auth-api-swagger.input>src/main/resources/sso-auth-api.yaml</auth-api-swagger.input>
         <role-api-swagger.input>src/main/resources/sso-role-api.yaml</role-api-swagger.input>
-        <customer-api-swagger.input>src/main/resources/sso-customer-api.yaml</customer-api-swagger.input>
+        <customer-api-swagger.input>src/main/resources/sso-account-api.yaml</customer-api-swagger.input>
         <driver-api-swagger.input>src/main/resources/sso-driver-api.yaml</driver-api-swagger.input>
         <swagger.package>com.karumien.cloud.sso.api</swagger.package>
         

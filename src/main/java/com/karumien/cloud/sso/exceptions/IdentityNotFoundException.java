@@ -10,18 +10,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Exception User exists - {@link HttpStatus#CONFLICT} - duplicate code.
+ * Exception when no ClientSystem exists - {@link HttpStatus#SC_NOT_FOUND}.
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 10. 6. 2019 13:56:31
  */
-@ResponseStatus(HttpStatus.CONFLICT)
-public class UserDuplicateException extends RuntimeException {
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class IdentityNotFoundException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;
 
-    public UserDuplicateException(String code) {
-        super("User's username exists: " + code);
+    public IdentityNotFoundException(String code) {
+        super("User not found: " + code);
     }
     
 }

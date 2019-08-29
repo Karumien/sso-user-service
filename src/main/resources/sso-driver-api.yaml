@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: REST API for SSO Driver Service
+  description: EW REST API for SSO - Driver Service
   version: '1.0'
   termsOfService: 'http://www.karumien.com/terms/'
   contact:
@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-basePath: /api/v1/sso
+basePath: /api/v1/iam
 schemes:
   - http
 paths:
@@ -23,7 +23,7 @@ paths:
           name: Driver
           description: The Driver to create
           schema:
-            $ref: '#/definitions/DriverBaseInfo'
+            $ref: '#/definitions/DriverInfo'
             example:
               lastName: Novak
               firstName: Karel
@@ -33,7 +33,7 @@ paths:
         '201':
           description: Successfully created
           schema:
-            $ref: '#/definitions/DriverBaseInfo'
+            $ref: '#/definitions/DriverInfo'
             example:
               id: 6287994b-0245-4ca7-8eb4-777230b2f91f
               lastName: Novak
@@ -55,7 +55,7 @@ paths:
         '200':
           description: Successfully returned Driver's info
           schema:
-            $ref: '#/definitions/DriverBaseInfo'
+            $ref: '#/definitions/DriverInfo'
         '404':
           description: Not found
     delete:
@@ -76,7 +76,7 @@ paths:
     post:
       summary: "Create/Reset Driver PIN"
       description: "Method to create/reset driver's PIN for given driver"
-      operationId: "createDriverPIN"
+      operationId: "createDriverPin"
       parameters:
         - name: id
           in: path
@@ -87,7 +87,7 @@ paths:
           name: pin
           description: PIN for Driver to create/change
           schema:
-            $ref: '#/definitions/DriverPIN'
+            $ref: '#/definitions/DriverPin'
             example:
               pin: "1234"
       responses:
@@ -98,7 +98,7 @@ paths:
         '406':
           description: Can't create/update Driver's PIN      
 definitions:
-  DriverBaseInfo:
+  DriverInfo:
     type: object
     description: "Basic information about Driver"
     required:
@@ -132,7 +132,7 @@ definitions:
       firstName: Karel
       Drivername: KajaN
       email: KajaN@eurowag.com
-  DriverPIN:
+  DriverPin:
     type: object
     description: "Driver's PIN Definition"
     properties:

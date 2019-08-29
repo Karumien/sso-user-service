@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: REST API for SSO Role Service
+  description: EW REST API for SSO - Role Service
   version: '1.0'
   termsOfService: 'http://www.karumien.com/terms/'
   contact:
@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-basePath: /api/v1/sso
+basePath: /api/v1/iam
 schemes:
   - http
 paths:

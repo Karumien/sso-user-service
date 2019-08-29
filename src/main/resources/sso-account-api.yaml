@@ -1,0 +1,87 @@
+swagger: '2.0'
+info:
+  description: EW REST API for SSO - Account Service
+  version: '1.0'
+  termsOfService: 'http://www.karumien.com/terms/'
+  contact:
+    email: info@karumien.com
+  title: Account Service
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /api/v1/iam
+schemes:
+  - http
+paths:
+  /accounts:
+    post:
+      summary: Create Account (Customer)
+      description: Create Account in target SSO
+      operationId: createAccount
+      parameters:
+        - in: body
+          name: Account
+          description: The Account to create
+          schema:
+            $ref: '#/definitions/AccountInfo'
+      responses:
+        '201':
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/AccountInfo'
+  /accounts/{id}:
+    get:
+      summary: "Get detail of the given Account"
+      description: "Method returns detail information about Account."
+      operationId: "getAccount"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by Account Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Account's info
+          schema:
+            $ref: '#/definitions/AccountInfo'
+        '404':
+          description: Not found
+    delete:
+      summary: "Remove existing Account"
+      operationId: "deleteAccount"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by Account Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully removed existing Account
+        '404':
+          description: Account Not found
+definitions:
+  AccountInfo:
+    type: object
+    description: "Basic information about Account"
+    required:
+      - name
+      - compRegNo
+    properties:
+      id:
+        type: string
+        description: Account Unique ID 
+      name:
+        type: string
+        description: "Account name"
+        maxLength: 50
+      compRegNo:
+        type: string
+        maxLength: 20
+        description: Account Registration Number
+    example:
+      id: fd65248c-f3aa-4310-8fcf-91eacdd324xx
+      name: Some s.r.o.
+      compRegNo: 6484605
+      
