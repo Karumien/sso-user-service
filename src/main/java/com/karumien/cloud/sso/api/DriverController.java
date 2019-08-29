@@ -8,13 +8,15 @@ package com.karumien.cloud.sso.api;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.DriversApi;
 import com.karumien.cloud.sso.api.model.DriverInfo;
 import com.karumien.cloud.sso.api.model.DriverPin;
-import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
+import com.karumien.cloud.sso.service.DriverService;
 
 import io.swagger.annotations.Api;
 
@@ -28,12 +30,15 @@ import io.swagger.annotations.Api;
 @Api(value = "Driver Service", description = "REST API for Driver Service", tags = { "Driver Service" })
 public class DriverController implements DriversApi {   
     
+	@Autowired
+	private DriverService driverService;
+	
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<DriverInfo> createDriver(@Valid DriverInfo driver) {
-        throw new UnsupportedApiOperationException();
+        return new ResponseEntity<>(driverService.createDriver(driver), HttpStatus.CREATED);
     }
     
     /**
@@ -41,7 +46,8 @@ public class DriverController implements DriversApi {
      */
     @Override
     public ResponseEntity<Void> createDriverPin(String id, @Valid DriverPin pin) {
-        throw new UnsupportedApiOperationException();
+        driverService.createPinForTheDriver(id, pin);
+    	return new ResponseEntity<Void>(HttpStatus.OK);
     }
     
     /**
@@ -49,7 +55,8 @@ public class DriverController implements DriversApi {
      */
     @Override
     public ResponseEntity<Void> deleteDriver(String id) {
-        throw new UnsupportedApiOperationException();
+    	driverService.deleteDriverUser(id);
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
     
 }

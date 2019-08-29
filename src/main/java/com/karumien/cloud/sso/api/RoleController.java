@@ -45,7 +45,7 @@ public class RoleController implements RolesApi {
      */
     @Override
     public ResponseEntity<Void> deleteRole(String id) {
-    	roleService.deleteRole(); 
+    	roleService.deleteRole(id); 
     	return new ResponseEntity<>(HttpStatus.OK);
     }
     
