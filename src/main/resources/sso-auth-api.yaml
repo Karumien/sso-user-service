@@ -13,7 +13,7 @@ basePath: /api/v1/iam
 schemes:
   - http
 paths:
-  /auth/public_key:
+  /auth/publicKey:
     get:
       summary: Retrieve Realm PublicKey
       operationId: publicKey

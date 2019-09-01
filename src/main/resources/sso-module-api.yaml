@@ -1,0 +1,105 @@
+swagger: '2.0'
+info:
+  description: EW REST API for SSO - Module Service - Management of Modules (Licences)
+  version: '1.0'
+  termsOfService: 'http://www.karumien.com/terms/'
+  contact:
+    email: info@karumien.com
+  title: Module Service
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /api/v1/iam
+schemes:
+  - http
+paths:
+  /modules:
+    post:
+      summary: Create Module
+      description: Create Module in target SSO
+      operationId: createModule
+      parameters:
+        - in: body
+          name: Module
+          description: The Module to Create
+          schema:
+            $ref: '#/definitions/ModuleInfo'
+      responses:
+        '201':
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/ModuleInfo'
+    get:
+      summary: "Get all known Modules"
+      operationId: "getModules"
+      responses:
+        '200':
+          description: Successfully returned Module's Info
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ModuleInfo'
+  /modules/{moduleId}:
+    get:
+      summary: "Get detail of the given Module"
+      description: "Method returns detail information about Module."
+      operationId: "getModule"
+      parameters:
+        - name: moduleId
+          in: path
+          description: Filtering by Module Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Module's Info
+          schema:
+            $ref: '#/definitions/ModuleInfo'
+        '404':
+          description: Not found
+    put:
+      summary: "Update informations about module"
+      operationId: "updateModule"
+      parameters:
+        - name: moduleId
+          in: path
+          description: Filtering by Module Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully updated Module's Info
+          schema:
+            $ref: '#/definitions/ModuleInfo'
+        '404':
+          description: Not found
+    delete:
+      summary: "Remove existing Module"
+      operationId: "deleteModule"
+      parameters:
+        - name: moduleId
+          in: path
+          description: Filtering by Module Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully removed existing Module
+        '404':
+          description: Module Not found
+definitions:
+  ModuleInfo:
+    type: object
+    description: "Basic information about Module"
+    required:
+      - moduleId
+    properties:
+      moduleId:
+        type: string
+        example: "MODULE_TLM01"
+        maxLength: 40
+      description:
+        type: string
+        example: "Map"
+        maxLength: 300
+        

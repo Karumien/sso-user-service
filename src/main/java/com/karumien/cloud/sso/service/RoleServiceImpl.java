@@ -16,9 +16,13 @@ package com.karumien.cloud.sso.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
+import javax.ws.rs.NotFoundException;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -26,7 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.karumien.cloud.sso.api.model.RoleBaseInfo;
+import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.RoleNotFoundException;
 
 /**
  * Implementation {@link RuleService} for identity management.
@@ -51,55 +56,83 @@ public class RoleServiceImpl implements RoleService{
      * {@inheritDoc}
      */
 	@Override
-	public RoleBaseInfo createRole(RoleBaseInfo role) {
-		RoleRepresentation roleRepresentation = new RoleRepresentation();
-		roleRepresentation.setDescription(role.getDescription());
-		roleRepresentation.setName(role.getName());
-		keycloak.realm(realm).users().get(role.getClientId()).roles().realmLevel().add(Arrays.asList(roleRepresentation));
-		return getRoleBaseOnId(role.getName());
-	}
+	public RoleInfo createRole(RoleInfo role) {
 
-	/**
-     * {@inheritDoc}
-     */
-	@Override
-	public void deleteRole(String id) {
-		RoleBaseInfo role = getRoleBaseOnId(id);
-		RoleRepresentation roleRepresentation = new RoleRepresentation();
+	    RoleRepresentation roleRepresentation = new RoleRepresentation();
 		roleRepresentation.setDescription(role.getDescription());
-		roleRepresentation.setName(role.getName());
-		roleRepresentation.setId(role.getId());
-		keycloak.realm(realm).users().get(role.getClientId()).roles().realmLevel().remove(Arrays.asList(roleRepresentation));
-	}
-
-	/**
-     * {@inheritDoc}
-     */
-	@Override
-	public RoleBaseInfo getRoleBaseOnId(String roleId) {
-		RealmResource realmResource = keycloak.realm(realm);
-		RoleRepresentation userClientRole = realmResource.clients().get(clientId) 
-				.roles().get(roleId).toRepresentation();
+		roleRepresentation.setName(role.getRoleId());
 		
-		return transformRoleToBaseRole(userClientRole);
+		if (Boolean.TRUE.equals(role.isClientRole())) {
+		    //TODO: Viliam Litavec
+	        // users().get(role.getClientId()).roles().realmLevel().add(Arrays.asList(roleRepresentation));	    
+		} else {
+		    keycloak.realm(realm).roles().create(roleRepresentation); 
+		}
+
+		return getRoleBaseOnId(role.getRoleId());
 	}
 
 	/**
      * {@inheritDoc}
      */
 	@Override
-	public void assigneRoleToClient(String userId, RoleBaseInfo role) {
+	public void deleteRole(String roleId) {
+	    try {
+	        keycloak.realm(realm).roles().deleteRole(roleId);
+	    } catch (NotFoundException e) {
+            throw new RoleNotFoundException(roleId);
+        }
+//	    
+//	    
+//	    RoleInfo role = getRoleBaseOnId(id);
+//		
+//		RoleRepresentation roleRepresentation = new RoleRepresentation();
+//		roleRepresentation.setDescription(role.getDescription());
+//		roleRepresentation.setName(role.getName());
+//		roleRepresentation.setId(role.getId());
+//		
+//		keycloak.realm(realm).users().get(role.getClientId()).roles().realmLevel().remove(Arrays.asList(roleRepresentation));
+	}
+
+	/**
+     * {@inheritDoc}
+     */
+	@Override
+	public RoleInfo getRoleBaseOnId(String roleId) {
+	    return transformRoleToBaseRole(findRole(roleId).orElseThrow(() -> new RoleNotFoundException(roleId))
+	            .toRepresentation());
+//		RoleRepresentation userClientRole = realmResource.clients().get(clientId) 
+//				.roles().get(roleId).toRepresentation();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+	public Optional<RoleResource> findRole(String roleId) {
+        try {
+            return Optional.of(keycloak.realm(realm).roles().get(roleId));
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
+	
+	/**
+     * {@inheritDoc}
+     */
+	@Override
+	public void assigneRoleToClient(String crmContactId, RoleInfo role) {
 		RealmResource realmResource = keycloak.realm(realm);
 		UsersResource userRessource = realmResource.users();
 
-		RoleRepresentation realmRole = realmResource.roles().get(role.getName()).toRepresentation();
-		userRessource.get(userId).roles().realmLevel() //
+		RoleRepresentation realmRole = realmResource.roles().get(role.getRoleId()).toRepresentation();
+		userRessource.get(crmContactId).roles().realmLevel() //
 		.add(Arrays.asList(realmRole));
 	}
 
 	@Override
-	public List<RoleBaseInfo> getAllRoleForUser(String user_id) {
-		List<RoleBaseInfo> listOfRoles = new ArrayList<>();
+	public List<RoleInfo> getAllRoleForUser(String crmContactId) {
+		List<RoleInfo> listOfRoles = new ArrayList<>();
 		
 		RealmResource realmResource = keycloak.realm(realm);
 		RolesResource userRoles = realmResource.clients().get(clientId).roles();	
@@ -110,23 +143,24 @@ public class RoleServiceImpl implements RoleService{
 	}
 
 	/**
-	 * Funtion to remap {@link RoleRepresentation} to {@link RoleBaseInfo}
-	 * @param userClientRole {@link RoleRepresentation} 
-	 * @return {@link RoleBaseInfo}
+	 * Funtion to remap {@link RoleRepresentation} to {@link RoleInfo}
+	 * @param role {@link RoleRepresentation} 
+	 * @return {@link RoleInfo}
 	 */
 	
-	private RoleBaseInfo transformRoleToBaseRole(RoleRepresentation userClientRole) {
-		RoleBaseInfo role = new RoleBaseInfo();
-		role.setName(userClientRole.getName());
-		role.setDescription(userClientRole.getDescription());
-		role.setId(userClientRole.getId());
-		return role;
+	private RoleInfo transformRoleToBaseRole(RoleRepresentation role) {
+		RoleInfo roleInfo = new RoleInfo();
+		roleInfo.setRoleId(role.getName());
+		roleInfo.setDescription(role.getDescription());
+		//role.setId(userClientRole.getId());
+		return roleInfo;
 	}
 
 	@Override
-	public void deleteRoleForUser(String userId, String role_id) {
-		RoleBaseInfo role = getRoleBaseOnId(role_id);
-		keycloak.realm(realm).users().get(userId).roles().realmLevel().remove(Arrays.asList(keycloak.realm(realm).roles().get(role.getName()).toRepresentation()));
+	public void deleteRoleForUser(String crmContactId, String roleId) {
+		RoleInfo role = getRoleBaseOnId(roleId);
+		keycloak.realm(realm).users().get(crmContactId).roles().realmLevel()
+		    .remove(Arrays.asList(keycloak.realm(realm).roles().get(role.getRoleId()).toRepresentation()));
 	}
 	
 }

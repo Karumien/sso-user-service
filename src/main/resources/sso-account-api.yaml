@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: EW REST API for SSO - Account Service
+  description: EW REST API for SSO - Account Service - Management of Accounts (Customers)
   version: '1.0'
   termsOfService: 'http://www.karumien.com/terms/'
   contact:
@@ -14,8 +14,18 @@ schemes:
   - http
 paths:
   /accounts:
+    get:
+      summary: "Get known Accounts"
+      operationId: "getAccounts"
+      responses:
+        '200':
+          description: Successfully found Accounts
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AccountInfo'
     post:
-      summary: Create Account (Customer)
+      summary: Create Account 
       description: Create Account in target SSO
       operationId: createAccount
       parameters:
@@ -29,15 +39,15 @@ paths:
           description: Successfully created
           schema:
             $ref: '#/definitions/AccountInfo'
-  /accounts/{id}:
+  /accounts/{crmAccountId}:
     get:
       summary: "Get detail of the given Account"
       description: "Method returns detail information about Account."
       operationId: "getAccount"
       parameters:
-        - name: id
+        - name: crmAccountId
           in: path
-          description: Filtering by Account Unique ID
+          description: Filtering by Account CRM ID
           required: true
           type: string       
       responses:
@@ -51,9 +61,9 @@ paths:
       summary: "Remove existing Account"
       operationId: "deleteAccount"
       parameters:
-        - name: id
+        - name: crmAccountId
           in: path
-          description: Filtering by Account Unique ID
+          description: Filtering by Account CRM ID
           required: true
           type: string       
       responses:
@@ -61,27 +71,170 @@ paths:
           description: Successfully removed existing Account
         '404':
           description: Account Not found
+  /accounts/{crmAccountId}/modules:
+    get:
+      summary: "Get Active Modules on Account"
+      operationId: "getAccountModules"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string   
+      responses:
+        '200':
+          description: Account's activated modules
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ModuleInfo'
+        '404':
+          description: Account Not Found
+    put:
+      summary: "Activate Modules on Account"
+      operationId: "activateAccountModules"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: modules
+          description: List of Module's ID to activate
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '202':
+          description: Successfully Activated Modules on Account
+        '404':
+          description: Account Not found
+    delete:
+      summary: "Deactivate Modules on Account"
+      operationId: "deactivateAccountModules"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: modules
+          description: List of Module's ID to activate
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '202':
+          description: Successfully deactivated Modules on Account
+        '404':
+          description: Account Not found
+  /accounts/{crmAccountId}/modules/{moduleId}:
+    get:
+      summary: "Get Active Module on Account"
+      operationId: "getAccountModule"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string   
+        - name: moduleId
+          in: path
+          description: Filtering by Module ID
+          required: true
+          type: string   
+      responses:
+        '202':
+          description: Succesfully Activated Module on Account
+        '404':
+          description: Account not found
+        '406':
+          description: Module not Activated
+    put:
+      summary: "Activate Module on Account"
+      operationId: "activateAccountModule"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string       
+        - name: moduleId
+          in: path
+          description: Filtering by Module ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully activated Module on Account
+        '404':
+          description: Account not found
+        '406':
+          description: Module not activated
+    delete:
+      summary: "Deactivate Module on Account"
+      operationId: "deactivateAccountModule"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string       
+        - name: moduleId
+          in: path
+          description: Filtering by Module ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully deactivated Module on Account
+        '404':
+          description: Account not found
+        '406':
+          description: Module not deactivated
 definitions:
   AccountInfo:
     type: object
     description: "Basic information about Account"
     required:
+      - crmAccountId
       - name
-      - compRegNo
     properties:
-      id:
+      crmAccountId:
         type: string
-        description: Account Unique ID 
+        description: Account CRM ID 
       name:
         type: string
-        description: "Account name"
-        maxLength: 50
+        description: "Account Name"
+        maxLength: 100
       compRegNo:
         type: string
         maxLength: 20
         description: Account Registration Number
+      contactEmail:
+        type: string
+        description: "Contact Email"
+        maxLength: 200
     example:
-      id: fd65248c-f3aa-4310-8fcf-91eacdd324xx
-      name: Some s.r.o.
+      id: 31034
+      name: Some AUTODOPRAVA, s.r.o.
       compRegNo: 6484605
-      
+      contactEmail: info@doprava.cz
+  ModuleInfo:
+    type: object
+    description: "Basic information about Module"
+    required:
+      - moduleId
+    properties:
+      moduleId:
+        type: string
+        example: "TLM01"
+        maxLength: 40
+      description:
+        type: string
+        example: "Map"
+        maxLength: 300

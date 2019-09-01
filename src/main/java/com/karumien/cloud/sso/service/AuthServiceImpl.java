@@ -74,13 +74,24 @@ public class AuthServiceImpl implements AuthService {
 //          }
 //        }
 
+//        
+//        RealmResource realmResource = keycloak.realm(realm);
+//        KeyResource keys = realmResource.keys();
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getAlgorithm()));
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getCertificate()));
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getKid()));
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getProviderId()));
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getPublicKey()));
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getStatus()));
+//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getType()));
+        
         ObjectMapper om = new ObjectMapper();
         Map<String, Object> realmInfo;
         try {
-            realmInfo = om.readValue(new URL(adminServerUrl).openStream(), Map.class);
+            realmInfo = om.readValue(new URL(adminServerUrl + "/realms/" + realm).openStream(), Map.class);
             return (String) realmInfo.get("public_key");
         } catch (Exception e) {
-            throw new IllegalStateException("Can't retreive public key");
+            throw new IllegalStateException("Can't retreive public key", e);
         }
     }
 

@@ -22,11 +22,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.karumien.cloud.sso.api.model.Credentials;
-import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
+import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
+import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 
 /**
  * Implementation {@link IdentityService} for identity management.
@@ -69,9 +69,9 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEnabled(true);
 
 
-        identity.singleAttribute("phone", identityInfo.getPhone());
-        identity.singleAttribute("contactEmail", identityInfo.getContactEmail());
-        identity.singleAttribute("crmContactId", identityInfo.getCrmContactId());
+        identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
+        identity.singleAttribute(ATTR_CONTACT_EMAIL, identityInfo.getContactEmail());
+        identity.singleAttribute(ATTR_CRM_CONTACT_ID, identityInfo.getCrmContactId());
 
         //identity.setCredentials(Arrays.asList(credential));
 

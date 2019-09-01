@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.RolesApi;
-import com.karumien.cloud.sso.api.model.RoleBaseInfo;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.service.RoleService;
 
 import io.swagger.annotations.Api;
@@ -26,7 +26,7 @@ import io.swagger.annotations.Api;
  * @since 1.0, 18. 7. 2019 11:15:51 
  */
 @RestController
-@Api(value = "Role Service", description = "REST API for Role Service", tags = { "Role Service" })
+@Api(value = "Role Service", description = "Management of Roles/Rights", tags = { "Role Service" })
 public class RoleController implements RolesApi {   
     
 	@Autowired
@@ -36,7 +36,7 @@ public class RoleController implements RolesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<RoleBaseInfo> createRole(@Valid RoleBaseInfo role) {
+    public ResponseEntity<RoleInfo> createRole(@Valid RoleInfo role) {
         return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
     }
     
@@ -53,7 +53,7 @@ public class RoleController implements RolesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<RoleBaseInfo> getRole(String id) {
+    public ResponseEntity<RoleInfo> getRole(String id) {
     	return new ResponseEntity<>(roleService.getRoleBaseOnId(id), HttpStatus.OK);
     }
 }

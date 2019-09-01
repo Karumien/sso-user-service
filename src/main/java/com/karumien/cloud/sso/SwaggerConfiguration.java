@@ -36,13 +36,32 @@ public class SwaggerConfiguration {
      */
     @Bean
     public Docket api10() {
-        return new Docket(DocumentationType.SWAGGER_2).groupName("ew-sso-api-1.0").select()
+        return new Docket(DocumentationType.SWAGGER_2).groupName("ew-sso-api-1.0")
+            .select()
             .apis(RequestHandlerSelectors.basePackage("com.karumien.cloud.sso.api"))
-            .paths(PathSelectors.regex("/[users|auth|customers|drivers|roles|version].*"))
+            .paths(PathSelectors.any())
             .build()
+            .useDefaultResponseMessages(false)
+//            .globalOperationParameters(Collections.singletonList(new ParameterBuilder()
+//                .name("x-request-id")
+//                .modelRef(new ModelRef("string"))
+//                .parameterType("header")
+//                .required(false)
+//                .build()))
+//            .globalResponseMessage(RequestMethod.GET, getCustomizedResponseMessages())                    
+//            .globalResponseMessage(RequestMethod.DELETE, getCustomizedResponseMessages())                    
+//            .globalResponseMessage(RequestMethod.POST, getCustomizedResponseMessages())                    
+//            .globalResponseMessage(RequestMethod.PUT, getCustomizedResponseMessages())                    
             .produces(Collections.singleton(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .apiInfo(new ApiInfoBuilder().version("1.0").title("Eurowag SSO API Documentation")
-            .description("Services of EW SSO API.").build());
+            .apiInfo(new ApiInfoBuilder().version("1.0").title("Eurowag SSO API (IAM) Documentation")
+            .description("Services of EW SSO API (IAM).")
+            .build());
     }
+    
+//    private List<ResponseMessage> getCustomizedResponseMessages(){
+//        List<ResponseMessage> responseMessages = new ArrayList<>();
+//        responseMessages.add(new ResponseMessageBuilder().code(501).message("Not Implemented Now").responseModel(new ModelRef("Error")).build());
+//        return responseMessages;
+//    }
 
 }

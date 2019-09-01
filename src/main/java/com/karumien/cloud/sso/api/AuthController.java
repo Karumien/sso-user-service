@@ -28,7 +28,7 @@ import io.swagger.annotations.Api;
  * @since 1.0, 13. 8. 2019 11:15:51 
  */
 @RestController
-@Api(value = "Authentication Service", description = "REST API for Authentication Service", tags = { "Authentication Service" })
+@Api(value = "Authentication Service", description = "Authentication Process", tags = { "Authentication Service" })
 public class AuthController implements AuthApi  {
 
     @Autowired

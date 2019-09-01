@@ -6,11 +6,9 @@
  */
 package com.karumien.cloud.sso.service;
 
-import javax.validation.Valid;
-
 import com.karumien.cloud.sso.api.model.Credentials;
-import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.Policy;
 
 /**
  * Service provides scenarios for Identity's management.
@@ -20,6 +18,10 @@ import com.karumien.cloud.sso.api.model.IdentityInfo;
  */
 public interface IdentityService {
 
+    String ATTR_CRM_CONTACT_ID = "crmContactId";
+    String ATTR_CONTACT_EMAIL = "contactEmail";
+    String ATTR_PHONE = "phone";
+    
     /**
      * Create Identity in target SSO.
      * 
@@ -27,7 +29,7 @@ public interface IdentityService {
      *            Identity specification
      * @return {@link IdentityInfo} changes after entity save
      */
-    IdentityInfo createIdentity(@Valid IdentityInfo identity);
+    IdentityInfo createIdentity(IdentityInfo identity);
 
     /**
      * Delete Identity in target SSO.

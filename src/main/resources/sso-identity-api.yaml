@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  description: EW REST API for SSO - Identity Service
+  description: EW REST API for SSO - Identity Service - Management of Identities (Users/Contacts)
   version: '1.0'
   termsOfService: 'http://www.karumien.com/terms/'
   Identity:
@@ -57,7 +57,7 @@ paths:
           schema:
             $ref: '#/definitions/IdentityInfo'
         '404':
-          description: Not found
+          description: not found
     delete:
       summary: "Remove existing Identity"
       operationId: deleteIdentity
@@ -71,7 +71,7 @@ paths:
         '200':
           description: Successfully removed existing Identity
         '404':
-          description: Identity Not found
+          description: Identity not found
   /identities/{crmContactId}/credentials:
     post:
       summary: "Create Identity credentials"
@@ -97,13 +97,40 @@ paths:
           schema:
             $ref: '#/definitions/Policy'      
         '404':
-          description: Identity Not found
+          description: Identity not found
           schema:
             $ref: '#/definitions/Policy'      
         '406':
           description: Can't create Identity's credentials - becase Policy Settings    
           schema:
             $ref: '#/definitions/Policy'
+  /identities/{crmContactId}/pin:
+    put:
+      summary: "Create/Reset Driver PIN"
+      description: "Method to create/reset driver's PIN for given driver"
+      operationId: "createDriverPin"
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by Driver Unique ID
+          required: true
+          type: string       
+        - in: body
+          name: pin
+          description: PIN for Driver to create/change
+          schema:
+            $ref: '#/definitions/DriverPin'
+            example:
+              pin: "1234"
+      responses:
+        '201':
+          description: "Driver PIN has been created/update"
+        '404':
+          description: Driver not found  
+        '406':
+          description: Can't create/update Driver's PIN 
+        '501':
+          description: Not Implemented Now
   /identities/{crmContactId}/impersonate:
     post:
       summary: "Impersonate Identity"
@@ -119,7 +146,7 @@ paths:
         '200':
           description: "Identity has been impersonated"
         '404':
-          description: Identity Not found
+          description: Identity not found
   /identities/{crmContactId}/logout:
     post:
       summary: "Logout Identity's session"
@@ -135,7 +162,7 @@ paths:
         '200':
           description: "Identity has been logged out of all sessions"
         '404':
-          description: Identity Not found
+          description: Identity not found
   /identities/password/policy:
     get:
       summary: "Returns Password Policy for Identities"
@@ -200,6 +227,14 @@ definitions:
         example: "#123456."
         maxLength: 50
 #        required: true
+  DriverPin:
+    type: object
+    description: "Driver's PIN Definition"
+    properties:
+      pin:
+        type: string
+        example: "123456"
+        maxLength: 10
   Policy:
     type: object
     description: "Configuration object for Password Policy"

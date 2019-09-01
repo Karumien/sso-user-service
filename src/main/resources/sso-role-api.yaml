@@ -23,19 +23,19 @@ paths:
           name: role
           description: The role to create
           schema:
-            $ref: '#/definitions/RoleBaseInfo'
+            $ref: '#/definitions/RoleInfo'
       responses:
         '201':
           description: Successfully created
           schema:
-            $ref: '#/definitions/RoleBaseInfo'
-  /roles/{id}:
+            $ref: '#/definitions/RoleInfo'
+  /roles/{roleId}:
     get:
       summary: "Get detail of the given role"
       description: "Method returns detail information about role."
       operationId: "getRole"
       parameters:
-        - name: id
+        - name: roleId
           in: path
           description: Filtering by role Unique ID
           required: true
@@ -44,14 +44,14 @@ paths:
         '200':
           description: Successfully returned role's info
           schema:
-            $ref: '#/definitions/RoleBaseInfo'
+            $ref: '#/definitions/RoleInfo'
         '404':
           description: Not found
     delete:
       summary: "Remove existing role"
       operationId: "deleteRole"
       parameters:
-        - name: id
+        - name: roleId
           in: path
           description: Filtering by role Unique ID
           required: true
@@ -62,18 +62,15 @@ paths:
         '404':
           description: role Not found
 definitions:
-  RoleBaseInfo:
+  RoleInfo:
     type: object
     description: "Basic information about Role"
     required:
-      - name
+      - roleId
     properties:
-      id:
+      roleId:
         type: string
-        description: Role Unique ID 
-      name:
-        type: string
-        description: "Role name"
+        description: "Unique Role ID (Role Name)"
         maxLength: 50
       description:
         type: string
@@ -91,4 +88,4 @@ definitions:
       name: First Role
       description: Role description
       clientId: 9abedf80-7413-4751-9b73-84d07a32e11c
-      clientRole: true9abedf80-7413-4751-9b73-84d07a32e11c
+      clientRole: true

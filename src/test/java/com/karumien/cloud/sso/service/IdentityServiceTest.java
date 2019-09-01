@@ -30,7 +30,7 @@ import com.karumien.cloud.sso.service.IdentityService;
 public class IdentityServiceTest {
 
     @Autowired
-    private IdentityService userService;
+    private IdentityService identityService;
 
     @Test
     public void createAccount() throws Exception {
@@ -41,7 +41,7 @@ public class IdentityServiceTest {
         identity.setLastName("Stary");
         identity.setEmail("stary@seznam.cz");
         
-        IdentityInfo userCreated = userService.createIdentity(identity);
+        IdentityInfo userCreated = identityService.createIdentity(identity);
         Assert.assertEquals(identity.getFirstName(), userCreated.getFirstName());
         Assert.assertEquals(identity.getLastName(), userCreated.getLastName());
         Assert.assertEquals(identity.getEmail(), userCreated.getEmail());
@@ -49,6 +49,6 @@ public class IdentityServiceTest {
         Assert.assertNotNull(userCreated.getUsername());
         Assert.assertEquals(userCreated.getEmail(), userCreated.getUsername());
         
-        userService.deleteIdentity(identity.getCrmContactId());
+        identityService.deleteIdentity(identity.getCrmContactId());
     }
 }

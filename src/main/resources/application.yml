@@ -20,9 +20,9 @@ server:
     worker-threads: 500
   port: ${PORT:2205}
   servlet:
-    contextPath: ${CONTEXT_PATH:/api/v1/sso}
+    contextPath: ${CONTEXT_PATH:/api/v1/iam}
 keycloak:
-  auth-server-url: ${KEYCLOAK_AUTH_URL:http://ew-sso-dev.westeurope.cloudapp.azure.com/auth}
+  auth-server-url: ${KEYCLOAK_AUTH_URL:http://ew-sso-uat.westeurope.cloudapp.azure.com/auth}
   realm: ${KEYCLOAK_REALM:eurowag}
   username: ${KEYCLOAK_USER:wagadmin}
   password: ${KEYCLOAK_PASSWORD:xara2002}
