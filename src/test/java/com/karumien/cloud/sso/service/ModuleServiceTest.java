@@ -116,14 +116,26 @@ public class ModuleServiceTest {
 
         List<ModuleInfo> modules = moduleService.getAccountModules(crmAccountId);
         Assert.assertEquals(modules.size(), 2);
-
+        Assert.assertTrue(moduleService.isActiveModule(moduleId, crmAccountId));
+        Assert.assertTrue(moduleService.isActiveModule(moduleId, crmAccountId2));
+        Assert.assertTrue(moduleService.isActiveModule(moduleId2, crmAccountId));
+        Assert.assertTrue(moduleService.isActiveModule(moduleId2, crmAccountId2));
+        
         moduleService.deactivateModules(Arrays.asList(moduleId), Arrays.asList(crmAccountId));
         modules = moduleService.getAccountModules(crmAccountId);
         Assert.assertEquals(modules.size(), 1);
-       
+        Assert.assertFalse(moduleService.isActiveModule(moduleId, crmAccountId));
+        Assert.assertTrue(moduleService.isActiveModule(moduleId, crmAccountId2));
+        Assert.assertTrue(moduleService.isActiveModule(moduleId2, crmAccountId));
+        Assert.assertTrue(moduleService.isActiveModule(moduleId2, crmAccountId2));
+        
         moduleService.deactivateModules(Arrays.asList(moduleId, moduleId2), Arrays.asList(crmAccountId, crmAccountId2));
         Assert.assertEquals(moduleService.getAccountModules(crmAccountId2).size(), 0);
         Assert.assertEquals(moduleService.getAccountModules(crmAccountId).size(), 0);
+        Assert.assertFalse(moduleService.isActiveModule(moduleId, crmAccountId));
+        Assert.assertFalse(moduleService.isActiveModule(moduleId, crmAccountId2));
+        Assert.assertFalse(moduleService.isActiveModule(moduleId2, crmAccountId));
+        Assert.assertFalse(moduleService.isActiveModule(moduleId2, crmAccountId2));
         
         accountService.deleteAccount(crmAccountId);
         accountService.deleteAccount(crmAccountId2);

@@ -108,4 +108,22 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(moduleService.getAccountModules(crmAccountId), HttpStatus.OK);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> deactivateAccountModule(String crmAccountId, String moduleId) {
+        moduleService.deactivateModules(Arrays.asList(moduleId), Arrays.asList(crmAccountId));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> getAccountModule(String crmAccountId, String moduleId) {
+        return new ResponseEntity<>(moduleService.isActiveModule(moduleId, crmAccountId) ? 
+                HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
+    }
+    
 }

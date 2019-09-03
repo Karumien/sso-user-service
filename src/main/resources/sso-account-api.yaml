@@ -148,8 +148,8 @@ paths:
           required: true
           type: string   
       responses:
-        '202':
-          description: Succesfully Activated Module on Account
+        '200':
+          description: Module is active on Account
         '404':
           description: Account not found
         '406':

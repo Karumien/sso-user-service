@@ -162,5 +162,14 @@ public class ModuleServiceImpl implements ModuleService {
             .listAll().stream().filter(role -> role.getName().startsWith(ROLE_PREFIX))
             .map(role -> mapping(role)).collect(Collectors.toList());                
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isActiveModule(String moduleId, String crmAccountId) {
+        //FIXME: performance
+        return getAccountModules(crmAccountId).stream().filter(module -> module.getModuleId().equals(moduleId)).findAny().isPresent();
+    }
     
 }
