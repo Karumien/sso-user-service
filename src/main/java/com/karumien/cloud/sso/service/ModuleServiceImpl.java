@@ -59,7 +59,7 @@ public class ModuleServiceImpl implements ModuleService {
     }
     
     public Optional<RoleResource> findModule(String moduleId) {
-        return roleService.findRole(getRoleName(moduleId));
+        return roleService.findRoleResource(getRoleName(moduleId));
     }
 
     /**

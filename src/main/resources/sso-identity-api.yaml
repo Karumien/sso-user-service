@@ -172,7 +172,24 @@ paths:
         '200':
           description: "Password Policy Settings"
           schema:
-            $ref: '#/definitions/Policy'     
+            $ref: '#/definitions/Policy' 
+  /identities/{crmContactId}/roles/binary:
+    get:
+      summary: "Get assigned Roles on Identity in Binary Representation"
+      operationId: "getIdentityRolesBinary"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string   
+      produces:
+        - text/plain
+      responses:
+        '200':
+          description: Identity's assigned Roles in Binary Representation 
+        '404':
+          description: Identity not found    
   /identities/{crmContactId}/roles:
     get:
       summary: "Get assigned Roles on Identity"
