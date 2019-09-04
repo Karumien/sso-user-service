@@ -6,6 +6,8 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.IdentitiesApi;
 import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.service.IdentityService;
 
@@ -97,6 +101,69 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> logoutIdentity(String crmContactId) {
         identityService.logoutIdentity(crmContactId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignIdentityRole(String crmContactId, String roleId) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.assignIdentityRole(crmContactId, roleId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unassignIdentityRole(String crmContactId, String roleId) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.unassignIdentityRole(crmContactId, roleId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignIdentityRoles(String crmContactId, @Valid List<String> roles) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.assignIdentityRoles(crmContactId, roles);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unassignIdentityRoles(String crmContactId, @Valid List<String> roles) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.unassignIdentityRoles(crmContactId, roles);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> getIdentityRole(String crmContactId, String roleId) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.getIdentityRole(crmContactId, roleId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<RoleInfo>> getIdentityRoles(String crmContactId) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.getIdentityRoles(crmContactId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createDriverPin(String id, DriverPin pin) {
+        // TODO viliam.litavec: Impl
+        return IdentitiesApi.super.createDriverPin(id, pin);
     }
     
 }

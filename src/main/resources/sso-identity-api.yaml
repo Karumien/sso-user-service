@@ -172,7 +172,132 @@ paths:
         '200':
           description: "Password Policy Settings"
           schema:
-            $ref: '#/definitions/Policy'      
+            $ref: '#/definitions/Policy'     
+  /identities/{crmContactId}/roles:
+    get:
+      summary: "Get assigned Roles on Identity"
+      operationId: "getIdentityRoles"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string   
+      responses:
+        '200':
+          description: Identity's assigned roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RoleInfo'
+        '404':
+          description: Identity not found
+    put:
+      summary: "Assign roles on Identity"
+      operationId: "assignIdentityRoles"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: roles
+          description: List of Identity's ID to assign
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '202':
+          description: Successfully assigned Roles to Identity
+        '404':
+          description: Identity not found
+    delete:
+      summary: "Unassign Roles on Identity"
+      operationId: "unassignIdentityRoles"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: roles
+          description: List of Identity's ID to unassign
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '202':
+          description: Successfully unsassigned Roles from Identity
+        '404':
+          description: Identity not found
+  /identities/{crmContactId}/roles/{roleId}:
+    get:
+      summary: "Get assigned Roles on Identity"
+      operationId: "getIdentityRole"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string   
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string   
+      responses:
+        '200':
+          description: Role is assigned to Identity
+        '404':
+          description: Identity not found
+        '406':
+          description: Role not assigned
+    put:
+      summary: "Assign Role to Identity"
+      operationId: "assignIdentityRole"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully assigned Role on Identity
+        '404':
+          description: Identity not found
+        '406':
+          description: Role for Identity not assigned
+    delete:
+      summary: "Remove Role on Identity"
+      operationId: "unassignIdentityRole"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully unassigned Role from Identity
+        '404':
+          description: Identity not found
+        '406':
+          description: Role not unassigned
 definitions:
   IdentityInfo:
     type: object
@@ -289,3 +414,30 @@ definitions:
         type: string
         description: "REGEX pattern for password validation"
         example: ".*"
+  RoleInfo:
+    type: object
+    description: "Basic information about Role"
+    required:
+      - roleId
+    properties:
+      roleId:
+        type: string
+        description: "Unique Role ID (Role Name)"
+        maxLength: 50
+      description:
+        type: string
+        description: "Role description"
+        maxLength: 255
+      clientId:
+        type: string
+        maxLength: 250
+        description: Client Id (for client roles)
+      clientRole:
+        type: boolean
+        description: "Identify Client Role (not realm role)"
+    example:
+      id: fd65248c-f3aa-4310-8fcf-91eacdd324xx
+      name: First Role
+      description: Role description
+      clientId: 9abedf80-7413-4751-9b73-84d07a32e11c
+      clientRole: true
