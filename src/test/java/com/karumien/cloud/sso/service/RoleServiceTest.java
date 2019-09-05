@@ -33,6 +33,9 @@ public class RoleServiceTest {
     @Autowired
     private Keycloak keycloak;
     
+    @Autowired
+    private RoleService roleService;
+    
     @Test
     public void roles() throws Exception {
         keycloak.realm(realm)
@@ -45,6 +48,11 @@ public class RoleServiceTest {
         
         
         //    .roles().list().forEach(r -> System.out.println("client-role: " + r.getName()));
+    }
+    
+    @Test
+    public void rolesBinaryTest() throws Exception {   
+        System.out.println( roleService.getRolesBinary("123456789"));
     }
 
 }

@@ -79,6 +79,17 @@ public interface RoleService {
      * @return {@link RoleInfo} object of rule
      */
     RoleInfo getRoleBaseOnId(String roleId);
+    
+    /**
+     * Function that return client role base on role ID.
+     * 
+     * @param roleId
+     *            {@link String} ID value of role
+     * @param clientId
+     *            {@link String} ID value of client
+     * @return {@link RoleInfo} object of rule
+     */
+    RoleInfo getClientsRoleBaseOnId(String roleId, String clientId);
 
     /**
      * Function to assign input role to identity.

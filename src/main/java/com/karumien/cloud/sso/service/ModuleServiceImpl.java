@@ -117,7 +117,7 @@ public class ModuleServiceImpl implements ModuleService {
     private String getRoleName(String moduleId) {
         return ROLE_PREFIX + moduleId;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -134,7 +134,7 @@ public class ModuleServiceImpl implements ModuleService {
             .filter(accountResource -> accountResource.isPresent())
             .forEach(accountResource -> accountResource.get().roles().realmLevel().add(rolesToAdd));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -151,7 +151,7 @@ public class ModuleServiceImpl implements ModuleService {
             .filter(accountResource -> accountResource.isPresent())
             .forEach(accountResource -> accountResource.get().roles().realmLevel().remove(rolesToRemove));
     }
-	
+
     /**
      * {@inheritDoc}
      */
@@ -171,5 +171,5 @@ public class ModuleServiceImpl implements ModuleService {
         //FIXME: performance
         return getAccountModules(crmAccountId).stream().filter(module -> module.getModuleId().equals(moduleId)).findAny().isPresent();
     }
-    
+
 }
