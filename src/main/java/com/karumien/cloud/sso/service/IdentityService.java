@@ -6,9 +6,15 @@
  */
 package com.karumien.cloud.sso.service;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
 import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 
 /**
  * Service provides scenarios for Identity's management.
@@ -89,4 +95,35 @@ public interface IdentityService {
      * @return boolean {@code true} when Identity with given username exists
      */
     boolean isIdentityExists(String username);
+
+	/**
+	 * Assign selected list of roles to as current Identity
+	 * @param crmContactId {@link String} id value of identity
+	 * @param roles {@link List} {@link String} list of ids of roles we want to add to identity
+	 * @return {@link Boolean} return true if we successfully assign roles false if not
+	 */
+	boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
+
+	/**
+	 * Remove selected list of roles to as current Identity
+	 * @param crmContactId {@link String} id value of identity
+	 * @param roles {@link List} {@link String} list of ids of roles we want to remove from identity
+	 * @return {@link Boolean} return true if we successfully remove roles false if not
+	 */
+	boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
+
+	/**
+	 * Return all roles that are assigned to selected identity
+	 * @param crmContactId {@link String} id of identity we want to find roles for
+	 * @return {@link List} {@link RoleInfo} list of roles that identity have
+	 */
+	List<RoleInfo> getAllIdentityRoles(String crmContactId);
+
+	
+	/**
+	 * Function that save pin to Identity driver base on input
+	 * @param id {@link String}
+	 * @param pin {@link DriverPin} pin we want to add to the driver identity
+	 */
+	void savePinToIdentityDriver(String id, DriverPin pin);
 }

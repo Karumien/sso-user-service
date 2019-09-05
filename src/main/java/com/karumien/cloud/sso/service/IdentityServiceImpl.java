@@ -7,6 +7,8 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -22,8 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
@@ -42,6 +46,9 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private Keycloak keycloak;
+    
+    @Autowired
+    private RoleService roleService;
 
     /**
      * {@inheritDoc}
@@ -219,5 +226,46 @@ public class IdentityServiceImpl implements IdentityService {
     public boolean isIdentityExists(String username) {
         return !keycloak.realm(realm).users().search(username).isEmpty();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+
+	@Override
+	public boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
+		UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
+				.orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+		UserRepresentation userRepresentation = UserResource.toRepresentation();		
+		return userRepresentation.getRealmRoles().addAll(roles);
+	}
+	/**
+     * {@inheritDoc}
+     */
+	@Override
+	public boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
+		UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
+				.orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+		UserRepresentation userRepresentation = UserResource.toRepresentation();		
+		return userRepresentation.getRealmRoles().removeAll(roles);
+	}
+
+	 /**
+     * {@inheritDoc}
+     */
+	@Override
+	public List<RoleInfo> getAllIdentityRoles(String crmContactId) {
+		return roleService.getAllRolesOfIdentity(crmContactId);
+	}
+
+	 /**
+     * {@inheritDoc}
+     */
+	@Override
+	public void savePinToIdentityDriver(String id, DriverPin pin) {
+		UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(id))
+				.orElseThrow(() -> new IdentityNotFoundException(id));
+		UserRepresentation userRepresentation = UserResource.toRepresentation();
+		userRepresentation.getAttributes().put("PIN", Arrays.asList(pin.getPin()));
+	}
     
 }

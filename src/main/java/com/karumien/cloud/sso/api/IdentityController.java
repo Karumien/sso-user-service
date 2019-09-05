@@ -6,6 +6,7 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -108,8 +109,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRole(String crmContactId, String roleId) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.assignIdentityRole(crmContactId, roleId);
+        return new ResponseEntity<>(identityService.assigneRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -117,8 +117,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRole(String crmContactId, String roleId) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.unassignIdentityRole(crmContactId, roleId);
+        return new ResponseEntity<>(identityService.unassigneRolesToIdentity(crmContactId,  Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -126,8 +125,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRoles(String crmContactId, @Valid List<String> roles) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.assignIdentityRoles(crmContactId, roles);
+        return new ResponseEntity<>(identityService.assigneRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -135,8 +133,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRoles(String crmContactId, @Valid List<String> roles) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.unassignIdentityRoles(crmContactId, roles);
+        return new ResponseEntity<>(identityService.unassigneRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -153,8 +150,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<RoleInfo>> getIdentityRoles(String crmContactId) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.getIdentityRoles(crmContactId);
+        return new ResponseEntity<List<RoleInfo>>(identityService.getAllIdentityRoles(crmContactId), HttpStatus.OK);
     }
 
     /**
@@ -162,8 +158,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> createDriverPin(String id, DriverPin pin) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.createDriverPin(id, pin);
+    	identityService.savePinToIdentityDriver(id, pin);
+        return new ResponseEntity<Void>(HttpStatus.OK);
     }
     
 }

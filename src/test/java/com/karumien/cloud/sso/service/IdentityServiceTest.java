@@ -13,6 +13,8 @@
  */
 package com.karumien.cloud.sso.service;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,6 +24,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.service.IdentityService;
 
 @RunWith(SpringRunner.class)
@@ -49,6 +53,27 @@ public class IdentityServiceTest {
         Assert.assertNotNull(userCreated.getUsername());
         Assert.assertEquals(userCreated.getEmail(), userCreated.getUsername());
         
+        identityService.deleteIdentity(identity.getCrmContactId());
+    }
+      
+    @Test
+    public void getAllIdentityRoles() throws Exception {
+    	identityService.deleteIdentity("CRM00001");
+    	IdentityInfo identity = null;
+		try {
+			identity = identityService.getIdentity("CRM00001");
+		} catch (IdentityNotFoundException e) {
+			if (identity == null) {
+				identity = new IdentityInfo();
+				identity.setCrmContactId("CRM00001");
+				identity.setFirstName("Ladislav");
+				identity.setLastName("Stary");
+				identity.setEmail("stary@seznam.cz");
+			}
+        }
+        IdentityInfo userCreated = identityService.createIdentity(identity);
+        List<RoleInfo> roles = identityService.getAllIdentityRoles(identity.getCrmContactId());
+        Assert.assertNotNull(roles);       
         identityService.deleteIdentity(identity.getCrmContactId());
     }
 }

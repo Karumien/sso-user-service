@@ -16,23 +16,18 @@ package com.karumien.cloud.sso.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 import javax.ws.rs.NotFoundException;
-
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.admin.client.resource.RolesResource;
 import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.account.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -146,8 +141,7 @@ public class RoleServiceImpl implements RoleService{
 		List<RoleInfo> listOfRoles = new ArrayList<>();
 		
 		RealmResource realmResource = keycloak.realm(realm);
-		Optional<GroupResource> userRoles = accountService.findGroupResource(crmContactId);
-		userRoles.get().roles().realmLevel().listEffective().forEach(role -> {
+		realmResource.users().get(crmContactId).roles().realmLevel().listEffective().forEach(role -> {
 			listOfRoles.add(transformRoleToBaseRole(role));
 		});
 		return listOfRoles;
@@ -184,13 +178,14 @@ public class RoleServiceImpl implements RoleService{
     	Optional<GroupResource> accountResorces = accountService.findGroupResource(crmContactId);
     	if (accountResorces.isPresent()) {
     		GroupResource resources = accountResorces.get();
-    		Map<String, Integer> maskMap = new HashMap();
-    		resources.roles().realmLevel().listEffective().stream()
+    		Map<String, Integer> maskMap = new HashMap<String, Integer>();
+    		resources.roles().realmLevel().listAll()
     		.forEach(role ->
       		{
-    			String[] splitName = role.getName().split("_");
+      			String[] splitName = role.getName().split("_");
     			if(splitName[0].equals("ROLE")) {
-    				Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + 1 : 1;
+    				Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + Integer.valueOf(role.getAttributes().get("binaryMask").get(0))
+    				: Integer.valueOf(role.getAttributes().get("binaryMask").get(0));
     				maskMap.put(splitName[1], rigtValue);
     			}
     		});
