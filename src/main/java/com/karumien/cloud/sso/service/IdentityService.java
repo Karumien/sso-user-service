@@ -7,8 +7,11 @@
 package com.karumien.cloud.sso.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
+
+import org.keycloak.representations.idm.UserRepresentation;
 
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
@@ -148,4 +151,6 @@ public interface IdentityService {
      *            unique Identity CRM ID
      */
     void resetPasswordByEmail(String crmContactId);
+
+    Optional<UserRepresentation> findIdentity(String crmContactId);
 }

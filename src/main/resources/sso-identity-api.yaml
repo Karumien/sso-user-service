@@ -336,7 +336,7 @@ definitions:
     type: object
     description: "Basic information about Identity"
     required:
-#      - crmAccountId
+      - crmAccountId
       - crmContactId
     properties:
       crmAccountId:

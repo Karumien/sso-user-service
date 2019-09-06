@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
@@ -29,6 +28,7 @@ import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -59,7 +59,9 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void deleteIdentity(String crmContactId) {
-        keycloak.realm(realm).users().delete(crmContactId);
+        UserRepresentation user = findIdentity(crmContactId)
+            .orElseThrow(() -> new IdentityNotFoundException(crmContactId));        
+        keycloak.realm(realm).users().delete(user.getId());
     }
 
     /**
@@ -69,10 +71,13 @@ public class IdentityServiceImpl implements IdentityService {
     public IdentityInfo createIdentity(@Valid IdentityInfo identityInfo) {
 
         UserRepresentation identity = new UserRepresentation();
-        identity.setUsername(Optional.ofNullable(identityInfo.getUsername()).orElse(identityInfo.getEmail()));
+        
+        if (StringUtils.isBlank(identityInfo.getUsername())) {
+            identity.setUsername("generated-" + identityInfo.getCrmContactId());
+        }
+        
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
-        identity.setId(identityInfo.getCrmContactId());
 
         // TODO: extract email as new method
         identity.setEmail(identityInfo.getEmail());
@@ -80,11 +85,17 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEnabled(true);
         identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isBlank(identityInfo.getEmail())));
 
-        identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
-        identity.singleAttribute(ATTR_CONTACT_EMAIL, identityInfo.getContactEmail());
-        identity.singleAttribute(ATTR_CRM_CONTACT_ID, identityInfo.getCrmContactId());
-        identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, identityInfo.getCrmAccountId());
-
+        if (!StringUtils.isBlank(identityInfo.getPhone())) {
+            identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
+        }
+        if (!StringUtils.isBlank(identityInfo.getContactEmail())) {
+            identity.singleAttribute(ATTR_CONTACT_EMAIL, identityInfo.getContactEmail());
+        }
+        identity.singleAttribute(ATTR_CRM_CONTACT_ID, 
+                Optional.of(identityInfo.getCrmContactId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_CONTACT_ID)));
+        identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
+                Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
+        
         // identity.setCredentials(Arrays.asList(credential));
 
         Response response = keycloak.realm(realm).users().create(identity);
@@ -194,37 +205,45 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public IdentityInfo getIdentity(String crmContactId) {
+        return mapping(findIdentity(crmContactId)
+                .orElseThrow(() -> new IdentityNotFoundException(crmContactId)));
+    }
+   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<UserRepresentation> findIdentity(String crmContactId) {
+        return keycloak.realm(realm).users().list().stream()
+            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
+            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmContactId)).findFirst();
+    }
+    
+    private IdentityInfo mapping(UserRepresentation userRepresentation) {
 
-        try {
-            UserRepresentation userRepresentation = keycloak.realm(realm).users().get(crmContactId).toRepresentation();
+        // TODO: Orica Mapper
+        IdentityInfo identity = new IdentityInfo();
+        identity.setFirstName(userRepresentation.getFirstName());
+        identity.setLastName(userRepresentation.getLastName());
+        identity.setUsername(userRepresentation.getUsername());
+        identity.setEmail(userRepresentation.getEmail());
+        identity.setEmailVerified(userRepresentation.isEmailVerified());
 
-            // TODO: Orica Mapper
-            IdentityInfo identity = new IdentityInfo();
-            identity.setFirstName(userRepresentation.getFirstName());
-            identity.setLastName(userRepresentation.getLastName());
-            identity.setUsername(userRepresentation.getUsername());
-            identity.setEmail(userRepresentation.getEmail());
-            identity.setEmailVerified(userRepresentation.isEmailVerified());
-
-            // TODO: function
-            if (userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID) != null) {
-                identity.setCrmAccountId(userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID).stream().findAny().orElse(null));
-            }
-            if (userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID) != null) {
-                identity.setCrmContactId(userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID).stream().findAny().orElse(null));
-            }
-            if (userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL) != null) {
-                identity.setContactEmail(userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL).stream().findAny().orElse(null));
-            }
-            if (userRepresentation.getAttributes().get(ATTR_PHONE) != null) {
-                identity.setPhone(userRepresentation.getAttributes().get(ATTR_PHONE).stream().findAny().orElse(null));
-            }
-
-            return identity;
-
-        } catch (NotFoundException e) {
-            throw new IdentityNotFoundException(crmContactId);
+        // TODO: function
+        if (userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID) != null) {
+            identity.setCrmAccountId(userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID).stream().findAny().orElse(null));
         }
+        if (userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID) != null) {
+            identity.setCrmContactId(userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID).stream().findAny().orElse(null));
+        }
+        if (userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL) != null) {
+            identity.setContactEmail(userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL).stream().findAny().orElse(null));
+        }
+        if (userRepresentation.getAttributes().get(ATTR_PHONE) != null) {
+            identity.setPhone(userRepresentation.getAttributes().get(ATTR_PHONE).stream().findAny().orElse(null));
+        }
+
+        return identity;
     }
 
     /**
@@ -256,10 +275,8 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-                .orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-        UserRepresentation userRepresentation = userResource.toRepresentation();
-        return userRepresentation.getRealmRoles().addAll(roles);
+        return findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
+            .getRealmRoles().addAll(roles);
     }
 
     /**
@@ -267,10 +284,8 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-                .orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-        UserRepresentation userRepresentation = userResource.toRepresentation();
-        return userRepresentation.getRealmRoles().removeAll(roles);
+        return findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
+            .getRealmRoles().removeAll(roles);
     }
 
     /**
@@ -285,10 +300,9 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void savePinToIdentityDriver(String id, DriverPin pin) {
-        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(id)).orElseThrow(() -> new IdentityNotFoundException(id));
-        UserRepresentation userRepresentation = userResource.toRepresentation();
-        userRepresentation.getAttributes().put("driverPin", Arrays.asList(pin.getPin()));
+    public void savePinToIdentityDriver(String crmContactId, DriverPin pin) {
+        findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
+            .getAttributes().put("driverPin", Arrays.asList(pin.getPin()));
     }
 
     /**
@@ -296,13 +310,11 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void resetPasswordByEmail(String crmContactId) {
-        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-                .orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-        UserRepresentation user = userResource.toRepresentation();
+        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
         if (StringUtils.isBlank(user.getEmail()) || !user.isEmailVerified()) {
             throw new IdentityEmailNotExistsOrVerifiedException(crmContactId);
         }
-        userResource.executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+        keycloak.realm(realm).users().get(crmContactId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
     }
 
 }
