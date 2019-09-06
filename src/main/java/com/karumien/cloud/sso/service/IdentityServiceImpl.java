@@ -83,6 +83,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         identity.singleAttribute(ATTR_CONTACT_EMAIL, identityInfo.getContactEmail());
         identity.singleAttribute(ATTR_CRM_CONTACT_ID, identityInfo.getCrmContactId());
+        identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, identityInfo.getCrmAccountId());
 
         // identity.setCredentials(Arrays.asList(credential));
 
@@ -90,7 +91,7 @@ public class IdentityServiceImpl implements IdentityService {
 
         identityInfo.setCrmContactId(getCreatedId(response));
         identityInfo.setUsername(identity.getUsername());
-        
+
         return identityInfo;
     }
 
@@ -172,14 +173,14 @@ public class IdentityServiceImpl implements IdentityService {
 
         // FIXME: update to unblocked
         // UserRepresentation userResource = keycloak.realm(realm).users().get(crmContactId).;
-        
+
         CredentialRepresentation newCredential = new CredentialRepresentation();
         // TODO: empty password simple validation?
         UserResource userResource = keycloak.realm(realm).users().get(crmContactId);
         newCredential.setType(CredentialRepresentation.PASSWORD);
         newCredential.setValue(newCredentials.getPassword());
         newCredential.setTemporary(Boolean.TRUE.equals(newCredential.isTemporary()));
-        
+
         try {
             userResource.resetPassword(newCredential);
         } catch (BadRequestException e) {
@@ -199,13 +200,26 @@ public class IdentityServiceImpl implements IdentityService {
 
             // TODO: Orica Mapper
             IdentityInfo identity = new IdentityInfo();
-            identity.setCrmContactId(userRepresentation.getId());
             identity.setFirstName(userRepresentation.getFirstName());
             identity.setLastName(userRepresentation.getLastName());
             identity.setUsername(userRepresentation.getUsername());
             identity.setEmail(userRepresentation.getEmail());
             identity.setEmailVerified(userRepresentation.isEmailVerified());
-        
+
+            // TODO: function
+            if (userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID) != null) {
+                identity.setCrmAccountId(userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID).stream().findAny().orElse(null));
+            }
+            if (userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID) != null) {
+                identity.setCrmContactId(userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID).stream().findAny().orElse(null));
+            }
+            if (userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL) != null) {
+                identity.setContactEmail(userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL).stream().findAny().orElse(null));
+            }
+            if (userRepresentation.getAttributes().get(ATTR_PHONE) != null) {
+                identity.setPhone(userRepresentation.getAttributes().get(ATTR_PHONE).stream().findAny().orElse(null));
+            }
+
             return identity;
 
         } catch (NotFoundException e) {

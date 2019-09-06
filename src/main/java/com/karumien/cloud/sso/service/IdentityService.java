@@ -26,6 +26,8 @@ public interface IdentityService {
 
     String ATTR_CRM_CONTACT_ID = "crmContactId";
 
+    String ATTR_CRM_ACCOUNT_ID = "crmAccountId";
+
     String ATTR_CONTACT_EMAIL = "contactEmail";
 
     String ATTR_PHONE = "phone";
