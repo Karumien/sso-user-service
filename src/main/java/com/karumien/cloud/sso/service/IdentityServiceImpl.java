@@ -215,8 +215,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public Optional<UserRepresentation> findIdentity(String crmContactId) {
         return keycloak.realm(realm).users().list().stream()
-            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
-            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmContactId)).findFirst();
+            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
+            .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
     }
     
     private IdentityInfo mapping(UserRepresentation userRepresentation) {
@@ -314,7 +314,7 @@ public class IdentityServiceImpl implements IdentityService {
         if (StringUtils.isBlank(user.getEmail()) || !user.isEmailVerified()) {
             throw new IdentityEmailNotExistsOrVerifiedException(crmContactId);
         }
-        keycloak.realm(realm).users().get(crmContactId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+        keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
     }
 
 }
