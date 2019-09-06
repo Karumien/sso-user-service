@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
@@ -29,8 +30,11 @@ import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
+import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
+
+import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 
 /**
  * Implementation {@link IdentityService} for identity management.
@@ -46,7 +50,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private Keycloak keycloak;
-    
+
     @Autowired
     private RoleService roleService;
 
@@ -74,19 +78,19 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmail(identityInfo.getEmail());
         // TODO: Identity.setEmailVerified(emailVerified);
         identity.setEnabled(true);
-
+        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isBlank(identityInfo.getEmail())));
 
         identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         identity.singleAttribute(ATTR_CONTACT_EMAIL, identityInfo.getContactEmail());
         identity.singleAttribute(ATTR_CRM_CONTACT_ID, identityInfo.getCrmContactId());
 
-        //identity.setCredentials(Arrays.asList(credential));
+        // identity.setCredentials(Arrays.asList(credential));
 
         Response response = keycloak.realm(realm).users().create(identity);
 
         identityInfo.setCrmContactId(getCreatedId(response));
         identityInfo.setUsername(identity.getUsername());
-
+        
         return identityInfo;
     }
 
@@ -104,7 +108,7 @@ public class IdentityServiceImpl implements IdentityService {
             String path = location.getPath();
             return path.substring(path.lastIndexOf('/') + 1);
         case CONFLICT:
-            throw new IdentityDuplicateException("Identity exists");
+            throw new IdentityDuplicateException("Identity with same username already exists");
         default:
             throw new UnsupportedOperationException("Unknown status " + response.getStatusInfo().toEnum());
         }
@@ -166,15 +170,18 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void createIdentityCredentials(String crmContactId, Credentials newCredentials) {
 
+        // FIXME: update to unblocked
+        // UserRepresentation userResource = keycloak.realm(realm).users().get(crmContactId).;
+        
         CredentialRepresentation newCredential = new CredentialRepresentation();
         // TODO: empty password simple validation?
-        UserResource UserResource = keycloak.realm(realm).users().get(crmContactId);
+        UserResource userResource = keycloak.realm(realm).users().get(crmContactId);
         newCredential.setType(CredentialRepresentation.PASSWORD);
         newCredential.setValue(newCredentials.getPassword());
         newCredential.setTemporary(Boolean.TRUE.equals(newCredential.isTemporary()));
-
+        
         try {
-            UserResource.resetPassword(newCredential);
+            userResource.resetPassword(newCredential);
         } catch (BadRequestException e) {
             e.printStackTrace();
             throw new PolicyPasswordException(newCredentials.getPassword());
@@ -187,18 +194,23 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public IdentityInfo getIdentity(String crmContactId) {
 
-        UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId)).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-        UserRepresentation userRepresentation = UserResource.toRepresentation();
+        try {
+            UserRepresentation userRepresentation = keycloak.realm(realm).users().get(crmContactId).toRepresentation();
 
-        // TODO: Orica Mapper
-        IdentityInfo identity = new IdentityInfo();
-        identity.setCrmContactId(userRepresentation.getId());
-        identity.setFirstName(userRepresentation.getFirstName());
-        identity.setLastName(userRepresentation.getLastName());
-        identity.setUsername(userRepresentation.getUsername());
-        identity.setEmail(userRepresentation.getEmail());
+            // TODO: Orica Mapper
+            IdentityInfo identity = new IdentityInfo();
+            identity.setCrmContactId(userRepresentation.getId());
+            identity.setFirstName(userRepresentation.getFirstName());
+            identity.setLastName(userRepresentation.getLastName());
+            identity.setUsername(userRepresentation.getUsername());
+            identity.setEmail(userRepresentation.getEmail());
+            identity.setEmailVerified(userRepresentation.isEmailVerified());
+        
+            return identity;
 
-        return identity;
+        } catch (NotFoundException e) {
+            throw new IdentityNotFoundException(crmContactId);
+        }
     }
 
     /**
@@ -206,8 +218,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void impersonateIdentity(String crmContactId) {
-        Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-            .orElseThrow(() -> new IdentityNotFoundException(crmContactId)).impersonate();
+        Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId)).orElseThrow(() -> new IdentityNotFoundException(crmContactId)).impersonate();
     }
 
     /**
@@ -215,8 +226,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void logoutIdentity(String crmContactId) {
-        Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-            .orElseThrow(() -> new IdentityNotFoundException(crmContactId)).logout();
+        Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId)).orElseThrow(() -> new IdentityNotFoundException(crmContactId)).logout();
     }
 
     /**
@@ -230,42 +240,55 @@ public class IdentityServiceImpl implements IdentityService {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
+        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
+                .orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        return userRepresentation.getRealmRoles().addAll(roles);
+    }
 
-	@Override
-	public boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-		UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-				.orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-		UserRepresentation userRepresentation = UserResource.toRepresentation();		
-		return userRepresentation.getRealmRoles().addAll(roles);
-	}
-	/**
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-		UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
-				.orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-		UserRepresentation userRepresentation = UserResource.toRepresentation();		
-		return userRepresentation.getRealmRoles().removeAll(roles);
-	}
+    @Override
+    public boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
+        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
+                .orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        return userRepresentation.getRealmRoles().removeAll(roles);
+    }
 
-	 /**
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public List<RoleInfo> getAllIdentityRoles(String crmContactId) {
-		return roleService.getAllRolesOfIdentity(crmContactId);
-	}
+    @Override
+    public List<RoleInfo> getAllIdentityRoles(String crmContactId) {
+        return roleService.getAllRolesOfIdentity(crmContactId);
+    }
 
-	 /**
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public void savePinToIdentityDriver(String id, DriverPin pin) {
-		UserResource UserResource = Optional.ofNullable(keycloak.realm(realm).users().get(id))
-				.orElseThrow(() -> new IdentityNotFoundException(id));
-		UserRepresentation userRepresentation = UserResource.toRepresentation();
-		userRepresentation.getAttributes().put("PIN", Arrays.asList(pin.getPin()));
-	}
-    
+    @Override
+    public void savePinToIdentityDriver(String id, DriverPin pin) {
+        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(id)).orElseThrow(() -> new IdentityNotFoundException(id));
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        userRepresentation.getAttributes().put("driverPin", Arrays.asList(pin.getPin()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetPasswordByEmail(String crmContactId) {
+        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId))
+                .orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserRepresentation user = userResource.toRepresentation();
+        if (StringUtils.isBlank(user.getEmail()) || !user.isEmailVerified()) {
+            throw new IdentityEmailNotExistsOrVerifiedException(crmContactId);
+        }
+        userResource.executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+    }
+
 }

@@ -39,6 +39,8 @@ paths:
           description: Successfully created
           schema:
             $ref: '#/definitions/AccountInfo'
+        '409':
+          description: Account already exists (conflict crmAccountId)
   /accounts/{crmAccountId}:
     get:
       summary: "Get detail of the given Account"

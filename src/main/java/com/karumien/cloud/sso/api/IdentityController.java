@@ -22,7 +22,6 @@ import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
-import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 import com.karumien.cloud.sso.service.IdentityService;
 
 import io.swagger.annotations.Api;
@@ -69,13 +68,9 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Policy> createIdentityCredentials(String id, @Valid Credentials credentials) {
-        try {
-            identityService.createIdentityCredentials(id, credentials);
-        } catch (PolicyPasswordException e) {
-            return new ResponseEntity<>(identityService.getPasswordPolicy(), HttpStatus.NOT_ACCEPTABLE);
-        }
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
+    public ResponseEntity<Void> createIdentityCredentials(String id, @Valid Credentials credentials) {
+        identityService.createIdentityCredentials(id, credentials);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
     /**
@@ -159,6 +154,15 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> createDriverPin(String id, DriverPin pin) {
     	identityService.savePinToIdentityDriver(id, pin);
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> resetIdentityCredentials(String crmContactId) {
+        identityService.resetPasswordByEmail(crmContactId);
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
     

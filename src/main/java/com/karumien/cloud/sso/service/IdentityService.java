@@ -25,9 +25,11 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
 public interface IdentityService {
 
     String ATTR_CRM_CONTACT_ID = "crmContactId";
+
     String ATTR_CONTACT_EMAIL = "contactEmail";
+
     String ATTR_PHONE = "phone";
-    
+
     /**
      * Create Identity in target SSO.
      * 
@@ -96,34 +98,52 @@ public interface IdentityService {
      */
     boolean isIdentityExists(String username);
 
-	/**
-	 * Assign selected list of roles to as current Identity
-	 * @param crmContactId {@link String} id value of identity
-	 * @param roles {@link List} {@link String} list of ids of roles we want to add to identity
-	 * @return {@link Boolean} return true if we successfully assign roles false if not
-	 */
-	boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
+    /**
+     * Assign selected list of roles to as current Identity
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     * @param roles
+     *            {@link List} {@link String} list of ids of roles we want to add to identity
+     * @return {@link Boolean} return true if we successfully assign roles false if not
+     */
+    boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
 
-	/**
-	 * Remove selected list of roles to as current Identity
-	 * @param crmContactId {@link String} id value of identity
-	 * @param roles {@link List} {@link String} list of ids of roles we want to remove from identity
-	 * @return {@link Boolean} return true if we successfully remove roles false if not
-	 */
-	boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
+    /**
+     * Remove selected list of roles to as current Identity
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     * @param roles
+     *            {@link List} {@link String} list of ids of roles we want to remove from identity
+     * @return {@link Boolean} return true if we successfully remove roles false if not
+     */
+    boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
 
-	/**
-	 * Return all roles that are assigned to selected identity
-	 * @param crmContactId {@link String} id of identity we want to find roles for
-	 * @return {@link List} {@link RoleInfo} list of roles that identity have
-	 */
-	List<RoleInfo> getAllIdentityRoles(String crmContactId);
+    /**
+     * Return all roles that are assigned to selected identity
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID we want to find roles for
+     * @return {@link List} {@link RoleInfo} list of roles that identity have
+     */
+    List<RoleInfo> getAllIdentityRoles(String crmContactId);
 
-	
-	/**
-	 * Function that save pin to Identity driver base on input
-	 * @param id {@link String}
-	 * @param pin {@link DriverPin} pin we want to add to the driver identity
-	 */
-	void savePinToIdentityDriver(String id, DriverPin pin);
+    /**
+     * Function that save pin to Identity driver base on input
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     * @param pin
+     *            {@link DriverPin} pin we want to add to the driver identity
+     */
+    void savePinToIdentityDriver(String crmContactId, DriverPin pin);
+
+    /**
+     * Initiate action for email change
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     */
+    void resetPasswordByEmail(String crmContactId);
 }

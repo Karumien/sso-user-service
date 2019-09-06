@@ -26,7 +26,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
-import com.karumien.cloud.sso.service.IdentityService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -71,7 +70,9 @@ public class IdentityServiceTest {
 				identity.setEmail("stary@seznam.cz");
 			}
         }
-        IdentityInfo userCreated = identityService.createIdentity(identity);
+		
+        //IdentityInfo userCreated = 
+                identityService.createIdentity(identity);
         List<RoleInfo> roles = identityService.getAllIdentityRoles(identity.getCrmContactId());
         Assert.assertNotNull(roles);       
         identityService.deleteIdentity(identity.getCrmContactId());

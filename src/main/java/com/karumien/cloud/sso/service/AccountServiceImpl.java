@@ -120,6 +120,9 @@ public class AccountServiceImpl implements AccountService {
         }
 
         getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup().getId()).subGroup(group));
+        
+        //TODO: caches?
+        keycloak.realm(realm).clearRealmCache();
         return getAccount(account.getCrmAccountId());
     }
     
@@ -175,6 +178,8 @@ public class AccountServiceImpl implements AccountService {
     public void deleteAccount(String crmAccountId) {
         keycloak.realm(realm).groups().group(findGroup(crmAccountId)
                 .orElseThrow(() -> new AccountNotFoundException(crmAccountId)).getId()).remove();
+        //TODO: caches?
+        keycloak.realm(realm).clearRealmCache();
     }
 
     /**

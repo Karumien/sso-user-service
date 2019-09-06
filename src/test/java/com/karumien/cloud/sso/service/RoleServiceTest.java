@@ -6,6 +6,7 @@
  */
 package com.karumien.cloud.sso.service;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.keycloak.admin.client.Keycloak;
@@ -15,13 +16,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 29. 8. 2019 15:17:10 
  */
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class RoleServiceTest {
 
     @Value("${keycloak.realm}")
@@ -43,16 +48,13 @@ public class RoleServiceTest {
         keycloak.realm(realm).clients().findAll()
             .forEach(r -> System.out.println("clientId: " + r.getClientId() + ", clientName: " + r.getName() + ", id: " + r.getId()));
         ClientResource client = keycloak.realm(realm).clients().get("6fd0f65b-de70-4a4c-a7eb-ca2dce1ae42c");
-        System.out.println(client.getSecret());
-        System.out.println(client.roles().list());
-        
-        
-        //    .roles().list().forEach(r -> System.out.println("client-role: " + r.getName()));
+        log.debug("" + client.getSecret());
+        log.debug("" + client.roles().list());
     }
     
     @Test
     public void rolesBinaryTest() throws Exception {   
-        System.out.println( roleService.getRolesBinary("123456789"));
+        log.debug("" + roleService.getRolesBinary("123456789"));
     }
 
 }

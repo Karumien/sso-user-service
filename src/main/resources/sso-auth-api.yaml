@@ -64,6 +64,7 @@ definitions:
       - password
       - client_credentials
       - refresh_token
+      - pin
   AuthorizationRequest:
     type: object
     required:
@@ -91,6 +92,10 @@ definitions:
         type: string
         maxLength: 4000
         description: Refresh Token for Access Token renewal process - required for grant_type of refresh_token.
+      pin:
+        type: string
+        maxLength: 10
+        description: Driver's pin - required for grant_type of type pin.
     example:
       password:
         grant_type: password

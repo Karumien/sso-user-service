@@ -36,10 +36,13 @@ paths:
             $ref: '#/definitions/IdentityInfo'
             example:
               crmContactId: 6287994b-0245-4ca7-8eb4-777230b2f91f
+              crmAccountId: 31034
               lastName: Novak
               firstName: Karel
               username: KajaN
               email: KajaN@eurowag.com
+        '409':
+          description: Identity already exists (conflict username/crmContactId)
   /identities/{crmContactId}:
     get:
       summary: "Get detail of the given Identity"
@@ -91,21 +94,34 @@ paths:
             example:
               username: "midie"
               password: "#123456."
+              temporary: true
       responses:
         '201':
-          description: "Identity creadentials has been created"
-          schema:
-            $ref: '#/definitions/Policy'      
+          description: "Identity creadentials has been created or reset"
         '404':
           description: Identity not found
-          schema:
-            $ref: '#/definitions/Policy'      
         '406':
-          description: Can't create Identity's credentials - becase Policy Settings    
-          schema:
-            $ref: '#/definitions/Policy'
+          description: Can't create Identity's credentials
+  /identities/{crmContactId}/credentials/reset:
+    post:
+      summary: "Reset Identity credentials"
+      description: "Method to reset Identity credentials"
+      operationId: resetIdentityCredentials
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '201':
+          description: "Successfully sent email for password reset"
+        '404':
+          description: Identity not found
+        '406':
+          description: Can't reset Identity's credentials
   /identities/{crmContactId}/pin:
-    put:
+    post:
       summary: "Create/Reset Driver PIN"
       description: "Method to create/reset driver's PIN for given driver"
       operationId: "createDriverPin"
@@ -320,9 +336,12 @@ definitions:
     type: object
     description: "Basic information about Identity"
     required:
+#      - crmAccountId
       - crmContactId
-      - username
     properties:
+      crmAccountId:
+        type: string
+        description: Identity's CRM Account ID
       crmContactId:
         type: string
         description: Identity's Unique ID 
@@ -336,12 +355,15 @@ definitions:
         maxLength: 50
       username:
         type: string
-        description: "Nick name of person for game"
+        description: "Unique username"
         maxLength: 50
       email:
         type: string
         description: "Primary email used primary for password reset"
         maxLength: 100
+      emailVerified:
+        type: boolean
+        description: "Verified status of itentity email"
       phone:
         type: string
         description: "Phone used primary for OTP"
@@ -351,24 +373,39 @@ definitions:
         description: "Contact email - can be company global"
         maxLength: 100
     example:
+      crmAccountId: 31034
       crmContactId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       lastName: Novak
       firstName: Karel
-      username: KajaN
       email: KajaN@eurowag.com
+      emailVerified: true
   Credentials:
     type: object
     description: "Object for setting of Identity credential"
+    required:
+      - username
     properties:
-      temporary:
-        type: boolean
-#        required: false
-        description: "Temporary - need reset after first login"
+      username:
+        type: string
+        description: "Unique username"
+        maxLength: 50
       password:
         type: string
-        example: "#123456."
         maxLength: 50
-#        required: true
+      currentPassword:
+        type: string
+        maxLength: 50
+      temporary:
+        type: boolean
+        description: "Temporary - need reset after first login"
+    example:
+      - username: "midie"
+        password: "#123456."
+      - password: "#123456."
+        temporary: true      
+      - password: "#123456."
+        currentPassword: "oldPassword"
+        temporary: true      
   DriverPin:
     type: object
     description: "Driver's PIN Definition"
