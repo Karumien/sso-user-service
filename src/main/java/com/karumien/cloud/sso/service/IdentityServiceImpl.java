@@ -66,7 +66,7 @@ public class IdentityServiceImpl implements IdentityService {
             .orElseThrow(() -> new IdentityNotFoundException(crmContactId));        
         keycloak.realm(realm).users().delete(user.getId());
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -82,7 +82,6 @@ public class IdentityServiceImpl implements IdentityService {
 
         identity.setEmail(identityInfo.getEmail());
         
-        //TODO: enabled after create = false, true when unblocked or create credentials
         identity.setEnabled(true);
         identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isBlank(identityInfo.getEmail())));
 
@@ -181,22 +180,27 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void createIdentityCredentials(String crmContactId, Credentials newCredentials) {
 
-        // FIXME: update to unblocked
-        // UserRepresentation userResource = keycloak.realm(realm).users().get(crmContactId).;
-
+        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        user.setEnabled(true);
+        user.setUsername(newCredentials.getUsername());
+        
+        // TODO: verify currentPassword
+                
+        UserResource userResource = keycloak.realm(realm).users().get(user.getId());
+        
         CredentialRepresentation newCredential = new CredentialRepresentation();
-        // TODO: empty password simple validation?
-        UserResource userResource = keycloak.realm(realm).users().get(crmContactId);
         newCredential.setType(CredentialRepresentation.PASSWORD);
         newCredential.setValue(newCredentials.getPassword());
         newCredential.setTemporary(Boolean.TRUE.equals(newCredential.isTemporary()));
-
+        
         try {
+            userResource.update(user);
             userResource.resetPassword(newCredential);
         } catch (BadRequestException e) {
             e.printStackTrace();
             throw new PolicyPasswordException(newCredentials.getPassword());
         }
+
     }
 
     /**
@@ -292,8 +296,9 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void savePinOfIdentityDriver(String crmContactId, DriverPin pin) {
-        findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))          
-            .getAttributes().put(ATTR_DRIVER_PIN, Arrays.asList(pin.getPin()));
+        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        user.getAttributes().put(ATTR_DRIVER_PIN, Arrays.asList(pin.getPin()));
+        keycloak.realm(realm).users().get(user.getId()).update(user);
     }
 
     /**
@@ -301,8 +306,9 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void removePinOfIdentityDriver(String crmContactId) {
-        findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
-            .getAttributes().remove(ATTR_DRIVER_PIN);
+        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        user.getAttributes().remove(ATTR_DRIVER_PIN);
+        keycloak.realm(realm).users().get(user.getId()).update(user);
     }
 
     /**
@@ -324,6 +330,7 @@ public class IdentityServiceImpl implements IdentityService {
     public void blockIdentity(String crmContactId, boolean blockedStatus) {
         UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
         user.setEnabled(!blockedStatus);
+        keycloak.realm(realm).users().get(user.getId()).update(user);
     }
 
     /**
