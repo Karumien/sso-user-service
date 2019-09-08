@@ -31,7 +31,9 @@ public interface IdentityService {
 
     String ATTR_CRM_ACCOUNT_ID = "crmAccountId";
 
-    String ATTR_CONTACT_EMAIL = "contactEmail";
+    String ATTR_GLOBAL_EMAIL = "globalEmail";
+
+    String ATTR_DRIVER_PIN = "driverPin";
 
     String ATTR_PHONE = "phone";
 
@@ -115,7 +117,7 @@ public interface IdentityService {
     boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
 
     /**
-     * Remove selected list of roles to as current Identity
+     * Remove selected list of roles to as current Identity.
      * 
      * @param crmContactId
      *            unique Identity CRM ID
@@ -126,7 +128,7 @@ public interface IdentityService {
     boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
 
     /**
-     * Return all roles that are assigned to selected identity
+     * Return all roles that are assigned to selected identity.
      * 
      * @param crmContactId
      *            unique Identity CRM ID we want to find roles for
@@ -135,17 +137,25 @@ public interface IdentityService {
     List<RoleInfo> getAllIdentityRoles(String crmContactId);
 
     /**
-     * Function that save pin to Identity driver base on input
+     * Function that save pin of Identity driver base on input.
      * 
      * @param crmContactId
      *            unique Identity CRM ID
      * @param pin
      *            {@link DriverPin} pin we want to add to the driver identity
      */
-    void savePinToIdentityDriver(String crmContactId, DriverPin pin);
+    void savePinOfIdentityDriver(String crmContactId, DriverPin pin);
 
     /**
-     * Initiate action for email change
+     * Function that remove pin of Identity driver.
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     */
+    void removePinOfIdentityDriver(String crmContactId);
+
+    /**
+     * Initiate action for email change.
      * 
      * @param crmContactId
      *            unique Identity CRM ID
@@ -153,4 +163,23 @@ public interface IdentityService {
     void resetPasswordByEmail(String crmContactId);
 
     Optional<UserRepresentation> findIdentity(String crmContactId);
+
+    /**
+     * Block/unblock Ientity.
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     * @param blockedStatus
+     *            new blocked status
+     */
+    void blockIdentity(String crmContactId, boolean blockedStatus);
+
+    /**
+     * Return PIN of Identity type Driver.
+     * 
+     * @param crmContactId
+     *            unique Identity CRM ID
+     * @return {@link DriverPin} pin of the driver
+     */
+    DriverPin getPinOfIdentityDriver(String crmContactId);
 }

@@ -9,6 +9,7 @@ package com.karumien.cloud.sso.service;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -22,12 +23,14 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
@@ -71,32 +74,28 @@ public class IdentityServiceImpl implements IdentityService {
     public IdentityInfo createIdentity(@Valid IdentityInfo identityInfo) {
 
         UserRepresentation identity = new UserRepresentation();
-        
-        if (StringUtils.isBlank(identityInfo.getUsername())) {
-            identity.setUsername("generated-" + identityInfo.getCrmContactId());
-        }
-        
+
+        identity.setUsername(StringUtils.isBlank(identityInfo.getUsername()) ?
+                "generated-" + identityInfo.getCrmContactId() : identityInfo.getUsername());
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
 
-        // TODO: extract email as new method
         identity.setEmail(identityInfo.getEmail());
-        // TODO: Identity.setEmailVerified(emailVerified);
+        
+        //TODO: enabled after create = false, true when unblocked or create credentials
         identity.setEnabled(true);
         identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isBlank(identityInfo.getEmail())));
 
         if (!StringUtils.isBlank(identityInfo.getPhone())) {
             identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         }
-        if (!StringUtils.isBlank(identityInfo.getContactEmail())) {
-            identity.singleAttribute(ATTR_CONTACT_EMAIL, identityInfo.getContactEmail());
+        if (!StringUtils.isBlank(identityInfo.getGlobalEmail())) {
+            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
         }
         identity.singleAttribute(ATTR_CRM_CONTACT_ID, 
                 Optional.of(identityInfo.getCrmContactId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_CONTACT_ID)));
         identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
                 Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
-        
-        // identity.setCredentials(Arrays.asList(credential));
 
         Response response = keycloak.realm(realm).users().create(identity);
 
@@ -230,19 +229,10 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmail(userRepresentation.getEmail());
         identity.setEmailVerified(userRepresentation.isEmailVerified());
 
-        // TODO: function
-        if (userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID) != null) {
-            identity.setCrmAccountId(userRepresentation.getAttributes().get(ATTR_CRM_ACCOUNT_ID).stream().findAny().orElse(null));
-        }
-        if (userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID) != null) {
-            identity.setCrmContactId(userRepresentation.getAttributes().get(ATTR_CRM_CONTACT_ID).stream().findAny().orElse(null));
-        }
-        if (userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL) != null) {
-            identity.setContactEmail(userRepresentation.getAttributes().get(ATTR_CONTACT_EMAIL).stream().findAny().orElse(null));
-        }
-        if (userRepresentation.getAttributes().get(ATTR_PHONE) != null) {
-            identity.setPhone(userRepresentation.getAttributes().get(ATTR_PHONE).stream().findAny().orElse(null));
-        }
+        identity.setCrmAccountId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
+        identity.setCrmContactId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_CONTACT_ID).orElse(null));
+        identity.setGlobalEmail(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
+        identity.setPhone(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
 
         return identity;
     }
@@ -301,9 +291,18 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void savePinToIdentityDriver(String crmContactId, DriverPin pin) {
+    public void savePinOfIdentityDriver(String crmContactId, DriverPin pin) {
+        findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))          
+            .getAttributes().put(ATTR_DRIVER_PIN, Arrays.asList(pin.getPin()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removePinOfIdentityDriver(String crmContactId) {
         findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
-            .getAttributes().put("driverPin", Arrays.asList(pin.getPin()));
+            .getAttributes().remove(ATTR_DRIVER_PIN);
     }
 
     /**
@@ -316,6 +315,34 @@ public class IdentityServiceImpl implements IdentityService {
             throw new IdentityEmailNotExistsOrVerifiedException(crmContactId);
         }
         keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void blockIdentity(String crmContactId, boolean blockedStatus) {
+        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        user.setEnabled(!blockedStatus);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DriverPin getPinOfIdentityDriver(String crmContactId) {
+        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        DriverPin pin = new DriverPin();
+        pin.setPin(getSimpleAttribute(user.getAttributes(), ATTR_DRIVER_PIN)
+                .orElseThrow(() -> new AttributeNotFoundException(ATTR_DRIVER_PIN)));
+        return pin;        
+    }
+
+    private Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
+        if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
+            return Optional.empty();
+        }
+        return attributes.get(attrName).stream().findFirst();
     }
 
 }

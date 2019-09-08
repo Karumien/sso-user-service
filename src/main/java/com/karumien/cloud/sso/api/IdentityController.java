@@ -53,7 +53,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> deleteIdentity(String crmContactId) {
         identityService.deleteIdentity(crmContactId);
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
     
     /**
@@ -147,15 +147,6 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<List<RoleInfo>> getIdentityRoles(String crmContactId) {
         return new ResponseEntity<List<RoleInfo>>(identityService.getAllIdentityRoles(crmContactId), HttpStatus.OK);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> createDriverPin(String id, DriverPin pin) {
-    	identityService.savePinToIdentityDriver(id, pin);
-        return new ResponseEntity<Void>(HttpStatus.OK);
-    }
     
     /**
      * {@inheritDoc}
@@ -163,7 +154,51 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> resetIdentityCredentials(String crmContactId) {
         identityService.resetPasswordByEmail(crmContactId);
-        return new ResponseEntity<Void>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> blockIdentity(String crmContactId) {
+        identityService.blockIdentity(crmContactId, true);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unblockIdentity(String crmContactId) {
+        identityService.blockIdentity(crmContactId, false);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createDriverPin(String crmContactId, DriverPin pin) {
+        identityService.savePinOfIdentityDriver(crmContactId, pin);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+ 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> deleteDriverPin(String crmContactId) {
+        identityService.removePinOfIdentityDriver(crmContactId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<DriverPin> getDriverPin(String crmContactId) {
+        return new ResponseEntity<>(identityService.getPinOfIdentityDriver(crmContactId), HttpStatus.OK);
     }
     
 }

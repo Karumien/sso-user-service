@@ -102,6 +102,35 @@ paths:
           description: Identity not found
         '406':
           description: Can't create Identity's credentials
+  /identities/{crmContactId}/credentials/block:
+    put:
+      summary: "Block Identity"
+      operationId: blockIdentity
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: "Identity successfully blocked"
+        '404':
+          description: Identity not found
+    delete:
+      summary: "Unblock Identity"
+      operationId: unblockIdentity
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: "Identity successfully unblocked"
+        '404':
+          description: Identity not found
   /identities/{crmContactId}/credentials/reset:
     post:
       summary: "Reset Identity credentials"
@@ -126,7 +155,7 @@ paths:
       description: "Method to create/reset driver's PIN for given driver"
       operationId: "createDriverPin"
       parameters:
-        - name: id
+        - name: crmContactId
           in: path
           description: Filtering by Driver Unique ID
           required: true
@@ -145,8 +174,38 @@ paths:
           description: Driver not found  
         '406':
           description: Can't create/update Driver's PIN 
-        '501':
-          description: Not Implemented Now
+    get:
+      summary: "Get Driver PIN"
+      operationId: "getDriverPin"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Driver Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: "Driver PIN has been created/update"
+          schema:
+            $ref: '#/definitions/DriverPin'
+            example:
+              pin: "1234"
+        '404':
+          description: Driver or pin not found  
+    delete:
+      summary: "Delete Driver PIN"
+      operationId: "deleteDriverPin"
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Driver Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: "Driver PIN has been deleted"
+        '404':
+          description: Driver not found  
   /identities/{crmContactId}/impersonate:
     post:
       summary: "Impersonate Identity"
@@ -368,7 +427,7 @@ definitions:
         type: string
         description: "Phone used primary for OTP"
         maxLength: 30
-      contactEmail:
+      globalEmail:
         type: string
         description: "Contact email - can be company global"
         maxLength: 100
@@ -409,6 +468,8 @@ definitions:
   DriverPin:
     type: object
     description: "Driver's PIN Definition"
+    required:
+      - pin
     properties:
       pin:
         type: string
