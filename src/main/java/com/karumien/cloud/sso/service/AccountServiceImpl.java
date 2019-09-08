@@ -82,8 +82,10 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Optional<GroupRepresentation> findGroup(String crmAccountId) {
         return getMasterGroup().getSubGroups().stream()
+            .filter(g -> g.getAttributes() != null)
             .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
-            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmAccountId)).findFirst();
+            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmAccountId))
+            .findFirst();
     }
     
     /**

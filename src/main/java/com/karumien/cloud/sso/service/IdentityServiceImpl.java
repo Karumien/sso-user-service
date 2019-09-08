@@ -215,6 +215,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public Optional<UserRepresentation> findIdentity(String crmContactId) {
         return keycloak.realm(realm).users().list().stream()
+            .filter(g -> g.getAttributes() != null)
             .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
             .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
     }
