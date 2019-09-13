@@ -398,6 +398,9 @@ definitions:
       - crmAccountId
       - crmContactId
     properties:
+#      id:
+#        type: string
+#        description: Identity's ID 
       crmAccountId:
         type: string
         description: Identity's CRM Account ID
