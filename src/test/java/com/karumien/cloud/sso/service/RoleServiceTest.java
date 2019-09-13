@@ -26,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
 public class RoleServiceTest {
 
     @Value("${keycloak.realm}")
@@ -44,9 +43,9 @@ public class RoleServiceTest {
     @Test
     public void roles() throws Exception {
         keycloak.realm(realm)
-            .roles().list().forEach(r -> System.out.println("realm-role: " + r.getName()));
+            .roles().list().forEach(r -> log.debug("realm-role: " + r.getName()));
         keycloak.realm(realm).clients().findAll()
-            .forEach(r -> System.out.println("clientId: " + r.getClientId() + ", clientName: " + r.getName() + ", id: " + r.getId()));
+            .forEach(r -> log.debug("clientId: " + r.getClientId() + ", clientName: " + r.getName() + ", id: " + r.getId()));
         ClientResource client = keycloak.realm(realm).clients().get("6fd0f65b-de70-4a4c-a7eb-ca2dce1ae42c");
         log.debug("" + client.getSecret());
         log.debug("" + client.roles().list());

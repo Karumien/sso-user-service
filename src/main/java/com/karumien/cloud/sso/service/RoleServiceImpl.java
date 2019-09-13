@@ -182,12 +182,15 @@ public class RoleServiceImpl implements RoleService{
     		resources.roles().realmLevel().listAll()
     		.forEach(role ->
       		{
+      		  Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
+      		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask") != null) {
+      		    Integer binaryMask = Integer.valueOf(roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask").get(0));
       			String[] splitName = role.getName().split("_");
     			if(splitName[0].equals("ROLE")) {
-    				Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + Integer.valueOf(role.getAttributes().get("binaryMask").get(0))
-    				: Integer.valueOf(role.getAttributes().get("binaryMask").get(0));
+    				Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + binaryMask : binaryMask;
     				maskMap.put(splitName[1], rigtValue);
     			}
+      		  }
     		});
     		StringBuilder binaryRule = new StringBuilder();
     		for (Entry<String, Integer> entry : maskMap.entrySet()) {

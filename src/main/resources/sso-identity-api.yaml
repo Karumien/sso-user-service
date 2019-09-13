@@ -404,6 +404,9 @@ definitions:
       crmContactId:
         type: string
         description: Identity's Unique ID 
+      nav4Id:
+        type: string
+        description: Identity's Unique NAV4 ID 
       lastName:
         type: string
         description: "Last name/ surname of the Identity"

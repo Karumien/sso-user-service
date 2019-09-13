@@ -198,7 +198,137 @@ paths:
           description: Account not found
         '406':
           description: Module not deactivated
+  /accounts/{crmAccountId}/identities:
+    post:
+      summary: Create Identity
+      description: Create Identity in target SSO
+      operationId: createIdentity
+      parameters:
+        - in: body
+          name: identity
+          description: The Identity to create
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+      responses:
+        '201':
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              crmContactId: 6287994b-0245-4ca7-8eb4-777230b2f91f
+              crmAccountId: 31034
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+        '409':
+          description: Identity already exists (conflict username/crmContactId)
+    get:
+      summary: Create Identity
+      description: Create Identity in target SSO
+      operationId: createIdentity
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string      
+      responses:
+        '200':
+          description: Successfully returned Identities
+          schema:
+            items:
+              $ref: '#/definitions/IdentityInfo'
+        '404':
+          description: Account not found
+  /accounts/{crmAccountId}/identities/{crmContactId}:
+    get:
+      summary: "Get detail of the given Identity"
+      description: "Method returns detail information about Identity."
+      operationId: getIdentity
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's info
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '404':
+          description: not found
+    delete:
+      summary: "Remove existing Identity"
+      operationId: deleteIdentity
+      parameters:
+        - name: id
+          in: path
+          description: Filtering by Identity Unique ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully removed existing Identity
+        '404':
+          description: Identity not found
 definitions:
+  IdentityInfo:
+    type: object
+    description: "Basic information about Identity"
+    required:
+      - crmAccountId
+      - crmContactId
+    properties:
+      crmAccountId:
+        type: string
+        description: Identity's CRM Account ID
+      crmContactId:
+        type: string
+        description: Identity's Unique ID 
+      nav4Id:
+        type: string
+        description: Identity's Unique NAV4 ID 
+      lastName:
+        type: string
+        description: "Last name/ surname of the Identity"
+        maxLength: 50
+      firstName:
+        type: string
+        description: "First name of the Identity"
+        maxLength: 50
+      username:
+        type: string
+        description: "Unique username"
+        maxLength: 50
+      email:
+        type: string
+        description: "Primary email used primary for password reset"
+        maxLength: 100
+      emailVerified:
+        type: boolean
+        description: "Verified status of itentity email"
+      phone:
+        type: string
+        description: "Phone used primary for OTP"
+        maxLength: 30
+      globalEmail:
+        type: string
+        description: "Contact email - can be company global"
+        maxLength: 100
+    example:
+      crmAccountId: 31034
+      crmContactId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      lastName: Novak
+      firstName: Karel
+      email: KajaN@eurowag.com
+      emailVerified: true
   AccountInfo:
     type: object
     description: "Basic information about Account"
