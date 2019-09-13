@@ -123,7 +123,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> getAccountModule(String crmAccountId, String moduleId) {
         return new ResponseEntity<>(moduleService.isActiveModule(moduleId, crmAccountId) ? 
-                HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
+                HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
     }
     
 }

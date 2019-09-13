@@ -10,12 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Exception when no ClientSystem exists - {@link HttpStatus#SC_NOT_FOUND}.
+ * Exception when no ClientSystem exists - {@link HttpStatus#GONE}.
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 10. 6. 2019 13:56:31
  */
-@ResponseStatus(HttpStatus.NOT_FOUND)
+@ResponseStatus(HttpStatus.GONE)
 public class IdentityNotFoundException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;

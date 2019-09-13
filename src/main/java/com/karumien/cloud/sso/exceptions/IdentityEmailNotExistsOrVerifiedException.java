@@ -10,12 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * Exception when Identity doesn't have email - {@link HttpStatus#}.
+ * Exception when Identity doesn't have email - {@link HttpStatus#UNPROCESSABLE_ENTITY}.
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 10. 6. 2019 13:56:31
  */
-@ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 public class IdentityEmailNotExistsOrVerifiedException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;
