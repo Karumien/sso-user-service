@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import javax.ws.rs.NotFoundException;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -56,6 +55,9 @@ public class RoleServiceImpl implements RoleService{
     
     @Autowired
     private AccountService accountService;
+    
+    @Autowired
+    private IdentityService identityService;
 
     /**
      * {@inheritDoc}
@@ -174,17 +176,14 @@ public class RoleServiceImpl implements RoleService{
 	 * {@inheritDoc}
 	 */
     @Override
-    public String getRolesBinary(String crmContactId) {
-    	Optional<GroupResource> accountResorces = accountService.findGroupResource(crmContactId);
-    	if (accountResorces.isPresent()) {
-    		GroupResource resources = accountResorces.get();
-    		Map<String, Integer> maskMap = new HashMap<String, Integer>();
-    		resources.roles().realmLevel().listAll()
-    		.forEach(role ->
+    public String getRolesBinary(String crmContactId) {	
+    	Map<String, Integer> maskMap = new HashMap<String, Integer>();
+		keycloak.realm(realm).users().get(crmContactId).roles().realmLevel().listEffective().forEach(role ->
       		{
       		  Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
       		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask") != null) {
-      		    Integer binaryMask = Integer.valueOf(roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask").get(0));
+      			String stringMask = roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask").get(0);
+      		    Integer binaryMask = Integer.valueOf(stringMask.substring(0,stringMask.length()-2), 16);
       			String[] splitName = role.getName().split("_");
     			if(splitName[0].equals("ROLE")) {
     				Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + binaryMask : binaryMask;
@@ -197,9 +196,7 @@ public class RoleServiceImpl implements RoleService{
     			binaryRule.append(entry.getKey() + ":" + Integer.toHexString(entry.getValue())+ " ");
     		}
     		return binaryRule.toString();
-    	} else {
-    		return "";
-    	}
+    
     }
 
     /**

@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,10 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -270,8 +273,10 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-        return findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
-            .getRealmRoles().addAll(roles);
+    	UserRepresentation resource = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    	List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
+    	keycloak.realm(realm).users().get(resource.getId()).roles().realmLevel().add(list);
+        return true;
     }
 
     /**
@@ -351,5 +356,19 @@ public class IdentityServiceImpl implements IdentityService {
         }
         return attributes.get(attrName).stream().findFirst();
     }
+
+	private List<RoleRepresentation> getListOfRoleReprasentationBaseOnIds(List<String> roles) {
+		List<RoleRepresentation> returnList = new ArrayList<>();
+		roles.forEach(role -> {
+			RoleResource searcherRole = keycloak.realm(realm).roles().get(role);
+			try {
+				returnList.add(searcherRole.toRepresentation());
+			}
+			catch(Exception e) {
+				
+			}
+		});
+		return returnList;
+	}
 
 }
