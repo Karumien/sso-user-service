@@ -233,7 +233,7 @@ paths:
       description: Create Identity in target SSO
       operationId: createAccountIdentity
       parameters:
-        - name: crmContactId
+        - name: crmAccountId
           in: path
           description: Filtering by Identity unique CRM ID
           required: true

@@ -37,6 +37,7 @@ import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -228,7 +229,9 @@ public class AccountServiceImpl implements AccountService {
      */
 	@Override
 	public boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
-		return keycloak.realm(realm).groups().group(findGroup(crmAccountId).get().getId()).members().remove(keycloak.realm(realm).users().get(crmContactId).toRepresentation());
+		UserResource user = keycloak.realm(realm).users().get(crmContactId);
+		user.leaveGroup(findGroup(crmAccountId).get().getId());
+		return true;
 	}
 
 }

@@ -161,7 +161,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> deleteAccountIdentity(String crmAccountId, String crmContactId) {
-		return new ResponseEntity<Void>(accountService.deleteAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId)? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+		return new ResponseEntity<Void>(accountService.deleteAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId)? HttpStatus.OK : HttpStatus.GONE);
 	}
     
 }
