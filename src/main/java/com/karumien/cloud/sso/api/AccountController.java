@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.service.AccountService;
+import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
 
 import io.swagger.annotations.Api;
@@ -39,6 +41,9 @@ public class AccountController implements AccountsApi {
     
     @Autowired
     private ModuleService moduleService;
+    
+    @Autowired
+    private IdentityService identityService;
 
     /**
      * {@inheritDoc}
@@ -125,5 +130,38 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(moduleService.isActiveModule(moduleId, crmAccountId) ? 
                 HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createAccountIdentity(String crmContactId) {
+    	List<IdentityInfo> identityInfo = accountService.getAccountIdentitys(crmContactId);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> createAccountIdentity(IdentityInfo identity) {
+		return new ResponseEntity<>(identityService.createIdentity(identity),HttpStatus.OK);
+	}
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> getAccountIdentity(String crmAccountId, String crmContactId) {
+    	return new ResponseEntity<IdentityInfo>(accountService.getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId),HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> deleteAccountIdentity(String crmAccountId, String crmContactId) {
+		return new ResponseEntity<Void>(accountService.deleteAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId)? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+	}
     
 }

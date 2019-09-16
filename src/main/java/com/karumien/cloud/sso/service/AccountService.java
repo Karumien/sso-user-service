@@ -11,8 +11,10 @@ import java.util.Optional;
 
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.springframework.http.HttpStatus;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.IdentityInfo;
 
 /**
  * Service provides scenarios for Account's management.
@@ -39,4 +41,27 @@ public interface AccountService {
     Optional<GroupRepresentation> findGroup(String crmAccountId);
         
     Optional<GroupResource> findGroupResource(String crmAccountId);
+
+    /**
+     * Return all identidities that are under this account
+     * @param crmContactId {@link String} id of account 
+     * @return {@link List} {@link IdentityInfo} list of identities
+     */
+	List<IdentityInfo> getAccountIdentitys(String crmContactId);
+
+	/**
+	 * Return {@link IdentityInfo} for account and contractra ID
+	 * @param crmAccountId {@link String} Account ID 
+	 * @param crmContactId {@link String} ID of contract
+	 * @return {@link IdentityInfo} identity info for selected crmContractId
+	 */
+	IdentityInfo getAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId);
+
+	/**
+	 * Remove identity from account members base on contract Id
+	 * @param crmAccountId {@link String} id of Account
+	 * @param crmContactId {@link String} ID of Contract
+	 * @return {@link Boolean} value if we ware successfull of not
+	 */
+	boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId);
 }

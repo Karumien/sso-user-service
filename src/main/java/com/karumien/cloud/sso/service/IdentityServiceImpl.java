@@ -99,11 +99,12 @@ public class IdentityServiceImpl implements IdentityService {
         identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
                 Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
 
+        identity.setRequiredActions(Arrays.asList("UPDATE_PASSWORD"));
         Response response = keycloak.realm(realm).users().create(identity);
-
+        
         identityInfo.setCrmContactId(getCreatedId(response));
         identityInfo.setUsername(identity.getUsername());
-
+        keycloak.realm(realm).users().get(identityInfo.getCrmContactId()).resetPasswordEmail();
         return identityInfo;
     }
 
@@ -226,7 +227,7 @@ public class IdentityServiceImpl implements IdentityService {
             .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
     }
     
-    private IdentityInfo mapping(UserRepresentation userRepresentation) {
+    public IdentityInfo mapping(UserRepresentation userRepresentation) {
 
         // TODO: Orica Mapper
         IdentityInfo identity = new IdentityInfo();

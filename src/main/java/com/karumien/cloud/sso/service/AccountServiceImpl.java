@@ -27,6 +27,7 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,12 +38,14 @@ import javax.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 
@@ -61,7 +64,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private Keycloak keycloak;
-
+    
+    @Autowired
+    private IdentityService identityService;
+    
     private GroupRepresentation getMasterGroup() {
         
         // TODO viliam.litavec: Optimize performance - use stored group id for MASTER_GROUP
@@ -193,5 +199,36 @@ public class AccountServiceImpl implements AccountService {
             .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
             .map(g -> mapping(g)).collect(Collectors.toList());
     }
+    
+    /**
+     * inheritDoc
+     */
+
+	@Override
+	public List<IdentityInfo> getAccountIdentitys(String crmContactId) {
+		List<UserRepresentation> members = keycloak.realm(realm).groups().group(findGroup(crmContactId).get().getId()).members();
+		List<IdentityInfo> infoList = new ArrayList<IdentityInfo>();
+		members.forEach(member -> {
+			infoList.add(((IdentityServiceImpl)identityService).mapping(member));
+		});
+		return infoList;
+	}
+
+	/**
+     * inheritDoc
+     */
+	@Override
+	public IdentityInfo getAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
+		Optional<IdentityInfo> identityFind = getAccountIdentitys(crmAccountId).stream().filter(identity -> identity.getCrmContactId().equals(crmContactId)).findAny();
+		return identityFind.orElse(null);
+	}
+
+	/**
+     * inheritDoc
+     */
+	@Override
+	public boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
+		return keycloak.realm(realm).groups().group(findGroup(crmAccountId).get().getId()).members().remove(keycloak.realm(realm).users().get(crmContactId).toRepresentation());
+	}
 
 }

@@ -202,7 +202,7 @@ paths:
     post:
       summary: Create Identity
       description: Create Identity in target SSO
-      operationId: createIdentity
+      operationId: createAccountIdentity
       parameters:
         - in: body
           name: identity
@@ -231,7 +231,7 @@ paths:
     get:
       summary: Create Identity
       description: Create Identity in target SSO
-      operationId: createIdentity
+      operationId: createAccountIdentity
       parameters:
         - name: crmContactId
           in: path
@@ -250,8 +250,13 @@ paths:
     get:
       summary: "Get detail of the given Identity"
       description: "Method returns detail information about Identity."
-      operationId: getIdentity
+      operationId: getAccountIdentity
       parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
         - name: crmContactId
           in: path
           description: Filtering by Identity unique CRM ID
@@ -266,13 +271,18 @@ paths:
           description: not found
     delete:
       summary: "Remove existing Identity"
-      operationId: deleteIdentity
+      operationId: deleteAccountIdentity
       parameters:
-        - name: id
+        - name: crmAccountId
           in: path
-          description: Filtering by Identity Unique ID
+          description: Filtering by Account unique CRM ID
           required: true
-          type: string       
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string    
       responses:
         '200':
           description: Successfully removed existing Identity
