@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
-import org.springframework.http.HttpStatus;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
