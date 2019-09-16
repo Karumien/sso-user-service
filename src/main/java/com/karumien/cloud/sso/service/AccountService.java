@@ -47,7 +47,7 @@ public interface AccountService {
      * @param crmContactId {@link String} id of account 
      * @return {@link List} {@link IdentityInfo} list of identities
      */
-	List<IdentityInfo> getAccountIdentitys(String crmContactId);
+	List<IdentityInfo> getAccountIdentities(String crmContactId);
 
 	/**
 	 * Return {@link IdentityInfo} for account and contractra ID

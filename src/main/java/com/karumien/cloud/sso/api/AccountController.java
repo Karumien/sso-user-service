@@ -38,10 +38,10 @@ public class AccountController implements AccountsApi {
 
     @Autowired
     private AccountService accountService;
-    
+
     @Autowired
     private ModuleService moduleService;
-    
+
     @Autowired
     private IdentityService identityService;
 
@@ -77,7 +77,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<List<AccountInfo>> getAccounts() {
         return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -86,7 +86,7 @@ public class AccountController implements AccountsApi {
         moduleService.activateModules(Arrays.asList(moduleId), Arrays.asList(crmAccountId));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -95,7 +95,7 @@ public class AccountController implements AccountsApi {
         moduleService.activateModules(modules, Arrays.asList(crmAccountId));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -112,7 +112,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<List<ModuleInfo>> getAccountModules(String crmAccountId) {
         return new ResponseEntity<>(moduleService.getAccountModules(crmAccountId), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -121,41 +121,39 @@ public class AccountController implements AccountsApi {
         moduleService.deactivateModules(Arrays.asList(moduleId), Arrays.asList(crmAccountId));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<Void> getAccountModule(String crmAccountId, String moduleId) {
-        return new ResponseEntity<>(moduleService.isActiveModule(moduleId, crmAccountId) ? 
-                HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(moduleService.isActiveModule(moduleId, crmAccountId) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    /***
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> createAccountIdentity(String crmAccountId, @Valid IdentityInfo identity) {
+        return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.OK);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createAccountIdentity(String crmContactId) {
-    	List<IdentityInfo> identityInfo = accountService.getAccountIdentitys(crmContactId);
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<IdentityInfo> createAccountIdentity(IdentityInfo identity) {
-		return new ResponseEntity<>(identityService.createIdentity(identity),HttpStatus.OK);
-	}
+    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String crmAccountId) {
+        return new ResponseEntity<>(accountService.getAccountIdentities(crmAccountId), HttpStatus.OK);
+    }
     
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<IdentityInfo> getAccountIdentity(String crmAccountId, String crmContactId) {
-    	return new ResponseEntity<IdentityInfo>(accountService.getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId),HttpStatus.OK);
+        return new ResponseEntity<IdentityInfo>(accountService.getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -163,5 +161,5 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> deleteAccountIdentity(String crmAccountId, String crmContactId) {
 		return new ResponseEntity<Void>(accountService.deleteAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId)? HttpStatus.OK : HttpStatus.GONE);
 	}
-    
+
 }

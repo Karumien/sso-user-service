@@ -24,6 +24,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
@@ -65,20 +78,20 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private Keycloak keycloak;
-    
+
     @Autowired
     private IdentityService identityService;
-    
+
     private GroupRepresentation getMasterGroup() {
-        
+
         // TODO viliam.litavec: Optimize performance - use stored group id for MASTER_GROUP
         try {
-            return keycloak.realm(realm).getGroupByPath("/" + MASTER_GROUP);                
-        } catch (NotFoundException e) {            
+            return keycloak.realm(realm).getGroupByPath("/" + MASTER_GROUP);
+        } catch (NotFoundException e) {
             // autocreate
             GroupRepresentation newMasterGroup = new GroupRepresentation();
-            newMasterGroup.setName(MASTER_GROUP);            
-            keycloak.realm(realm).groups().add(newMasterGroup);            
+            newMasterGroup.setName(MASTER_GROUP);
+            keycloak.realm(realm).groups().add(newMasterGroup);
             return newMasterGroup;
         }
     }
@@ -88,24 +101,21 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Optional<GroupRepresentation> findGroup(String crmAccountId) {
-        return getMasterGroup().getSubGroups().stream()
-            .filter(g -> g.getAttributes() != null)
-            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
-            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmAccountId))
-            .findFirst();
+        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes() != null).filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
+                .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmAccountId)).findFirst();
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Optional<GroupResource> findGroupResource(String crmAccountId) {
-        
+
         Optional<GroupRepresentation> group = findGroup(crmAccountId);
         if (!group.isPresent()) {
             return Optional.empty();
         }
-        
+
         return Optional.of(keycloak.realm(realm).groups().group(group.get().getId()));
     }
 
@@ -117,7 +127,7 @@ public class AccountServiceImpl implements AccountService {
 
         GroupRepresentation group = new GroupRepresentation();
         group.setName(account.getName());
-        group.setPath("/"+MASTER_GROUP + "/" + group.getName());
+        group.setPath("/" + MASTER_GROUP + "/" + group.getName());
         group.singleAttribute(ATTR_CRM_ACCOUNT_ID, account.getCrmAccountId());
 
         if (!StringUtils.isEmpty(account.getCompRegNo())) {
@@ -129,12 +139,12 @@ public class AccountServiceImpl implements AccountService {
         }
 
         getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup().getId()).subGroup(group));
-        
-        //TODO: caches?
+
+        // TODO: caches?
         keycloak.realm(realm).clearRealmCache();
         return getAccount(account.getCrmAccountId());
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -154,19 +164,18 @@ public class AccountServiceImpl implements AccountService {
             throw new UnsupportedOperationException("Unknown status " + response.getStatusInfo().toEnum());
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public AccountInfo getAccount(String crmAccountId) {
-        return mapping(findGroup(crmAccountId)
-                .orElseThrow(() -> new AccountNotFoundException(crmAccountId)));
+        return mapping(findGroup(crmAccountId).orElseThrow(() -> new AccountNotFoundException(crmAccountId)));
     }
 
     private AccountInfo mapping(GroupRepresentation group) {
-        
-        //TODO viliam: Orica
+
+        // TODO viliam: Orica
         AccountInfo accountInfo = new AccountInfo();
         accountInfo.setCrmAccountId(group.getAttributes().get(ATTR_CRM_ACCOUNT_ID).stream().findFirst().orElse(null));
         if (group.getAttributes().get(ATTR_COMP_REG_NO) != null) {
@@ -176,7 +185,7 @@ public class AccountServiceImpl implements AccountService {
             accountInfo.setContactEmail(group.getAttributes().get(ATTR_CONTACT_EMAIL).stream().findFirst().orElse(null));
         }
         accountInfo.setName(group.getName());
-        
+
         return accountInfo;
     }
 
@@ -185,10 +194,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public void deleteAccount(String crmAccountId) {
-        keycloak.realm(realm).groups().group(findGroup(crmAccountId)
-                .orElseThrow(() -> new AccountNotFoundException(crmAccountId)).getId()).remove();
-        //TODO: caches?
-        keycloak.realm(realm).clearRealmCache();
+        keycloak.realm(realm).groups().group(findGroup(crmAccountId).orElseThrow(() -> new AccountNotFoundException(crmAccountId)).getId()).remove();
     }
 
     /**
@@ -196,36 +202,35 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<AccountInfo> getAccounts() {
-        return getMasterGroup().getSubGroups().stream()
-            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
-            .map(g -> mapping(g)).collect(Collectors.toList());
+        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID)).map(g -> mapping(g))
+                .collect(Collectors.toList());
     }
-    
+
     /**
-     * inheritDoc
+     * {@inheritDoc}
      */
+    @Override
+    public List<IdentityInfo> getAccountIdentities(String crmAccountId) {
+        List<UserRepresentation> members = keycloak.realm(realm).groups().group(findGroup(crmAccountId).get().getId()).members();
+        List<IdentityInfo> infoList = new ArrayList<IdentityInfo>();
+        members.forEach(member -> {
+            infoList.add(((IdentityServiceImpl) identityService).mapping(member));
+        });
+        return infoList;
+    }
 
-	@Override
-	public List<IdentityInfo> getAccountIdentitys(String crmContactId) {
-		List<UserRepresentation> members = keycloak.realm(realm).groups().group(findGroup(crmContactId).get().getId()).members();
-		List<IdentityInfo> infoList = new ArrayList<IdentityInfo>();
-		members.forEach(member -> {
-			infoList.add(((IdentityServiceImpl)identityService).mapping(member));
-		});
-		return infoList;
-	}
-
-	/**
-     * inheritDoc
+    /**
+     * {@inheritDoc}
      */
-	@Override
-	public IdentityInfo getAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
-		Optional<IdentityInfo> identityFind = getAccountIdentitys(crmAccountId).stream().filter(identity -> identity.getCrmContactId().equals(crmContactId)).findAny();
-		return identityFind.orElse(null);
-	}
+    @Override
+    public IdentityInfo getAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
+        Optional<IdentityInfo> identityFind = getAccountIdentities(crmAccountId).stream().filter(identity -> identity.getCrmContactId().equals(crmContactId))
+                .findAny();
+        return identityFind.orElse(null);
+    }
 
-	/**
-     * inheritDoc
+    /**
+     * {@inheritDoc}
      */
 	@Override
 	public boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {

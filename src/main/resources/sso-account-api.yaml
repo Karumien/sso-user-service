@@ -204,44 +204,37 @@ paths:
       description: Create Identity in target SSO
       operationId: createAccountIdentity
       parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string       
         - in: body
           name: identity
           description: The Identity to create
           schema:
             $ref: '#/definitions/IdentityInfo'
-            example:
-              lastName: Novak
-              firstName: Karel
-              username: KajaN
-              email: KajaN@eurowag.com
       responses:
         '201':
           description: Successfully created
           schema:
-            $ref: '#/definitions/IdentityInfo'
-            example:
-              crmContactId: 6287994b-0245-4ca7-8eb4-777230b2f91f
-              crmAccountId: 31034
-              lastName: Novak
-              firstName: Karel
-              username: KajaN
-              email: KajaN@eurowag.com
+            $ref: '#/definitions/IdentityInfo'            
         '409':
           description: Identity already exists (conflict username/crmContactId)
     get:
-      summary: Create Identity
-      description: Create Identity in target SSO
-      operationId: createAccountIdentity
+      summary: Return all Identities registered for Account
+      operationId: getAccountIdentities
       parameters:
         - name: crmAccountId
           in: path
-          description: Filtering by Identity unique CRM ID
+          description: Filtering by Account CRM ID
           required: true
-          type: string      
+          type: string       
       responses:
         '200':
           description: Successfully returned Identities
           schema:
+            type: array            
             items:
               $ref: '#/definitions/IdentityInfo'
         '404':

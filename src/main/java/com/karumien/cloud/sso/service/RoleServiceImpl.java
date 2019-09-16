@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-
 import javax.ws.rs.NotFoundException;
+
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
