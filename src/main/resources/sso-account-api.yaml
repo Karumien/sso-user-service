@@ -281,6 +281,161 @@ paths:
           description: Successfully removed existing Identity
         '404':
           description: Identity not found
+  /accounts/{crmAccountId}/identities/{crmContactId}/roles:
+    get:
+      summary: "Get detail of the given Identity"
+      operationId: getAccountIdentityRoles
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RoleInfo'
+        '404':
+          description: not found
+    put:
+      summary: "Assign roles on Identity"
+      operationId: assignAccountIdentityRoles
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string   
+        - in: body
+          name: roles
+          description: List of Roles's ID to deactivate
+          schema:
+            type: array
+            items:
+              type: string  
+      responses:
+        '202':
+          description: Successfully added roles to Identity
+        '404':
+          description: Identity not found
+    delete:
+      summary: "Unassign roles on Identity"
+      operationId: unassignAccountIdentityRoles
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string   
+        - in: body
+          name: roles
+          description: List of Roles's ID to deactivate
+          schema:
+            type: array
+            items:
+              type: string  
+      responses:
+        '202':
+          description: Successfully removed roles of Identity
+        '404':
+          description: Identity not found
+  /accounts/{crmAccountId}/identities/{crmContactId}/roles/{roleId}:
+    get:
+      summary: "Get assigned Roles on Identity"
+      operationId: "getAccountIdentityRole"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string   
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string   
+      responses:
+        '200':
+          description: Role is assigned to Identity
+        '404':
+          description: Identity not found
+        '406':
+          description: Role not assigned
+    put:
+      summary: "Assign Role to Identity"
+      operationId: "assignAccountIdentityRole"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully assigned Role on Identity
+        '404':
+          description: Identity not found
+        '406':
+          description: Role for Identity not assigned
+    delete:
+      summary: "Remove Role on Identity"
+      operationId: "unassignAccountIdentityRole"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully unassigned Role from Identity
+        '404':
+          description: Identity not found
+        '406':
+          description: Role not unassigned
 definitions:
   IdentityInfo:
     type: object
@@ -289,6 +444,9 @@ definitions:
       - crmAccountId
       - crmContactId
     properties:
+      identityId:
+        type: string
+        description: Identity's ID 
       crmAccountId:
         type: string
         description: Identity's CRM Account ID
@@ -373,3 +531,24 @@ definitions:
         type: string
         example: "Map"
         maxLength: 300
+  RoleInfo:
+    type: object
+    description: "Basic information about Role"
+    required:
+      - roleId
+    properties:
+      roleId:
+        type: string
+        description: "Unique Role ID (Role Name)"
+        maxLength: 50
+      description:
+        type: string
+        description: "Role description"
+        maxLength: 255
+      clientId:
+        type: string
+        maxLength: 250
+        description: Client Id (for client roles)
+      clientRole:
+        type: boolean
+        description: "Identify Client Role (not realm role)"

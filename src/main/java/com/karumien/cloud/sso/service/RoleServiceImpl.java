@@ -13,26 +13,27 @@
  */
 package com.karumien.cloud.sso.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.NotFoundException;
 
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.RoleNotFoundException;
 
 /**
@@ -52,10 +53,7 @@ public class RoleServiceImpl implements RoleService{
 
     @Autowired
     private Keycloak keycloak;
-    
-    @Autowired
-    private AccountService accountService;
-    
+        
     @Autowired
     private IdentityService identityService;
 
@@ -126,13 +124,12 @@ public class RoleServiceImpl implements RoleService{
      * {@inheritDoc}
      */
 	@Override
-	public void assigneRoleToClient(String crmContactId, RoleInfo role) {
-		RealmResource realmResource = keycloak.realm(realm);
-		UsersResource userRessource = realmResource.users();
-
-		RoleRepresentation realmRole = realmResource.roles().get(role.getRoleId()).toRepresentation();
-		userRessource.get(crmContactId).roles().realmLevel() //
-		.add(Arrays.asList(realmRole));
+	public void assignRoleToIdentity(String crmContactId, RoleInfo role) {
+        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        RoleRepresentation realmRole = findRoleResource(role.getRoleId()).orElseThrow(() -> new RoleNotFoundException(role.getRoleId())).toRepresentation();
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        user.roles().realmLevel().add(Arrays.asList(realmRole));
+        user.update(userRepresentation);
 	}
 
 	/**
@@ -140,13 +137,9 @@ public class RoleServiceImpl implements RoleService{
      */
 	@Override
 	public List<RoleInfo> getAllRolesOfIdentity(String crmContactId) {
-		List<RoleInfo> listOfRoles = new ArrayList<>();
-		
-		RealmResource realmResource = keycloak.realm(realm);
-		realmResource.users().get(crmContactId).roles().realmLevel().listEffective().forEach(role -> {
-			listOfRoles.add(transformRoleToBaseRole(role));
-		});
-		return listOfRoles;
+        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+		return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective()
+		    .stream().map(role -> transformRoleToBaseRole(role)).collect(Collectors.toList());
 	}
 
 	/**
@@ -166,10 +159,12 @@ public class RoleServiceImpl implements RoleService{
      * {@inheritDoc}
      */
 	@Override
-	public void deleteRoleForIdentity(String crmContactId, String roleId) {
-		RoleInfo role = getRoleBaseOnId(roleId);
-		keycloak.realm(realm).users().get(crmContactId).roles().realmLevel()
-		    .remove(Arrays.asList(keycloak.realm(realm).roles().get(role.getRoleId()).toRepresentation()));
+	public void unassignRoleFromIdentity(String crmContactId, String roleId) {
+        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        RoleRepresentation realmRole = findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId)).toRepresentation();
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        user.roles().realmLevel().remove(Arrays.asList(realmRole));
+        user.update(userRepresentation);
 	}
 
 	/**
@@ -177,8 +172,9 @@ public class RoleServiceImpl implements RoleService{
 	 */
     @Override
     public String getRolesBinary(String crmContactId) {	
+        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
     	Map<String, Integer> maskMap = new HashMap<String, Integer>();
-		keycloak.realm(realm).users().get(crmContactId).roles().realmLevel().listEffective().forEach(role ->
+		keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().forEach(role ->
       		{
       		  Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
       		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask") != null) {

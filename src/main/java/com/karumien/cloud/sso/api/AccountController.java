@@ -20,6 +20,7 @@ import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
@@ -151,7 +152,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> getAccountIdentity(String crmAccountId, String crmContactId) {
-        return new ResponseEntity<IdentityInfo>(accountService.getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId), HttpStatus.OK);
     }
 
     /**
@@ -159,7 +160,54 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> deleteAccountIdentity(String crmAccountId, String crmContactId) {
-		return new ResponseEntity<Void>(accountService.deleteAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId)? HttpStatus.OK : HttpStatus.GONE);
+		return new ResponseEntity<>(accountService.deleteAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId)? HttpStatus.OK : HttpStatus.GONE);
 	}
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignAccountIdentityRoles(String crmAccountId, String crmContactId, @Valid List<String> roles) {
+        return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<RoleInfo>> getAccountIdentityRoles(String crmAccountId, String crmContactId) {
+        return new ResponseEntity<>(identityService.getAllIdentityRoles(crmContactId), HttpStatus.OK);
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unassignAccountIdentityRoles(String crmAccountId, String crmContactId, @Valid List<String> roles) {
+        return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignAccountIdentityRole(String crmAccountId, String crmContactId, String roleId) {
+        return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unassignAccountIdentityRole(String crmAccountId, String crmContactId, String roleId) {
+        return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> getAccountIdentityRole(String crmAccountId, String crmContactId, String roleId) {
+        return new ResponseEntity<>(identityService.isActiveRole(roleId, crmContactId) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+    }
 }

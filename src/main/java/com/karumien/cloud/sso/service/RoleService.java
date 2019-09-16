@@ -99,7 +99,7 @@ public interface RoleService {
      * @param role
      *            {@link RoleInfo} object of role we want to ussigne to identity
      */
-    void assigneRoleToClient(String clientId, RoleInfo role);
+    void assignRoleToIdentity(String clientId, RoleInfo role);
 
     /**
      * Function that return all role that identity have signed
@@ -119,7 +119,7 @@ public interface RoleService {
      * @param roleId
      *            {@link String} id of role that we want to remove
      */
-    void deleteRoleForIdentity(String crmContactId, String roleId);
+    void unassignRoleFromIdentity(String crmContactId, String roleId);
 
     /**
      * Return Role Resource by unique ID {@code roleId}.

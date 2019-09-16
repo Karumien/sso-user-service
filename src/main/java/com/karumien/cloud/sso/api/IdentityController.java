@@ -104,7 +104,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRole(String crmContactId, String roleId) {
-        return new ResponseEntity<>(identityService.assigneRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -112,7 +112,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRole(String crmContactId, String roleId) {
-        return new ResponseEntity<>(identityService.unassigneRolesToIdentity(crmContactId,  Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId,  Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -120,7 +120,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRoles(String crmContactId, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.assigneRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**
@@ -128,7 +128,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRoles(String crmContactId, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.unassigneRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
     }
     
     /**

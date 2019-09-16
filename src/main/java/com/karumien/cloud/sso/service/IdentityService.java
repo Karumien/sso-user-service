@@ -114,7 +114,7 @@ public interface IdentityService {
      *            {@link List} {@link String} list of ids of roles we want to add to identity
      * @return {@link Boolean} return true if we successfully assign roles false if not
      */
-    boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
+    boolean assignRolesToIdentity(String crmContactId, @Valid List<String> roles);
 
     /**
      * Remove selected list of roles to as current Identity.
@@ -125,7 +125,7 @@ public interface IdentityService {
      *            {@link List} {@link String} list of ids of roles we want to remove from identity
      * @return {@link Boolean} return true if we successfully remove roles false if not
      */
-    boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles);
+    boolean unassignRolesToIdentity(String crmContactId, @Valid List<String> roles);
 
     /**
      * Return all roles that are assigned to selected identity.
@@ -182,4 +182,6 @@ public interface IdentityService {
      * @return {@link DriverPin} pin of the driver
      */
     DriverPin getPinOfIdentityDriver(String crmContactId);
+
+    boolean isActiveRole(String roleId, String crmContactId);
 }

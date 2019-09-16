@@ -99,12 +99,8 @@ public class IdentityServiceImpl implements IdentityService {
         identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
                 Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
 
-        identity.setRequiredActions(Arrays.asList("UPDATE_PASSWORD"));
-        Response response = keycloak.realm(realm).users().create(identity);
-        
-        identityInfo.setCrmContactId(getCreatedId(response));
-        identityInfo.setUsername(identity.getUsername());
-        keycloak.realm(realm).users().get(identityInfo.getCrmContactId()).resetPasswordEmail();
+        Response response = keycloak.realm(realm).users().create(identity);        
+        identityInfo.setIdentityId(getCreatedId(response));
         return identityInfo;
     }
 
@@ -201,7 +197,6 @@ public class IdentityServiceImpl implements IdentityService {
             userResource.update(user);
             userResource.resetPassword(newCredential);
         } catch (BadRequestException e) {
-            e.printStackTrace();
             throw new PolicyPasswordException(newCredentials.getPassword());
         }
 
@@ -273,20 +268,24 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public boolean assigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-    	UserRepresentation resource = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-    	List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
-    	keycloak.realm(realm).users().get(resource.getId()).roles().realmLevel().add(list);
-        return true;
+    public boolean assignRolesToIdentity(String crmContactId, @Valid List<String> roles) {
+    	UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
+    	user.roles().realmLevel().add(list);
+    	return true;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean unassigneRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-        return findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId))
-            .getRealmRoles().removeAll(roles);
+    public boolean unassignRolesToIdentity(String crmContactId, @Valid List<String> roles) {
+        UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
+        user.roles().realmLevel().remove(list);
+        return true;
     }
 
     /**
@@ -371,5 +370,14 @@ public class IdentityServiceImpl implements IdentityService {
 		});
 		return returnList;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public boolean isActiveRole(String roleId, String crmContactId) {
+        //FIXME: performance
+        return getAllIdentityRoles(crmContactId).stream().filter(role -> role.getRoleId().equals(roleId)).findAny().isPresent();
+    }
 
 }
