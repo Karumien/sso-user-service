@@ -189,7 +189,7 @@ public class RoleServiceImpl implements RoleService{
       		  Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
       		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask") != null) {
       			String stringMask = roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask").get(0);
-      		    Integer binaryMask = Integer.valueOf(stringMask.substring(0,stringMask.length()-2), 16);
+      		    Integer binaryMask = Integer.valueOf(stringMask.substring(0,stringMask.length()-2), 2);
       			
       		    // TODO: use attribute module - no split?
       		    String[] splitName = role.getName().split("_");

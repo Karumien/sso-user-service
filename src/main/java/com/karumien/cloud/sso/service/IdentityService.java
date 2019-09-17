@@ -38,6 +38,8 @@ public interface IdentityService {
 
     String ATTR_BINARY_ROLES = "binaryRoles";
 
+    String ATTR_BINARY_RIGHTS = "binaryRights";
+
     String ATTR_PHONE = "phone";
 
     /**
