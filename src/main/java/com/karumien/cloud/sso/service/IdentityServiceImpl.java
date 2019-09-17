@@ -300,9 +300,9 @@ public class IdentityServiceImpl implements IdentityService {
         UserResource userResource = keycloak.realm(realm).users().get(userRepresentation.getId());
         String binaryRoles = roleService.getRolesBinary(userRepresentation);
         if (StringUtils.isEmpty(binaryRoles)) {
-            userRepresentation.getAttributes().remove(ATTR_BINARY_ROLES);
+            userRepresentation.getAttributes().remove(ATTR_BINARY_RIGHTS);
         } else {
-            userRepresentation.getAttributes().put(ATTR_BINARY_ROLES, Arrays.asList(binaryRoles));
+            userRepresentation.getAttributes().put(ATTR_BINARY_RIGHTS, Arrays.asList(binaryRoles));
         }
         userResource.update(userRepresentation);
     }
