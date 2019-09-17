@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -34,6 +35,8 @@ public interface IdentityService {
     String ATTR_GLOBAL_EMAIL = "globalEmail";
 
     String ATTR_DRIVER_PIN = "driverPin";
+
+    String ATTR_BINARY_ROLES = "binaryRoles";
 
     String ATTR_PHONE = "phone";
 
@@ -184,4 +187,10 @@ public interface IdentityService {
     DriverPin getPinOfIdentityDriver(String crmContactId);
 
     boolean isActiveRole(String roleId, String crmContactId);
+
+    void refreshBinaryRoles(UserRepresentation userRepresentation);
+
+    IdentityInfo mapping(UserRepresentation userRepresentation);
+
+    Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName);
 }

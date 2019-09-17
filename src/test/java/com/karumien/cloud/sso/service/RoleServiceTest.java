@@ -6,6 +6,7 @@
  */
 package com.karumien.cloud.sso.service;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -55,7 +55,9 @@ public class RoleServiceTest {
     
     @Test
     public void rolesBinaryTest() throws Exception {   
-        Assert.assertEquals("TLM00:10010", roleService.getRolesBinary("d608252a-aad4-42c1-a93c-9c396d84fd04"));
+        Assert.assertEquals("TLM00:10010", 
+                roleService.getRolesBinary( keycloak.realm(realm).users()
+                        .get("d608252a-aad4-42c1-a93c-9c396d84fd04").toRepresentation()));
     }
 
 }

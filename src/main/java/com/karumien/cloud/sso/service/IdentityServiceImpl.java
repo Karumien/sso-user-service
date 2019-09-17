@@ -27,12 +27,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
@@ -40,7 +42,6 @@ import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedExcepti
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
 
-import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 
 /**
  * Implementation {@link IdentityService} for identity management.
@@ -60,6 +61,9 @@ public class IdentityServiceImpl implements IdentityService {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private AccountService accountService;
+
     /**
      * {@inheritDoc}
      */
@@ -78,7 +82,7 @@ public class IdentityServiceImpl implements IdentityService {
 
         UserRepresentation identity = new UserRepresentation();
 
-        identity.setUsername(StringUtils.isBlank(identityInfo.getUsername()) ?
+        identity.setUsername(StringUtils.isEmpty(identityInfo.getUsername()) ?
                 "generated-" + identityInfo.getCrmContactId() : identityInfo.getUsername());
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
@@ -86,12 +90,12 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmail(identityInfo.getEmail());
         
         identity.setEnabled(true);
-        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isBlank(identityInfo.getEmail())));
+        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isEmpty(identityInfo.getEmail())));
 
-        if (!StringUtils.isBlank(identityInfo.getPhone())) {
+        if (!StringUtils.isEmpty(identityInfo.getPhone())) {
             identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         }
-        if (!StringUtils.isBlank(identityInfo.getGlobalEmail())) {
+        if (!StringUtils.isEmpty(identityInfo.getGlobalEmail())) {
             identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
         }
         identity.singleAttribute(ATTR_CRM_CONTACT_ID, 
@@ -101,6 +105,12 @@ public class IdentityServiceImpl implements IdentityService {
 
         Response response = keycloak.realm(realm).users().create(identity);        
         identityInfo.setIdentityId(getCreatedId(response));
+        
+        String groupId = accountService.findGroup(identityInfo.getCrmAccountId())
+            .orElseThrow(() -> new AccountNotFoundException(identityInfo.getCrmAccountId())).getId();
+       
+        keycloak.realm(realm).users().get(identity.getId()).joinGroup(groupId);
+            
         return identityInfo;
     }
 
@@ -221,7 +231,11 @@ public class IdentityServiceImpl implements IdentityService {
             .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
             .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IdentityInfo mapping(UserRepresentation userRepresentation) {
 
         // TODO: Orica Mapper
@@ -237,6 +251,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setGlobalEmail(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
         identity.setPhone(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
 
+        identity.setIdentityId(userRepresentation.getId());
         return identity;
     }
 
@@ -271,9 +286,25 @@ public class IdentityServiceImpl implements IdentityService {
     public boolean assignRolesToIdentity(String crmContactId, @Valid List<String> roles) {
     	UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
     	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
-        List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
+        List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);        
     	user.roles().realmLevel().add(list);
+    	refreshBinaryRoles(userRepresentation);
     	return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void refreshBinaryRoles(UserRepresentation userRepresentation) {        
+        UserResource userResource = keycloak.realm(realm).users().get(userRepresentation.getId());
+        String binaryRoles = roleService.getRolesBinary(userRepresentation);
+        if (StringUtils.isEmpty(binaryRoles)) {
+            userRepresentation.getAttributes().remove(ATTR_BINARY_ROLES);
+        } else {
+            userRepresentation.getAttributes().put(ATTR_BINARY_ROLES, Arrays.asList(binaryRoles));
+        }
+        userResource.update(userRepresentation);
     }
 
     /**
@@ -285,6 +316,7 @@ public class IdentityServiceImpl implements IdentityService {
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
         user.roles().realmLevel().remove(list);
+        refreshBinaryRoles(userRepresentation);
         return true;
     }
 
@@ -322,7 +354,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void resetPasswordByEmail(String crmContactId) {
         UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-        if (StringUtils.isBlank(user.getEmail()) || !user.isEmailVerified()) {
+        if (StringUtils.isEmpty(user.getEmail()) || !user.isEmailVerified()) {
             throw new IdentityEmailNotExistsOrVerifiedException(crmContactId);
         }
         keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
@@ -350,7 +382,8 @@ public class IdentityServiceImpl implements IdentityService {
         return pin;        
     }
 
-    private Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
+    @Override
+    public Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
         if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
             return Optional.empty();
         }

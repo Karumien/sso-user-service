@@ -40,7 +40,6 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,8 +100,10 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Optional<GroupRepresentation> findGroup(String crmAccountId) {
-        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes() != null).filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
-                .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID).contains(crmAccountId)).findFirst();
+        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes() != null)
+            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
+            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID)
+            .contains(crmAccountId)).findFirst();
     }
 
     /**
@@ -210,25 +211,22 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
-    public List<IdentityInfo> getAccountIdentities(String crmAccountId) {
-        List<UserRepresentation> members = keycloak.realm(realm).groups().group(findGroup(crmAccountId).get().getId()).members();
-        List<IdentityInfo> infoList = new ArrayList<IdentityInfo>();
-        members.forEach(member -> {
-            infoList.add(((IdentityServiceImpl) identityService).mapping(member));
-        });
-        return infoList;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public IdentityInfo getAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
         Optional<IdentityInfo> identityFind = getAccountIdentities(crmAccountId).stream().filter(identity -> identity.getCrmContactId().equals(crmContactId))
                 .findAny();
         return identityFind.orElse(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<IdentityInfo> getAccountIdentities(String crmAccountId) {
+        List<UserRepresentation> users = findGroupResource(crmAccountId)
+            .orElseThrow(() -> new AccountNotFoundException(crmAccountId)).members();
+        return users.stream().map(user -> identityService.mapping(user)).collect(Collectors.toList());
+    }
+    
     /**
      * {@inheritDoc}
      */

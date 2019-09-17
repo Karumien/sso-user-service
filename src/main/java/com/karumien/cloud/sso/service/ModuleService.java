@@ -34,4 +34,6 @@ public interface ModuleService {
 
     boolean isActiveModule(String moduleId, String crmAccountId);
 
+    List<String> getAccountModulesSimple(String crmAccountId);
+
 }

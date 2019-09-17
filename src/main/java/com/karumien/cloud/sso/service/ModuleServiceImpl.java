@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.NotFoundException;
 
+import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.karumien.cloud.sso.api.model.ModuleInfo;
@@ -39,8 +41,17 @@ import com.karumien.cloud.sso.exceptions.RoleNotFoundException;
 @Service
 public class ModuleServiceImpl implements ModuleService {
 
+    @Value("${keycloak.realm}")
+    private String realm;
+
+    @Autowired
+    private Keycloak keycloak;
+
     @Autowired
     private RoleService roleService;
+    
+    @Autowired
+    private IdentityService identityService;
     
     @Autowired 
     private AccountService accountService;
@@ -133,6 +144,11 @@ public class ModuleServiceImpl implements ModuleService {
         crmAccountIds.stream().map(crmAccountId ->  accountService.findGroupResource(crmAccountId))
             .filter(accountResource -> accountResource.isPresent())
             .forEach(accountResource -> accountResource.get().roles().realmLevel().add(rolesToAdd));
+
+        crmAccountIds.stream().forEach(crmAccountId -> 
+            accountService.getAccountIdentities(crmAccountId).forEach(identity -> identityService.refreshBinaryRoles(
+                keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
+
     }
 
     /**
@@ -150,6 +166,10 @@ public class ModuleServiceImpl implements ModuleService {
         crmAccountIds.stream().map(crmAccountId ->  accountService.findGroupResource(crmAccountId))
             .filter(accountResource -> accountResource.isPresent())
             .forEach(accountResource -> accountResource.get().roles().realmLevel().remove(rolesToRemove));
+        
+        crmAccountIds.stream().forEach(crmAccountId -> 
+            accountService.getAccountIdentities(crmAccountId).forEach(identity -> identityService.refreshBinaryRoles(
+                keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
     }
 
     /**
@@ -161,6 +181,15 @@ public class ModuleServiceImpl implements ModuleService {
             .orElseThrow(() -> new AccountNotFoundException(crmAccountId)).roles().realmLevel()
             .listAll().stream().filter(role -> role.getName().startsWith(ROLE_PREFIX))
             .map(role -> mapping(role)).collect(Collectors.toList());                
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getAccountModulesSimple(String crmAccountId) {
+        List<ModuleInfo> info = getAccountModules(crmAccountId);
+        return info.stream().map(module -> module.getModuleId()).collect(Collectors.toList());                
     }
 
     /**

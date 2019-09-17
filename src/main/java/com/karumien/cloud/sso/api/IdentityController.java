@@ -22,7 +22,9 @@ import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.service.IdentityService;
+import com.karumien.cloud.sso.service.RoleService;
 
 import io.swagger.annotations.Api;
 
@@ -38,6 +40,9 @@ public class IdentityController implements IdentitiesApi {
 
     @Autowired
     private IdentityService identityService;
+    
+    @Autowired
+    private RoleService roleService;
     
     /**
      * {@inheritDoc}
@@ -199,6 +204,14 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<DriverPin> getDriverPin(String crmContactId) {
         return new ResponseEntity<>(identityService.getPinOfIdentityDriver(crmContactId), HttpStatus.OK);
+    }
+    
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
+    public ResponseEntity<Void> getIdentityRolesBinary(String crmContactId) {
+        String binaryRoles = roleService.getRolesBinary(
+            identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId)));
+                return new ResponseEntity(binaryRoles, HttpStatus.OK);
     }
     
 }

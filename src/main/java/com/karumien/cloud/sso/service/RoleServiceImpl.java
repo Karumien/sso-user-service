@@ -57,6 +57,9 @@ public class RoleServiceImpl implements RoleService{
     @Autowired
     private IdentityService identityService;
 
+    @Autowired
+    private ModuleService moduleService;
+
     /**
      * {@inheritDoc}
      */
@@ -171,25 +174,40 @@ public class RoleServiceImpl implements RoleService{
 	 * {@inheritDoc}
 	 */
     @Override
-    public String getRolesBinary(String crmContactId) {	
-        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-    	Map<String, Integer> maskMap = new HashMap<String, Integer>();
+    public String getRolesBinary(UserRepresentation userRepresentation) {	
+
+        StringBuilder binaryRule = new StringBuilder();
+        Optional<String> crmAccountId = identityService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CRM_ACCOUNT_ID);
+        
+        if (!crmAccountId.isPresent()) {
+            return binaryRule.toString();
+        }
+        
+        Map<String, Integer> maskMap = new HashMap<String, Integer>();
 		keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().forEach(role ->
       		{
       		  Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
       		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask") != null) {
       			String stringMask = roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask").get(0);
       		    Integer binaryMask = Integer.valueOf(stringMask.substring(0,stringMask.length()-2), 16);
-      			String[] splitName = role.getName().split("_");
+      			
+      		    // TODO: use attribute module - no split?
+      		    String[] splitName = role.getName().split("_");
     			if(splitName[0].equals("ROLE")) {
     				Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + binaryMask : binaryMask;
     				maskMap.put(splitName[1], rigtValue);
     			}
       		  }
     		});
-    		StringBuilder binaryRule = new StringBuilder();
+		    
+		
+		    List<String> modules = moduleService.getAccountModulesSimple(crmAccountId.get());
+		
     		for (Entry<String, Integer> entry : maskMap.entrySet()) {
-    			binaryRule.append(entry.getKey() + ":" + Integer.toHexString(entry.getValue())+ " ");
+    		    String key = entry.getKey();
+    		    if (modules.contains(key)) {
+    		        binaryRule.append(key + ":" + Integer.toHexString(entry.getValue())+ " ");
+    		    }
     		}
     		return binaryRule.toString();
     
