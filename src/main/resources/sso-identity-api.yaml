@@ -59,8 +59,8 @@ paths:
           description: Successfully returned Identity's info
           schema:
             $ref: '#/definitions/IdentityInfo'
-        '404':
-          description: not found
+        '410':
+          description: Gone
     delete:
       summary: "Remove existing Identity"
       operationId: deleteIdentity
@@ -73,8 +73,8 @@ paths:
       responses:
         '200':
           description: Successfully removed existing Identity
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /identities/{crmContactId}/credentials:
     post:
       summary: "Create Identity credentials"
@@ -98,9 +98,9 @@ paths:
       responses:
         '201':
           description: "Identity creadentials has been created or reset"
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Can't create Identity's credentials
   /identities/{crmContactId}/credentials/block:
     put:
@@ -115,8 +115,8 @@ paths:
       responses:
         '200':
           description: "Identity successfully blocked"
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
     delete:
       summary: "Unblock Identity"
       operationId: unblockIdentity
@@ -129,8 +129,8 @@ paths:
       responses:
         '200':
           description: "Identity successfully unblocked"
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /identities/{crmContactId}/credentials/reset:
     post:
       summary: "Reset Identity credentials"
@@ -145,9 +145,9 @@ paths:
       responses:
         '201':
           description: "Successfully sent email for password reset"
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Can't reset Identity's credentials
   /identities/{crmContactId}/pin:
     post:
@@ -170,9 +170,9 @@ paths:
       responses:
         '201':
           description: "Driver PIN has been created/update"
-        '404':
-          description: Driver not found  
-        '406':
+        '410':
+          description: Driver Gone  
+        '422':
           description: Can't create/update Driver's PIN 
     get:
       summary: "Get Driver PIN"
@@ -190,8 +190,8 @@ paths:
             $ref: '#/definitions/DriverPin'
             example:
               pin: "1234"
-        '404':
-          description: Driver or pin not found  
+        '410':
+          description: Driver or pin Gone  
     delete:
       summary: "Delete Driver PIN"
       operationId: "deleteDriverPin"
@@ -204,8 +204,8 @@ paths:
       responses:
         '200':
           description: "Driver PIN has been deleted"
-        '404':
-          description: Driver not found  
+        '410':
+          description: Driver Gone 
   /identities/{crmContactId}/impersonate:
     post:
       summary: "Impersonate Identity"
@@ -220,8 +220,8 @@ paths:
       responses:
         '200':
           description: "Identity has been impersonated"
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /identities/{crmContactId}/logout:
     post:
       summary: "Logout Identity's session"
@@ -236,8 +236,8 @@ paths:
       responses:
         '200':
           description: "Identity has been logged out of all sessions"
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /identities/password/policy:
     get:
       summary: "Returns Password Policy for Identities"
@@ -263,8 +263,8 @@ paths:
       responses:
         '200':
           description: Identity's assigned Roles in Binary Representation 
-        '404':
-          description: Identity not found    
+        '410':
+          description: Identity Gone  
   /identities/{crmContactId}/roles:
     get:
       summary: "Get assigned Roles on Identity"
@@ -282,8 +282,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/RoleInfo'
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
     put:
       summary: "Assign roles on Identity"
       operationId: "assignIdentityRoles"
@@ -303,8 +303,8 @@ paths:
       responses:
         '202':
           description: Successfully assigned Roles to Identity
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
     delete:
       summary: "Unassign Roles on Identity"
       operationId: "unassignIdentityRoles"
@@ -324,8 +324,8 @@ paths:
       responses:
         '202':
           description: Successfully unsassigned Roles from Identity
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /identities/{crmContactId}/roles/{roleId}:
     get:
       summary: "Get assigned Roles on Identity"
@@ -344,9 +344,9 @@ paths:
       responses:
         '200':
           description: Role is assigned to Identity
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Role not assigned
     put:
       summary: "Assign Role to Identity"
@@ -365,9 +365,9 @@ paths:
       responses:
         '202':
           description: Successfully assigned Role on Identity
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Role for Identity not assigned
     delete:
       summary: "Remove Role on Identity"
@@ -386,9 +386,9 @@ paths:
       responses:
         '202':
           description: Successfully unassigned Role from Identity
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Role not unassigned
 definitions:
   IdentityInfo:

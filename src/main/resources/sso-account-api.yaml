@@ -57,8 +57,8 @@ paths:
           description: Successfully returned Account's info
           schema:
             $ref: '#/definitions/AccountInfo'
-        '404':
-          description: Not found
+        '410':
+          description: Gone
     delete:
       summary: "Remove existing Account"
       operationId: "deleteAccount"
@@ -71,8 +71,8 @@ paths:
       responses:
         '200':
           description: Successfully removed existing Account
-        '404':
-          description: Account Not found
+        '410':
+          description: Account Gone
   /accounts/{crmAccountId}/modules:
     get:
       summary: "Get Active Modules on Account"
@@ -90,8 +90,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/ModuleInfo'
-        '404':
-          description: Account Not Found
+        '410':
+          description: Account Gone
     put:
       summary: "Activate Modules on Account"
       operationId: "activateAccountModules"
@@ -111,8 +111,8 @@ paths:
       responses:
         '202':
           description: Successfully Activated Modules on Account
-        '404':
-          description: Account Not found
+        '410':
+          description: Account Gone
     delete:
       summary: "Deactivate Modules on Account"
       operationId: "deactivateAccountModules"
@@ -132,8 +132,8 @@ paths:
       responses:
         '202':
           description: Successfully deactivated Modules on Account
-        '404':
-          description: Account Not found
+        '410':
+          description: Account Gone
   /accounts/{crmAccountId}/modules/{moduleId}:
     get:
       summary: "Get Active Module on Account"
@@ -152,10 +152,10 @@ paths:
       responses:
         '200':
           description: Module is active on Account
-        '404':
-          description: Account not found
-        '406':
-          description: Module not Activated
+        '410':
+          description: Account Gone
+        '422':
+          description: Module Unprocessable entity
     put:
       summary: "Activate Module on Account"
       operationId: "activateAccountModule"
@@ -173,10 +173,10 @@ paths:
       responses:
         '202':
           description: Successfully activated Module on Account
-        '404':
-          description: Account not found
-        '406':
-          description: Module not activated
+        '410':
+          description: Account Gone
+        '422':
+          description: Module Unprocessable entity
     delete:
       summary: "Deactivate Module on Account"
       operationId: "deactivateAccountModule"
@@ -194,9 +194,9 @@ paths:
       responses:
         '202':
           description: Successfully deactivated Module on Account
-        '404':
-          description: Account not found
-        '406':
+        '410':
+          description: Account Gone
+        '422':
           description: Module not deactivated
   /accounts/{crmAccountId}/identities:
     post:
@@ -237,8 +237,8 @@ paths:
             type: array            
             items:
               $ref: '#/definitions/IdentityInfo'
-        '404':
-          description: Account not found
+        '410':
+          description: Account Gone
   /accounts/{crmAccountId}/identities/{crmContactId}:
     get:
       summary: "Get detail of the given Identity"
@@ -260,8 +260,8 @@ paths:
           description: Successfully returned Identity's info
           schema:
             $ref: '#/definitions/IdentityInfo'
-        '404':
-          description: not found
+        '410':
+          description: Gone
     delete:
       summary: "Remove existing Identity"
       operationId: deleteAccountIdentity
@@ -279,8 +279,8 @@ paths:
       responses:
         '200':
           description: Successfully removed existing Identity
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /accounts/{crmAccountId}/identities/{crmContactId}/roles:
     get:
       summary: "Get detail of the given Identity"
@@ -303,8 +303,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/RoleInfo'
-        '404':
-          description: not found
+        '410':
+          description: Gone
     put:
       summary: "Assign roles on Identity"
       operationId: assignAccountIdentityRoles
@@ -329,8 +329,8 @@ paths:
       responses:
         '202':
           description: Successfully added roles to Identity
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
     delete:
       summary: "Unassign roles on Identity"
       operationId: unassignAccountIdentityRoles
@@ -355,8 +355,8 @@ paths:
       responses:
         '202':
           description: Successfully removed roles of Identity
-        '404':
-          description: Identity not found
+        '410':
+          description: Identity Gone
   /accounts/{crmAccountId}/identities/{crmContactId}/roles/{roleId}:
     get:
       summary: "Get assigned Roles on Identity"
@@ -380,9 +380,9 @@ paths:
       responses:
         '200':
           description: Role is assigned to Identity
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Role not assigned
     put:
       summary: "Assign Role to Identity"
@@ -406,9 +406,9 @@ paths:
       responses:
         '202':
           description: Successfully assigned Role on Identity
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Role for Identity not assigned
     delete:
       summary: "Remove Role on Identity"
@@ -432,9 +432,9 @@ paths:
       responses:
         '202':
           description: Successfully unassigned Role from Identity
-        '404':
-          description: Identity not found
-        '406':
+        '410':
+          description: Identity Gone
+        '422':
           description: Role not unassigned
 definitions:
   IdentityInfo:

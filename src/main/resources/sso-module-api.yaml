@@ -55,8 +55,8 @@ paths:
           description: Successfully returned Module's Info
           schema:
             $ref: '#/definitions/ModuleInfo'
-        '404':
-          description: Not found
+        '410':
+          description: Gone
     put:
       summary: "Update informations about module"
       operationId: "updateModule"
@@ -71,8 +71,8 @@ paths:
           description: Successfully updated Module's Info
           schema:
             $ref: '#/definitions/ModuleInfo'
-        '404':
-          description: Not found
+        '410':
+          description: Gone
     delete:
       summary: "Remove existing Module"
       operationId: "deleteModule"
@@ -85,8 +85,8 @@ paths:
       responses:
         '200':
           description: Successfully removed existing Module
-        '404':
-          description: Module Not found
+        '410':
+          description: Module Gone
 definitions:
   ModuleInfo:
     type: object

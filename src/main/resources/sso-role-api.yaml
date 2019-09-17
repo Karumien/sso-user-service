@@ -45,8 +45,8 @@ paths:
           description: Successfully returned role's info
           schema:
             $ref: '#/definitions/RoleInfo'
-        '404':
-          description: Not found
+        '410':
+          description: Gone
     delete:
       summary: "Remove existing role"
       operationId: "deleteRole"
@@ -59,8 +59,8 @@ paths:
       responses:
         '200':
           description: Successfully removed existing role
-        '404':
-          description: role Not found
+        '410':
+          description: role Gone
 definitions:
   RoleInfo:
     type: object
