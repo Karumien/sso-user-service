@@ -97,6 +97,9 @@ public class IdentityServiceImpl implements IdentityService {
         if (!StringUtils.isEmpty(identityInfo.getGlobalEmail())) {
             identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
         }
+        if (!StringUtils.isEmpty(identityInfo.getLocale())) {
+            identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
+        }
         identity.singleAttribute(ATTR_CRM_CONTACT_ID, 
                 Optional.of(identityInfo.getCrmContactId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_CONTACT_ID)));
         identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
@@ -195,11 +198,13 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmail(userRepresentation.getEmail());
         identity.setEmailVerified(userRepresentation.isEmailVerified());
 
+        
         identity.setCrmAccountId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
         identity.setCrmContactId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_CONTACT_ID).orElse(null));
         identity.setGlobalEmail(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
         identity.setPhone(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
-
+        
+        identity.setLocale(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
         return identity;
     }

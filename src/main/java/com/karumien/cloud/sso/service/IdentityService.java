@@ -39,6 +39,8 @@ public interface IdentityService {
 
     String ATTR_PHONE = "phone";
 
+    String ATTR_LOCALE = "locale";
+
     /**
      * Create Identity in target SSO.
      * 

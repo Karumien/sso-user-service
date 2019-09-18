@@ -427,6 +427,10 @@ definitions:
         type: string
         description: "Contact email - can be company global"
         maxLength: 100
+      locale:
+        type: string
+        description: "User's default Locale"
+        maxLength: 50  
     example:
       crmAccountId: 31034
       crmContactId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
