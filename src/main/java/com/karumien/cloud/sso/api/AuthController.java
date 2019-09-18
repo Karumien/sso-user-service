@@ -17,6 +17,7 @@ import com.karumien.cloud.sso.api.handler.AuthApi;
 import com.karumien.cloud.sso.api.model.AuthorizationRequest;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 import com.karumien.cloud.sso.api.model.GrantType;
+import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.service.AuthService;
 
 import io.swagger.annotations.Api;
@@ -81,4 +82,14 @@ public class AuthController implements AuthApi  {
         authService.logoutByToken(user.getRefreshToken());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);   
     }
+    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Policy> getPasswordPolicy() {
+        return new ResponseEntity<>(authService.getPasswordPolicy(), HttpStatus.OK);
+    }
+    
 }

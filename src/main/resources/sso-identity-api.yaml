@@ -238,16 +238,6 @@ paths:
           description: "Identity has been logged out of all sessions"
         '410':
           description: Identity Gone
-  /identities/password/policy:
-    get:
-      summary: "Returns Password Policy for Identities"
-      description: "Method for get Identity's password policy"
-      operationId: "getPasswordPolicy"
-      responses:
-        '200':
-          description: "Password Policy Settings"
-          schema:
-            $ref: '#/definitions/Policy' 
   /identities/{crmContactId}/roles/binary:
     get:
       summary: "Get assigned Roles on Identity in Binary Representation"
@@ -481,60 +471,6 @@ definitions:
         type: string
         example: "123456"
         maxLength: 10
-  Policy:
-    type: object
-    description: "Configuration object for Password Policy"
-    properties:
-      value:
-        type: string
-        description: "Full policy description"
-      minSpecialChars:
-        type: integer
-        description: "Minimum use special chars in password"
-        example: "1"       
-      minUpperCase: 
-        type: integer
-        description: "Minimum use upper case chars in password"
-        example: "1"
-      minLength:
-        type: integer
-        description: "Minimum password length"
-        example: "8"
-      notUseUsername:
-        type: boolean
-        description: "Use username in password"
-        example: "true"
-      passwordHistory:
-        type: integer
-        description: "Use same password from history"
-        example: "3"
-      minLowerCase:
-        type: integer
-        description: "Minimum use lower case chars in password"
-        example: "1"
-      minDigits:
-        type: integer
-        description: "Minimum use digits in password"
-        example: "1"
-      passwordExpireDays:
-        type: integer
-        description: "Password expire in days"
-        example: "365"
-      hashAlgorithm:
-        type: string
-        description: "Hash algorithm for password encode"
-        example: "pbkdf2-sha256"
-      hashIterations:
-        type: integer
-        description: "Hash iterations for password encode"
-        example: "27500"
-      passwordBlacklist:
-        type: boolean
-        description: "Use blacklist for passwords"
-      regexPattern:
-        type: string
-        description: "REGEX pattern for password validation"
-        example: ".*"
   RoleInfo:
     type: object
     description: "Basic information about Role"

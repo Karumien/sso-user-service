@@ -20,7 +20,6 @@ import com.karumien.cloud.sso.api.handler.IdentitiesApi;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.service.IdentityService;
@@ -59,14 +58,6 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> deleteIdentity(String crmContactId) {
         identityService.deleteIdentity(crmContactId);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Policy> getPasswordPolicy() {
-        return new ResponseEntity<>(identityService.getPasswordPolicy(), HttpStatus.OK);
     }
     
     /**
@@ -206,6 +197,9 @@ public class IdentityController implements IdentitiesApi {
         return new ResponseEntity<>(identityService.getPinOfIdentityDriver(crmContactId), HttpStatus.OK);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ResponseEntity<Void> getIdentityRolesBinary(String crmContactId) {

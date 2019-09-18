@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.service;
 
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
+import com.karumien.cloud.sso.api.model.Policy;
 
 /**
  * Service provides scenatios for authentication's tokens management.
@@ -22,6 +23,13 @@ public interface AuthService {
      * @return String public key
      */
     String getPublicKey();
+
+    /**
+     * Returns configuration of Password Policy
+     * 
+     * @return {@link Policy} configuration of Password Policy
+     */
+    Policy getPasswordPolicy();
 
     /**
      * Logout user by token.

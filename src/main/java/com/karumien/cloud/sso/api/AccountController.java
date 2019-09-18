@@ -76,6 +76,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<AccountInfo>> getAccounts() {
+        // Locale locale = LocaleContextHolder.getLocale();
         return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
     }
 

@@ -32,7 +32,6 @@ import org.springframework.util.StringUtils;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
@@ -133,57 +132,7 @@ public class IdentityServiceImpl implements IdentityService {
             throw new UnsupportedOperationException("Unknown status " + response.getStatusInfo().toEnum());
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Policy getPasswordPolicy() {
-
-        String policyDescription = keycloak.realm(realm).toRepresentation().getPasswordPolicy();
-
-        Policy policy = new Policy();
-        policy.setValue(policyDescription);
-        policy.setHashAlgorithm(extract("hashAlgorithm", policyDescription, String.class));
-        policy.setMinSpecialChars(extract("specialChars", policyDescription, Integer.class));
-        policy.setMinUpperCase(extract("upperCase", policyDescription, Integer.class));
-        policy.setMinLowerCase(extract("lowerCase", policyDescription, Integer.class));
-        policy.setPasswordHistory(extract("passwordHistory", policyDescription, Integer.class));
-        policy.setMinDigits(extract("digits", policyDescription, Integer.class));
-        policy.setHashIterations(extract("hashIterations", policyDescription, Integer.class));
-
-        if (extract("passwordBlacklist", policyDescription, String.class) != null) {
-            policy.setPasswordBlacklist(true);
-        }
-
-        if (extract("notUsername", policyDescription, String.class) != null) {
-            policy.setNotUseUsername(true);
-        }
-
-        policy.setRegexPattern(extract("regexPattern", policyDescription, String.class));
-        policy.setPasswordExpireDays(extract("forceExpiredPasswordChange", policyDescription, Integer.class));
-        policy.setMinLength(extract("length", policyDescription, Integer.class));
-
-        return policy;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T extract(String code, String policyDescription, Class<T> clazz) {
-
-        if (policyDescription == null || !policyDescription.contains(code)) {
-            return null;
-        }
-
-        String extractedValue = policyDescription.substring(policyDescription.indexOf(code) + code.length() + 1);
-        extractedValue = extractedValue.substring(0, extractedValue.indexOf(")"));
-
-        if (Integer.class.equals(clazz)) {
-            return (T) Integer.valueOf(extractedValue);
-        }
-
-        return (T) extractedValue;
-    }
-
+   
     /**
      * {@inheritDoc}
      */
@@ -382,6 +331,9 @@ public class IdentityServiceImpl implements IdentityService {
         return pin;        
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
         if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {

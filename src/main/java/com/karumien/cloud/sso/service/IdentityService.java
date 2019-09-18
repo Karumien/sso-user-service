@@ -17,7 +17,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 
 /**
@@ -56,14 +55,7 @@ public interface IdentityService {
      *            unique Identity CRM ID
      */
     void deleteIdentity(String crmContactId);
-
-    /**
-     * Returns configuration of Password Policy
-     * 
-     * @return {@link Policy} configuration of Password Policy
-     */
-    Policy getPasswordPolicy();
-
+    
     /**
      * Create/update Identity credentials
      * 

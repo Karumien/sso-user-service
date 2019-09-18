@@ -36,4 +36,5 @@ public class SSOUserApplication {
         SpringApplication.run(SSOUserApplication.class, args);
     }
     
+    
 }

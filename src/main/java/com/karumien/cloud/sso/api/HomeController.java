@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.api;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ import io.swagger.annotations.Api;
  * @since 1.0, 15. 7. 2019 21:27:49
  */
 @Controller
-@Api(value = "Version Service", description = "Home Rewrite and Application Version Informations", tags = { "Version Service" })
+@Api(value = "Info Service", description = "Home Rewrite and Application Informations", tags = { "Info Service" })
 public class HomeController {
     
     @Autowired
@@ -36,7 +37,13 @@ public class HomeController {
     }
     
     @GetMapping(value = "/version")
-    public ResponseEntity<VersionInfo> getVersionInfo() {
+    public ResponseEntity<VersionInfo> getVersion() {
         return new ResponseEntity<>(infoService.getVersionInfo(), HttpStatus.OK);
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @GetMapping(value = "/locale", produces = "text/plain")
+    public ResponseEntity<Void> getLocale() {
+        return new ResponseEntity(""+LocaleContextHolder.getLocale(), HttpStatus.OK);
     }
 }

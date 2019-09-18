@@ -13,8 +13,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -42,12 +44,13 @@ public class SwaggerConfiguration {
             .paths(PathSelectors.any())
             .build()
             .useDefaultResponseMessages(false)
-//            .globalOperationParameters(Collections.singletonList(new ParameterBuilder()
-//                .name("x-request-id")
-//                .modelRef(new ModelRef("string"))
-//                .parameterType("header")
-//                .required(false)
-//                .build()))
+            .globalOperationParameters(Collections.singletonList(new ParameterBuilder()
+                .name("x-locale")
+                .modelRef(new ModelRef("string"))
+                .parameterType("header")
+                .description("User's locale for apply, i.e. en, cs, cs_CZ")
+                .required(false)
+                .build()))
 //            .globalResponseMessage(RequestMethod.GET, getCustomizedResponseMessages())                    
 //            .globalResponseMessage(RequestMethod.DELETE, getCustomizedResponseMessages())                    
 //            .globalResponseMessage(RequestMethod.POST, getCustomizedResponseMessages())                    
