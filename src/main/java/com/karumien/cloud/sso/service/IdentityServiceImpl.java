@@ -112,7 +112,7 @@ public class IdentityServiceImpl implements IdentityService {
         String groupId = accountService.findGroup(identityInfo.getCrmAccountId())
             .orElseThrow(() -> new AccountNotFoundException(identityInfo.getCrmAccountId())).getId();
        
-        keycloak.realm(realm).users().get(identity.getId()).joinGroup(groupId);
+        keycloak.realm(realm).users().get(identityInfo.getIdentityId()).joinGroup(groupId);
             
         return identityInfo;
     }
