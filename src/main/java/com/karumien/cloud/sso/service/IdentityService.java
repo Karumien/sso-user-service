@@ -41,6 +41,8 @@ public interface IdentityService {
 
     String ATTR_LOCALE = "locale";
 
+    String ATTR_NAV4ID = "nav4Id";
+
     /**
      * Create Identity in target SSO.
      * 

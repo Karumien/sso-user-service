@@ -104,7 +104,8 @@ public class IdentityServiceImpl implements IdentityService {
                 Optional.of(identityInfo.getCrmContactId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_CONTACT_ID)));
         identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
                 Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
-
+        identity.singleAttribute(ATTR_NAV4ID, 
+                Optional.of(identityInfo.getNav4Id()).orElseThrow(() -> new IdNotFoundException(ATTR_NAV4ID)));
         Response response = keycloak.realm(realm).users().create(identity);        
         identityInfo.setIdentityId(getCreatedId(response));
         
@@ -203,7 +204,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setCrmContactId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_CONTACT_ID).orElse(null));
         identity.setGlobalEmail(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
         identity.setPhone(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
-        
+        identity.setNav4Id(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
         identity.setLocale(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
         return identity;
