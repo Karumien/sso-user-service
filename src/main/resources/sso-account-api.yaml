@@ -41,14 +41,29 @@ paths:
             $ref: '#/definitions/AccountInfo'
         '409':
           description: Account already exists (conflict crmAccountId)
+  /accounts/identity/{username}:
+    get:
+      summary: "Check if username exist"
+      operationId: "checkUserNameExist"
+      parameters:
+        - in: path
+          name: username
+          description: User name we want to check
+          required: true
+          type: string 
+      responses:
+        '200':
+          description: Successfully found User name
+        '406':
+          description: User name not found
   /accounts/{crmAccountId}:
     get:
       summary: "Get detail of the given Account"
       description: "Method returns detail information about Account."
       operationId: "getAccount"
       parameters:
-        - name: crmAccountId
-          in: path
+        - in: path
+          name: crmAccountId
           description: Filtering by Account CRM ID
           required: true
           type: string       
@@ -198,6 +213,25 @@ paths:
           description: Account Gone
         '422':
           description: Module not deactivated
+  /accounts/{crmAccountId}/roles:
+    get:
+      summary: "Get Active Roles on Account"
+      operationId: "getAccountRoles"
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string   
+      responses:
+        '200':
+          description: Account's activated roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RoleInfo'
+        '410':
+          description: Roles Gone
   /accounts/{crmAccountId}/identities:
     post:
       summary: Create Identity
@@ -436,6 +470,62 @@ paths:
           description: Identity Gone
         '422':
           description: Role not unassigned
+  /accounts/{crmAccountId}/identities/{crmContactId}/rights:
+    get:
+      summary: "Get rights of the given Identity"
+      operationId: getAccountIdentityRights
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RoleInfo'
+        '410':
+          description: Gone
+  /accounts/{crmAccountId}/identities/{crmContactId}/credentials:
+    post:
+      summary: "Add Account Identity credentials"
+      description: "Method to create Identity credentials for given customer"
+      operationId: createIdentityCredentials
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: credentials
+          description: The Credentials for Identity to create/change
+          schema:
+            $ref: '#/definitions/Credentials'
+            example:
+              username: "midie"
+              password: "#123456."
+              temporary: true
+      responses:
+        '201':
+          description: "Identity creadentials has been created or reset"
+        '410':
+          description: Identity Gone
+        '422':
+          description: Can't create Identity's credentials
 definitions:
   IdentityInfo:
     type: object
@@ -556,3 +646,30 @@ definitions:
       clientRole:
         type: boolean
         description: "Identify Client Role (not realm role)"
+  Credentials:
+    type: object
+    description: "Object for setting of Identity credential"
+    required:
+      - username
+    properties:
+      username:
+        type: string
+        description: "Unique username"
+        maxLength: 50
+      password:
+        type: string
+        maxLength: 50
+      currentPassword:
+        type: string
+        maxLength: 50
+      temporary:
+        type: boolean
+        description: "Temporary - need reset after first login"
+    example:
+      - username: "midie"
+        password: "#123456."
+      - password: "#123456."
+        temporary: true      
+      - password: "#123456."
+        currentPassword: "oldPassword"
+        temporary: true

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
@@ -210,5 +211,32 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> getAccountIdentityRole(String crmAccountId, String crmContactId, String roleId) {
         return new ResponseEntity<>(identityService.isActiveRole(roleId, crmContactId) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> checkUserNameExist(String username) {
+    	//TODO : need to be implemented
+    	return AccountsApi.super.checkUserNameExist(username);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<RoleInfo>> getAccountIdentityRights(String crmAccountId, String crmContactId) {
+    	//TODO : need to be implemented
+    	return AccountsApi.super.getAccountIdentityRights(crmAccountId, crmContactId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, Credentials credentials) {
+    	//TODO : need to be implemented
+    	return AccountsApi.super.createIdentityCredentials(crmAccountId, crmContactId,credentials);
     }
 }
