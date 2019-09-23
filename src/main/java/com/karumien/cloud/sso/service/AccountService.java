@@ -63,4 +63,11 @@ public interface AccountService {
 	 * @return {@link Boolean} value if we ware successfull of not
 	 */
 	boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId);
+
+	/**
+	 * Check if this username is already used for some user
+	 * @param username {@link String} user name to check
+	 * @return {@link Boolean} return true if user name was already used and false if not
+	 */
+	boolean checkIfUserNameExist(String username);
 }

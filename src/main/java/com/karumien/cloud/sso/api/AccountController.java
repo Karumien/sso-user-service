@@ -217,9 +217,8 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> checkUserNameExist(String username) {
-    	//TODO : need to be implemented
-    	return AccountsApi.super.checkUserNameExist(username);
+    public ResponseEntity<Void> checkUserNameExist(String username) {    	
+    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
     }
     
     /**

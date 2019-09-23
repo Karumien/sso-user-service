@@ -116,7 +116,6 @@ public class AccountServiceImpl implements AccountService {
         if (!group.isPresent()) {
             return Optional.empty();
         }
-
         return Optional.of(keycloak.realm(realm).groups().group(group.get().getId()));
     }
 
@@ -235,6 +234,11 @@ public class AccountServiceImpl implements AccountService {
 		UserResource user = keycloak.realm(realm).users().get(crmContactId);
 		user.leaveGroup(findGroup(crmAccountId).get().getId());
 		return true;
+	}
+
+	@Override
+	public boolean checkIfUserNameExist(String username) {
+		return keycloak.realm(realm).users().search(username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
 	}
 
 }
