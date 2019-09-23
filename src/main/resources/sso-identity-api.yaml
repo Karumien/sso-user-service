@@ -102,6 +102,51 @@ paths:
           description: Identity Gone
         '422':
           description: Can't create Identity's credentials
+  /identities/nav4/{nav4Id}:
+    get:
+      summary: "Get detail of the given Identity"
+      description: "Method returns detail information about Identity."
+      operationId: getIdentityNav4
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's info
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '410':
+          description: Gone
+  /identities/nav4/{nav4Id}/credentials:
+    post:
+      summary: "Create Identity credentials"
+      description: "Method to create Identity credentials for given customer"
+      operationId: createIdentityNav4Credentials
+      parameters:
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+        - in: body
+          name: credentials
+          description: The Credentials for Identity to create/change
+          schema:
+            $ref: '#/definitions/Credentials'
+            example:
+              username: "midie"
+              password: "#123456."
+              temporary: true
+      responses:
+        '201':
+          description: "Identity creadentials has been created or reset"
+        '410':
+          description: Identity Gone
+        '422':
+          description: Can't create Identity's credentials
   /identities/{crmContactId}/credentials/block:
     put:
       summary: "Block Identity"
@@ -380,6 +425,31 @@ paths:
           description: Identity Gone
         '422':
           description: Role not unassigned
+  /identities/exists:
+    get:
+      summary: "Check if exist Identity by specified attributes"
+      operationId: exists
+      parameters:
+        - in: query
+          name: username
+          description: Identity existency check by username
+          required: false
+          type: string 
+        - in: query
+          name: crmContactId
+          description: Identity existency check by CRM Contact ID
+          required: false
+          type: string 
+        - in: query
+          name: nav4Id
+          description: Identity existency check by NAV4 ID 
+          required: false
+          type: string 
+      responses:
+        '200':
+          description: Found Identity specified by filter
+        '410':
+          description: Identity specified by filter not found
 definitions:
   IdentityInfo:
     type: object

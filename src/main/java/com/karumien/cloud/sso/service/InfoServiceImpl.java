@@ -90,5 +90,4 @@ public class InfoServiceImpl implements InfoService {
                 .attributes(values).application(getApplicationVersion(applicationName, values)).build();
     }
 
-
 }

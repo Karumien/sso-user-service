@@ -13,6 +13,7 @@
  */
 package com.karumien.cloud.sso.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -80,7 +81,6 @@ public class ModuleServiceImpl implements ModuleService {
     public ModuleInfo createModule(ModuleInfo module) {
         
         RoleInfo role = new RoleInfo();
-        role.setClientRole(false);
         role.setRoleId(getRoleName(module.getModuleId()));
         role.setDescription(module.getDescription());
 
@@ -146,7 +146,7 @@ public class ModuleServiceImpl implements ModuleService {
             .forEach(accountResource -> accountResource.get().roles().realmLevel().add(rolesToAdd));
 
         crmAccountIds.stream().forEach(crmAccountId -> 
-            accountService.getAccountIdentities(crmAccountId).forEach(identity -> identityService.refreshBinaryRoles(
+            accountService.getAccountIdentities(crmAccountId, null).forEach(identity -> identityService.refreshBinaryRoles(
                 keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
 
     }
@@ -168,7 +168,7 @@ public class ModuleServiceImpl implements ModuleService {
             .forEach(accountResource -> accountResource.get().roles().realmLevel().remove(rolesToRemove));
         
         crmAccountIds.stream().forEach(crmAccountId -> 
-            accountService.getAccountIdentities(crmAccountId).forEach(identity -> identityService.refreshBinaryRoles(
+            accountService.getAccountIdentities(crmAccountId, null).forEach(identity -> identityService.refreshBinaryRoles(
                 keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
     }
 

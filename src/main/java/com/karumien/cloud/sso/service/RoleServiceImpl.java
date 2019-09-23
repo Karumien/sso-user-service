@@ -70,14 +70,14 @@ public class RoleServiceImpl implements RoleService{
 		roleRepresentation.setDescription(role.getDescription());
 		roleRepresentation.setName(role.getRoleId());
 		
-		if (Boolean.TRUE.equals(role.isClientRole())) {
-			org.keycloak.representations.idm.ClientRepresentation clientResource = keycloak.realm(realm).clients().findByClientId(role.getClientId()).get(0);
-			keycloak.realm(realm).clients().get(clientResource.getId()).roles().create(roleRepresentation);
-			return getClientsRoleBaseOnId(role.getRoleId(), role.getClientId());
-		} else {
+//		if (Boolean.TRUE.equals(role.isClientRole())) {
+//			org.keycloak.representations.idm.ClientRepresentation clientResource = keycloak.realm(realm).clients().findByClientId(role.getClientId()).get(0);
+//			keycloak.realm(realm).clients().get(clientResource.getId()).roles().create(roleRepresentation);
+//			return getClientsRoleBaseOnId(role.getRoleId(), role.getClientId());
+//		} else {
 		    keycloak.realm(realm).roles().create(roleRepresentation);
 		    return getRoleBaseOnId(role.getRoleId());
-		}
+//		}
 	}
 
 	/**

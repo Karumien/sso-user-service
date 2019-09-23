@@ -27,4 +27,25 @@ keycloak:
   username: ${KEYCLOAK_USER:wagadmin}
   password: ${KEYCLOAK_PASSWORD:xara2002}
   client-id: ${KEYCLOAK_CLIENT_ID:admin-cli}
- 
+logbook:
+  include:
+    - /api/**
+  exclude:
+    - /actuator/**
+  filter.enabled: true
+  secure-filter.enabled: true
+  format.style: json
+  strategy: default
+# strategy: body-only-if-status-at-least
+  minimum-status: 400
+  obfuscate:
+    headers:
+      - Authorization
+      - X-Secret
+      - x-locale
+    parameters:
+      - access_token
+      - password
+      - x-locale
+    write:
+      chunk-size: 1000

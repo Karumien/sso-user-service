@@ -38,7 +38,7 @@
         <docker.repository.url>cloud.docker.com/repository/docker/karumien</docker.repository.url>
         <docker.tag>latest</docker.tag>
 		
-		<logstash-logback.version>6.0</logstash-logback.version>
+		<logstash-logback.version>6.2</logstash-logback.version>
 		<commons-io.version>2.6</commons-io.version>
 		<keycloak.version>7.0.0</keycloak.version>
 		
@@ -210,7 +210,37 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <version>2.1.3.RELEASE</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+            <version>2.1.3.RELEASE</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-spring-boot-starter</artifactId>
+            <version>2.0.0-RC.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-json</artifactId>
+            <version>2.0.0-RC.3</version>
+        </dependency>
 		
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>logbook-logstash</artifactId>
+            <version>2.0.0-RC.3</version>
+        </dependency>
+
 	</dependencies>
 	
 	<build>

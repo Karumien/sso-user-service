@@ -102,4 +102,23 @@ definitions:
         type: string
         example: "Map"
         maxLength: 300
-        
+      businessPriority:
+        type: integer
+        description: Order by priority (1 is highest priority/first)        
+      groups:
+        type: array
+        items:
+          $ref: "#/definitions/RightGroup"
+  RightGroup:
+    type: object
+    description: Rigth's logical group
+    properties:
+      code:
+        type: string
+        description: unique prefix ie. TLM_MOD
+      description:
+        type: string
+        description: Translated name of group
+      businessPriority:
+        type: integer
+        description: Order by priority (1 is highest priority/first)

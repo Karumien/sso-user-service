@@ -8,6 +8,7 @@ package com.karumien.cloud.sso.api;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -18,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
-import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
-import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
@@ -141,12 +140,9 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.OK);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String crmAccountId) {
-        return new ResponseEntity<>(accountService.getAccountIdentities(crmAccountId), HttpStatus.OK);
+    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String crmAccountId, @Valid List<String> crmContactIds) {
+        return AccountsApi.super.getAccountIdentities(crmAccountId, crmContactIds);
     }
     
     /**
@@ -177,8 +173,9 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<RoleInfo>> getAccountIdentityRoles(String crmAccountId, String crmContactId) {
-        return new ResponseEntity<>(identityService.getAllIdentityRoles(crmContactId), HttpStatus.OK);
+    public ResponseEntity<List<String>> getAccountIdentityRoleIds(String crmAccountId, String crmContactId) {
+        return new ResponseEntity<>(
+            identityService.getAllIdentityRoles(crmContactId).stream().map(r -> r.getRoleId()).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     /**
@@ -213,29 +210,14 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(identityService.isActiveRole(roleId, crmContactId) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
     }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> checkUserNameExist(String username) {    	
-    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public ResponseEntity<Void> checkUserNameExist(String username) {    	
+//    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
+//    }
+
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<List<RoleInfo>> getAccountIdentityRights(String crmAccountId, String crmContactId) {
-    	//TODO : need to be implemented
-    	return AccountsApi.super.getAccountIdentityRights(crmAccountId, crmContactId);
-    }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, Credentials credentials) {
-    	//TODO : need to be implemented
-    	return AccountsApi.super.createIdentityCredentials(crmAccountId, crmContactId,credentials);
-    }
 }

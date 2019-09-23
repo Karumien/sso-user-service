@@ -41,21 +41,6 @@ paths:
             $ref: '#/definitions/AccountInfo'
         '409':
           description: Account already exists (conflict crmAccountId)
-  /accounts/identity/{username}:
-    get:
-      summary: "Check if username exist"
-      operationId: "checkUserNameExist"
-      parameters:
-        - in: path
-          name: username
-          description: User name we want to check
-          required: true
-          type: string 
-      responses:
-        '200':
-          description: Successfully found User name
-        '406':
-          description: User name not found
   /accounts/{crmAccountId}:
     get:
       summary: "Get detail of the given Account"
@@ -263,7 +248,15 @@ paths:
           in: path
           description: Filtering by Account CRM ID
           required: true
-          type: string       
+          type: string
+        - in: body
+          name: crmContactIds
+          required: false
+          description: CRM Contacts IDs
+          schema:
+            type: array
+            items: 
+              type: string
       responses:
         '200':
           description: Successfully returned Identities
@@ -288,7 +281,7 @@ paths:
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
-          type: string       
+          type: string    
       responses:
         '200':
           description: Successfully returned Identity's info
@@ -315,10 +308,37 @@ paths:
           description: Successfully removed existing Identity
         '410':
           description: Identity Gone
-  /accounts/{crmAccountId}/identities/{crmContactId}/roles:
+  /accounts/{crmAccountId}/identities/roles:
     get:
       summary: "Get detail of the given Identity"
-      operationId: getAccountIdentityRoles
+      operationId: getAccountIdentitiesRoles
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - in: body
+          name: crmContactIds
+          required: false
+          description: CRM Contacts IDs
+          schema:
+            type: array
+            items: 
+              type: string
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/IdentityRoleInfo'
+        '410':
+          description: Gone  
+  /accounts/{crmAccountId}/identities/{crmContactId}/rights:
+    get:
+      summary: "Get Identity's Rights Ids"
+      operationId: getAccountIdentityRightIds
       parameters:
         - name: crmAccountId
           in: path
@@ -336,7 +356,31 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/RoleInfo'
+              type: string
+        '410':
+          description: Gone
+  /accounts/{crmAccountId}/identities/{crmContactId}/roles:
+    get:
+      summary: "Get Identity's Roles Ids"
+      operationId: getAccountIdentityRoleIds
+      parameters:
+        - name: crmAccountId
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: crmContactId
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              type: string
         '410':
           description: Gone
     put:
@@ -408,7 +452,7 @@ paths:
           type: string   
         - name: roleId
           in: path
-          description: Filtering by Identity ID
+          description: Filtering by Role ID
           required: true
           type: string   
       responses:
@@ -434,7 +478,7 @@ paths:
           type: string       
         - name: roleId
           in: path
-          description: Filtering by Identity ID
+          description: Filtering by Role ID
           required: true
           type: string    
       responses:
@@ -470,30 +514,25 @@ paths:
           description: Identity Gone
         '422':
           description: Role not unassigned
-  /accounts/{crmAccountId}/identities/{crmContactId}/rights:
+  /account/{crmAccountId}/hierarchy:
     get:
-      summary: "Get rights of the given Identity"
-      operationId: getAccountIdentityRights
+      summary: Hierarchy definition for Account - modules and right groups (translated, filtered by activated services)
+      operationId: getAccountHierarchy
       parameters:
         - name: crmAccountId
           in: path
-          description: Filtering by Account unique CRM ID
+          description: Filtering by Account CRM ID
           required: true
           type: string
-        - name: crmContactId
-          in: path
-          description: Filtering by Identity unique CRM ID
-          required: true
-          type: string       
       responses:
         '200':
-          description: Successfully returned Identity's Roles
+          description: Successfully returned Identities
           schema:
-            type: array
+            type: array            
             items:
-              $ref: '#/definitions/RoleInfo'
+              $ref: '#/definitions/ModuleInfo'
         '410':
-          description: Gone
+          description: Account Gone  
   /accounts/{crmAccountId}/identities/{crmContactId}/credentials:
     post:
       summary: "Add Account Identity credentials"
@@ -584,6 +623,26 @@ definitions:
       firstName: Karel
       email: KajaN@eurowag.com
       emailVerified: true
+  IdentityRoleInfo:
+    type: object
+    description: "Basic information Identity Roles"
+    required:
+      - crmAccountId
+      - crmContactId
+    properties:
+      crmAccountId:
+        type: string
+        description: Identity's CRM Account ID
+      crmContactId:
+        type: string
+        description: Identity's Unique ID 
+      nav4Id:
+        type: string
+        description: Identity's Unique NAV4 ID 
+      roles:
+        type: array
+        items:
+          type: string
   AccountInfo:
     type: object
     description: "Basic information about Account"
@@ -619,12 +678,32 @@ definitions:
     properties:
       moduleId:
         type: string
-        example: "TLM01"
+        example: "MODULE_TLM01"
         maxLength: 40
       description:
         type: string
         example: "Map"
         maxLength: 300
+      businessPriority:
+        type: integer
+        description: Order by priority (1 is highest priority/first)        
+      groups:
+        type: array
+        items:
+          $ref: "#/definitions/RightGroup"
+  RightGroup:
+    type: object
+    description: Rigth's logical group
+    properties:
+      code:
+        type: string
+        description: unique prefix ie. TLM_MOD
+      description:
+        type: string
+        description: Translated name of group
+      businessPriority:
+        type: integer
+        description: Order by priority (1 is highest priority/first)        
   RoleInfo:
     type: object
     description: "Basic information about Role"
@@ -639,13 +718,17 @@ definitions:
         type: string
         description: "Role description"
         maxLength: 255
-      clientId:
+      crmAccountId:
         type: string
-        maxLength: 250
-        description: Client Id (for client roles)
-      clientRole:
-        type: boolean
-        description: "Identify Client Role (not realm role)"
+        description: Custom role for account
+      roles:
+        type: array
+        items:
+          type: string
+      rights:
+        type: array
+        items:
+          type: string
   Credentials:
     type: object
     description: "Object for setting of Identity credential"
@@ -673,3 +756,53 @@ definitions:
       - password: "#123456."
         currentPassword: "oldPassword"
         temporary: true
+  ErrorMessageCode:
+    type: string
+    description: Master Error Code
+    enum:
+      - CLIENT_ERROR
+  ErrorCode:
+    type: string
+    description: Error codes for attributes
+    enum:
+      - invalid-username
+      - invalid-password  
+  ErrorData:
+    type: object
+    description: EW ErrorMessage model data
+    required:
+    - code
+    properties:
+      code:
+        $ref: "#/definitions/ErrorCode"
+        description: ie. invalid-phone-number-format
+      attribute: 
+        type: string
+        description: ie. phoneNumberPrimary
+      description:
+        type: string
+        description: ie. Invalid phone number format. Valid is XXX XXX XXX
+      data:
+        type: object
+  ErrorMessage:
+    type: object
+    description: EW ErrorMessage model
+    required:
+    - errno
+    - errcode
+    properties:
+      errno: 
+        type: integer
+        default: -1
+      errcode: 
+        $ref: "#/definitions/ErrorMessageCode"
+        type: string
+        maxLength: 50
+      errmsg: 
+        type: string
+        maxLength: 250
+        description: Optional error message
+      errdata:
+        type: array
+        items:
+          $ref: "#/definitions/ErrorData"
