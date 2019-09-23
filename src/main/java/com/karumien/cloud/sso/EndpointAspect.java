@@ -25,10 +25,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-@Aspect
-@Order(1)
-@Component
-@ConditionalOnExpression("${endpoint.aspect.enabled:true}")
+//@Aspect
+//@Order(1)
+//@Component
+//@ConditionalOnExpression("${endpoint.aspect.enabled:true}")
 public class EndpointAspect {
 
   private final static List<String> MDC_CONTEXT = Arrays.asList("crmAccountId", "crmContactId", "moduleId", "nav4Id");
