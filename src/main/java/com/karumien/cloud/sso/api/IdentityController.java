@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019-2029 Karumien s.r.o.
  *
- * Karumien s.r.o. is not responsible for defects arising from 
+ * Karumien s.r.o. is not responsible for defects arising from
  * unauthorized changes to the source code.
  */
 package com.karumien.cloud.sso.api;
@@ -31,7 +31,7 @@ import io.swagger.annotations.Api;
  * REST Controller for Identity Service (API).
  * 
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
- * @since 1.0, 18. 7. 2019 11:15:51 
+ * @since 1.0, 18. 7. 2019 11:15:51
  */
 @RestController
 @Api(value = "Identity Service", description = "Management of Identities (Users/Contacts)", tags = { "Identity Service" })
@@ -39,10 +39,10 @@ public class IdentityController implements IdentitiesApi {
 
     @Autowired
     private IdentityService identityService;
-    
+
     @Autowired
     private RoleService roleService;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -59,7 +59,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.deleteIdentity(crmContactId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -68,7 +68,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.createIdentityCredentials(id, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -76,7 +76,7 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<IdentityInfo> getIdentity(String crmContactId) {
         return new ResponseEntity<>(identityService.getIdentity(crmContactId), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -102,15 +102,16 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> assignIdentityRole(String crmContactId, String roleId) {
         return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRole(String crmContactId, String roleId) {
-        return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId,  Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+        return new ResponseEntity<>(
+                identityService.unassignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -118,7 +119,7 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> assignIdentityRoles(String crmContactId, @Valid List<String> roles) {
         return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -126,7 +127,7 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> unassignIdentityRoles(String crmContactId, @Valid List<String> roles) {
         return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -135,7 +136,7 @@ public class IdentityController implements IdentitiesApi {
         // TODO viliam.litavec: Impl
         return IdentitiesApi.super.getIdentityRole(crmContactId, roleId);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -143,7 +144,7 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<List<RoleInfo>> getIdentityRoles(String crmContactId) {
         return new ResponseEntity<List<RoleInfo>>(identityService.getAllIdentityRoles(crmContactId), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -152,7 +153,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.resetPasswordByEmail(crmContactId);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -161,7 +162,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.blockIdentity(crmContactId, true);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -179,7 +180,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.savePinOfIdentityDriver(crmContactId, pin);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
- 
+
     /**
      * {@inheritDoc}
      */
@@ -188,7 +189,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.removePinOfIdentityDriver(crmContactId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -196,16 +197,43 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<DriverPin> getDriverPin(String crmContactId) {
         return new ResponseEntity<>(identityService.getPinOfIdentityDriver(crmContactId), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ResponseEntity<Void> getIdentityRolesBinary(String crmContactId) {
-        String binaryRoles = roleService.getRolesBinary(
-            identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId)));
-                return new ResponseEntity(binaryRoles, HttpStatus.OK);
+        String binaryRoles = roleService
+                .getRolesBinary(identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId)));
+        return new ResponseEntity(binaryRoles, HttpStatus.OK);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> exists(@Valid String username, @Valid String crmContactId, @Valid String nav4Id) {
+        // TODO viliam.litavec: Need implementation
+        return IdentitiesApi.super.exists(username, crmContactId, nav4Id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createIdentityNav4Credentials(String crmContactId, @Valid Credentials credentials) {
+        // TODO viliam.litavec: Need implementation
+        return IdentitiesApi.super.createIdentityNav4Credentials(crmContactId, credentials);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> getIdentityNav4(String nav4Id) {
+        // TODO viliam.litavec: Need implementation
+        return IdentitiesApi.super.getIdentityNav4(nav4Id);
+    }
+
 }

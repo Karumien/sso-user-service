@@ -56,4 +56,5 @@ public class RoleController implements RolesApi {
     public ResponseEntity<RoleInfo> getRole(String id) {
     	return new ResponseEntity<>(roleService.getRoleBaseOnId(id), HttpStatus.OK);
     }
+    
 }

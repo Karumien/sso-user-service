@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.service.AccountService;
@@ -218,6 +219,14 @@ public class AccountController implements AccountsApi {
 //    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
 //    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, @Valid Credentials credentials) {
+        // TODO viliam.litavec: Need implementation
+        return AccountsApi.super.createIdentityCredentials(crmAccountId, crmContactId, credentials);
+    }
     
     
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2019-2029 Karumien s.r.o.
  *
- * Karumien s.r.o. is not responsible for defects arising from 
+ * Karumien s.r.o. is not responsible for defects arising from
  * unauthorized changes to the source code.
  */
 package com.karumien.cloud.sso.api;
@@ -23,7 +23,7 @@ import io.swagger.annotations.Api;
  * REST Controller for Module Service (API).
  * 
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
- * @since 1.0, 18. 7. 2019 11:15:51 
+ * @since 1.0, 18. 7. 2019 11:15:51
  */
 @RestController
 @Api(value = "Module Service", description = "Management of Modules (Licences)", tags = { "Module Service" })
@@ -39,7 +39,7 @@ public class ModuleController implements ModulesApi {
     public ResponseEntity<ModuleInfo> getModule(String moduleId) {
         return new ResponseEntity<>(moduleService.getModule(moduleId), HttpStatus.OK);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -47,7 +47,7 @@ public class ModuleController implements ModulesApi {
     public ResponseEntity<ModuleInfo> createModule(@Valid ModuleInfo module) {
         return new ResponseEntity<>(moduleService.createModule(module), HttpStatus.CREATED);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -56,5 +56,13 @@ public class ModuleController implements ModulesApi {
         moduleService.deleteModule(moduleId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-        
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<ModuleInfo> updateModule(String moduleId) {
+        // TODO viliam.litavec: Need implementation
+        return ModulesApi.super.updateModule(moduleId);
+    }
 }

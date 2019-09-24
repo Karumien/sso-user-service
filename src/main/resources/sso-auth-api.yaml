@@ -75,6 +75,7 @@ definitions:
       - client_credentials
       - refresh_token
       - pin
+      - impersonate
   AuthorizationRequest:
     type: object
     required:
@@ -85,27 +86,27 @@ definitions:
       username:
         type: string
         maxLength: 100
-        description: Identity ID of user - required for grant_type of type password.
+        description: Identity ID of user - required for grant_type of type 'password' or 'impersonate' or 'pin'.
       password:
         type: string
         maxLength: 100
-        description: User's password - required for grant_type of type password.
+        description: User's password - required for grant_type of type 'password'.
       client_id:
         type: string
         maxLength: 250
-        description: Client Id - required for grant_type of type client_credentials.
+        description: Client Id - required for grant_type of type 'client_credentials'.
       client_secret:
         type: string
         maxLength: 250
-        description: Client Secret - required for grant_type of type client_credentials.
+        description: Client Secret - required for grant_type of type 'client_credentials'.
       refresh_token:
         type: string
         maxLength: 4000
-        description: Refresh Token for Access Token renewal process - required for grant_type of refresh_token.
+        description: Refresh Token for Access Token renewal process - required for grant_type of type 'refresh_token' or 'impersonate'.
       pin:
         type: string
         maxLength: 10
-        description: Driver's pin - required for grant_type of type pin.
+        description: Driver's pin - required for grant_type of type 'pin'.
     example:
       password:
         grant_type: password

@@ -43,6 +43,8 @@ public interface IdentityService {
 
     String ATTR_NAV4ID = "nav4Id";
 
+    String ATTR_BUSINESS_PRIORITY = "businessPriority";
+
     /**
      * Create Identity in target SSO.
      * 
