@@ -21,7 +21,9 @@ import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
@@ -228,5 +230,40 @@ public class AccountController implements AccountsApi {
         return AccountsApi.super.createIdentityCredentials(crmAccountId, crmContactId, credentials);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<ModuleInfo>> getAccountHierarchy(String crmAccountId) {
+        // TODO viliam.litavec: Need implementation
+        return AccountsApi.super.getAccountHierarchy(crmAccountId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<IdentityRoleInfo>> getAccountIdentitiesRoles(String crmAccountId, @Valid List<String> crmContactIds) {
+        // TODO viliam.litavec: Need implementation
+        return AccountsApi.super.getAccountIdentitiesRoles(crmAccountId, crmContactIds);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<String>> getAccountIdentityRightIds(String crmAccountId, String crmContactId) {
+        // TODO viliam.litavec: Need implementation
+        return AccountsApi.super.getAccountIdentityRightIds(crmAccountId, crmContactId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<RoleInfo>> getAccountRoles(String crmAccountId) {
+        // TODO viliam.litavec: Need implementation
+        return AccountsApi.super.getAccountRoles(crmAccountId);
+    }
     
 }
