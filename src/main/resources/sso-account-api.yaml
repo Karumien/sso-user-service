@@ -554,10 +554,6 @@ paths:
           description: The Credentials for Identity to create/change
           schema:
             $ref: '#/definitions/Credentials'
-            example:
-              username: "midie"
-              password: "#123456."
-              temporary: true
       responses:
         '201':
           description: "Identity creadentials has been created or reset"
@@ -801,8 +797,6 @@ definitions:
         default: -1
       errcode: 
         $ref: "#/definitions/ErrorCode"
-        type: string
-        maxLength: 50
       errmsg: 
         type: string
         maxLength: 250
