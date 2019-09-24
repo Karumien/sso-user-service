@@ -454,7 +454,7 @@ paths:
           in: path
           description: Filtering by Role ID
           required: true
-          type: string   
+          type: string  
       responses:
         '200':
           description: Role is assigned to Identity
@@ -487,7 +487,7 @@ paths:
         '410':
           description: Identity Gone
         '422':
-          description: Role for Identity not assigned
+          description: Role for Identity not assigned      
     delete:
       summary: "Remove Role on Identity"
       operationId: "unassignAccountIdentityRole"
@@ -565,7 +565,21 @@ paths:
           description: Identity Gone
         '422':
           description: Can't create Identity's credentials
+          schema:
+              description: "Error Codes for Attributes: #/definitions/ErrorCodeCredentials"
+              $ref: '#/definitions/ErrorMessage'
 definitions:
+  ErrorCode:
+    type: string
+    description: Master Error Code
+    enum:
+      - CLIENT_ERROR
+  ErrorCodeCredentials:
+    type: string
+    description: Error codes for attributes
+    enum:
+      - invalid-username
+      - invalid-password  
   IdentityInfo:
     type: object
     description: "Basic information about Identity"
@@ -756,17 +770,6 @@ definitions:
       - password: "#123456."
         currentPassword: "oldPassword"
         temporary: true
-  ErrorMessageCode:
-    type: string
-    description: Master Error Code
-    enum:
-      - CLIENT_ERROR
-  ErrorCode:
-    type: string
-    description: Error codes for attributes
-    enum:
-      - invalid-username
-      - invalid-password  
   ErrorData:
     type: object
     description: EW ErrorMessage model data
@@ -774,13 +777,16 @@ definitions:
     - code
     properties:
       code:
-        $ref: "#/definitions/ErrorCode"
+        type: string
         description: ie. invalid-phone-number-format
+        maxLength: 50
       attribute: 
         type: string
+        maxLength: 250
         description: ie. phoneNumberPrimary
       description:
         type: string
+        maxLength: 1000
         description: ie. Invalid phone number format. Valid is XXX XXX XXX
       data:
         type: object
@@ -795,7 +801,7 @@ definitions:
         type: integer
         default: -1
       errcode: 
-        $ref: "#/definitions/ErrorMessageCode"
+        $ref: "#/definitions/ErrorCode"
         type: string
         maxLength: 50
       errmsg: 
