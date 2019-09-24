@@ -514,7 +514,7 @@ paths:
           description: Identity Gone
         '422':
           description: Role not unassigned
-  /account/{crmAccountId}/hierarchy:
+  /accounts/{crmAccountId}/hierarchy:
     get:
       summary: Hierarchy definition for Account - modules and right groups (translated, filtered by activated services)
       operationId: getAccountHierarchy

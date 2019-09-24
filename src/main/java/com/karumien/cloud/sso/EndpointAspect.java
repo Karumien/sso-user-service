@@ -16,10 +16,6 @@ package com.karumien.cloud.sso;
 import java.util.Arrays;
 import java.util.List;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.CodeSignature;
 import org.jboss.logging.MDC;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.annotation.Order;
@@ -31,18 +27,18 @@ import org.springframework.stereotype.Component;
 //@ConditionalOnExpression("${endpoint.aspect.enabled:true}")
 public class EndpointAspect {
 
-  private final static List<String> MDC_CONTEXT = Arrays.asList("crmAccountId", "crmContactId", "moduleId", "nav4Id");
-    
-  @Around("within(com.karumien.cloud.sso.api..*)")
-  public void aroundAdvice(ProceedingJoinPoint joinPoint) {
-      CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
-      for (int i = 0; i < codeSignature.getParameterNames().length; i++) {
-          String name = codeSignature.getParameterNames()[i];
-          if (MDC_CONTEXT.contains(name)) {
-              MDC.put(name, joinPoint.getArgs()[i]);
-          }
-      }
-  }
+//  private final static List<String> MDC_CONTEXT = Arrays.asList("crmAccountId", "crmContactId", "moduleId", "nav4Id");
+//    
+//  @Around("within(com.karumien.cloud.sso.api..*)")
+//  public void aroundAdvice(ProceedingJoinPoint joinPoint) {
+//      CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
+//      for (int i = 0; i < codeSignature.getParameterNames().length; i++) {
+//          String name = codeSignature.getParameterNames()[i];
+//          if (MDC_CONTEXT.contains(name)) {
+//              MDC.put(name, joinPoint.getArgs()[i]);
+//          }
+//      }
+//  }
 
 //    @Around("within(com.karumien.cloud.sso.api..*)")
 //    public Object aroundAdvice(ProceedingJoinPoint joinPoint) throws Throwable {

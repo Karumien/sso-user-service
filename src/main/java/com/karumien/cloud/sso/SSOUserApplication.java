@@ -12,14 +12,11 @@
  */
 package com.karumien.cloud.sso;
 
-import org.slf4j.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Performance Service Application.
@@ -33,14 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 //@EnableHystrixDashboard
 //@EnableFeignClients
 //@EnableAspectJAutoProxy
-@Slf4j
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
 public class SSOUserApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SSOUserApplication.class, args);
-        MDC.put("group", "eurowag");
-        log.info("Started SSO=1");
     }
     
 //    @Bean
