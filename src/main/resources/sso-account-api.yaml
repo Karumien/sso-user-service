@@ -564,10 +564,9 @@ paths:
         '410':
           description: Identity Gone
         '422':
-          description: Can't create Identity's credentials
+          description: "Can't create Identity's credentials - Error Codes for Attributes: #/definitions/ErrorCodeCredentials"
           schema:
-              description: "Error Codes for Attributes: #/definitions/ErrorCodeCredentials"
-              $ref: '#/definitions/ErrorMessage'
+            $ref: '#/definitions/ErrorMessage'
 definitions:
   ErrorCode:
     type: string
