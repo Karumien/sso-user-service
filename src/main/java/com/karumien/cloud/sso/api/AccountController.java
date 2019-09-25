@@ -223,6 +223,15 @@ public class AccountController implements AccountsApi {
 //    public ResponseEntity<Void> checkUserNameExist(String username) {    	
 //    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
 //    }
+//
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, @Valid Credentials credentials) {
+//        identityService.createIdentityCredentials(crmContactId, credentials);
+//        return new ResponseEntity<>(HttpStatus.CREATED);
+//    }
     
     /**
      * {@inheritDoc}
@@ -265,6 +274,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, Credentials credentials) {
-    	return new ResponseEntity<Void>(accountService.updateCredentialsForIdentity(crmAccountId,crmContactId, credentials) ? HttpStatus.CREATED : HttpStatus.GONE);
+        identityService.createIdentityCredentials(crmContactId, credentials);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+        // return new ResponseEntity<Void>(accountService.updateCredentialsForIdentity(crmAccountId,crmContactId, credentials) ? HttpStatus.CREATED : HttpStatus.GONE);
     }
 }
