@@ -191,4 +191,11 @@ public interface IdentityService {
     IdentityInfo mapping(UserRepresentation userRepresentation);
 
     Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName);
+
+    /**
+     * Return identity base on nav4Id from request parameter
+     * @param nav4Id {@link String} nav4Id id of identity we want to find
+     * @return {@link IdentityInfo} Identity we want to get
+     */
+	IdentityInfo getIdentityByNav4(String nav4Id);
 }

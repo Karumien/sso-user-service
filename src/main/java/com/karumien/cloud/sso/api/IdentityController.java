@@ -232,8 +232,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> getIdentityNav4(String nav4Id) {
-        // TODO viliam.litavec: Need implementation
-        return IdentitiesApi.super.getIdentityNav4(nav4Id);
+    	IdentityInfo identity = identityService.getIdentityByNav4(nav4Id);
+    	return new ResponseEntity<IdentityInfo>(identity, identity != null ? HttpStatus.OK : HttpStatus.GONE);
     }
 
 }
