@@ -230,8 +230,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, @Valid Credentials credentials) {
-        // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.createIdentityCredentials(crmAccountId, crmContactId, credentials);
+        identityService.createIdentityCredentials(crmContactId, credentials);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
     /**
