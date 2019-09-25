@@ -143,8 +143,12 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.OK);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String crmAccountId, @Valid List<String> crmContactIds) {
+     // TODO viliam.litavec: Need implementation
         return AccountsApi.super.getAccountIdentities(crmAccountId, crmContactIds);
     }
     
