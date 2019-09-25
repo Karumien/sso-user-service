@@ -148,8 +148,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String crmAccountId, @Valid List<String> crmContactIds) {
-     // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.getAccountIdentities(crmAccountId, crmContactIds);
+    	return new ResponseEntity<>(accountService.getAccountIdentities(crmAccountId, crmContactIds), HttpStatus.OK);
     }
     
     /**
@@ -224,15 +223,6 @@ public class AccountController implements AccountsApi {
 //    public ResponseEntity<Void> checkUserNameExist(String username) {    	
 //    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
 //    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, @Valid Credentials credentials) {
-        // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.createIdentityCredentials(crmAccountId, crmContactId, credentials);
-    }
     
     /**
      * {@inheritDoc}
@@ -270,4 +260,11 @@ public class AccountController implements AccountsApi {
         return AccountsApi.super.getAccountRoles(crmAccountId);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, Credentials credentials) {
+    	return new ResponseEntity<Void>(accountService.updateCredentialsForIdentity(crmAccountId,crmContactId, credentials) ? HttpStatus.CREATED : HttpStatus.GONE);
+    }
 }

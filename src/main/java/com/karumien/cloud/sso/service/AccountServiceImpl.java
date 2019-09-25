@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
@@ -228,6 +230,16 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public boolean checkIfUserNameExist(String username) {
 		return keycloak.realm(realm).users().search(username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
+	}
+
+	@Override
+	public boolean updateCredentialsForIdentity(String crmAccountId, String crmContactId, Credentials credentials) {
+		IdentityInfo identity = getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId);
+		UserRepresentation user = keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation();
+		if (credentials.getUsername() != null) {
+			user.setUsername(credentials.getUsername());
+		}
+		return true;
 	}
 
 }
