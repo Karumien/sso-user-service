@@ -13,6 +13,7 @@ import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 
 /**
@@ -84,4 +85,13 @@ public interface AccountService {
      * @return {@link Boolean} return true if user name was already used and false if not
      */
     boolean checkIfUserNameExist(String username);
+
+	/**
+	 * Update identity credentials
+	 * @param crmAccountId {@link String} ID of Account
+	 * @param crmContactId {@link String} ID of contract
+	 * @param credentials {@link Credentials} credentials that we want to set up
+	 * @return {@link Boolean} return true if we sucessfull set up credentials
+	 */
+	boolean updateCredentialsForIdentity(String crmAccountId, String crmContactId, Credentials credentials);
 }
