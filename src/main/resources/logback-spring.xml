@@ -42,30 +42,30 @@
                                 "parent_span_id": "%mdc{X-B3-ParentSpanId}",
                                 "exportable": "%mdc{X-Span-Export}"
                             },
-                            "access_token": "%mdc{access_token}",
                             "service_name": "sso-user-service",
                             "context": {
                                 "crm_account_id": "%mdc{crmAccountId}",
                                 "crm_contact_id": "%mdc{crmContactId}",
                                 "nav4_id": "%mdc{nav4Id}",
-                                "module_id": "%mdc{moduleId}"                                
+                                "module_id": "%mdc{moduleId}",
+                                "identity_id": "%mdc{identityId}"                                
                             },
-                            "duration_ms": #asLong(%mdc{duration})"
+                            "jwt": "#tryJson{%mdc{access_token}}",
+                            "headers": "%mdc{headers_all}",
+                            "duration": "#asLong{%mdc{duration_ms}}"
                         }
                     </pattern>
-                </pattern><!-- "http": "#asJson{%message}", 
-                            "access_token": "#asJson{%mdc{access_token}}",
-                            ,
-                            "identity": {
-                                "crm_account_id": "%mdc{identityCrmAccountId}",
-                                "nav4_id": "%mdc{identityNav4Id}",
-                                "crm_contact_id": "%mdc{identityCrmContactId}",
-                                "identity_id": "%mdc{identityId}"
-                            }
-                            
-                             -->
+                </pattern>
                 <mdc>
+                    <excludeMdcKeyName>identityId</excludeMdcKeyName>
                     <excludeMdcKeyName>traceId</excludeMdcKeyName>
+                    <excludeMdcKeyName>duration_ms</excludeMdcKeyName>
+                    <excludeMdcKeyName>moduleId</excludeMdcKeyName>
+                    <excludeMdcKeyName>crmAccountId</excludeMdcKeyName>
+                    <excludeMdcKeyName>access_token</excludeMdcKeyName>
+                    <excludeMdcKeyName>headers_all</excludeMdcKeyName>
+                    <excludeMdcKeyName>crmContactId</excludeMdcKeyName>
+                    <excludeMdcKeyName>nav4Id</excludeMdcKeyName>
                     <excludeMdcKeyName>spanId</excludeMdcKeyName>
                     <excludeMdcKeyName>parentId</excludeMdcKeyName>
                     <excludeMdcKeyName>spanExportable</excludeMdcKeyName>

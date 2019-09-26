@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.MDC;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -80,7 +81,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
             MDC.put("user", user);
         }
 
-        MDC.put("headers", "" +  new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders());
+        MDC.put("headers_all", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
         
         String locale = requestCacheWrapperObject.getHeader("x-locale");
         if (locale != null) {
@@ -95,6 +96,27 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
         return true;
     }
 
+    private String toJson(HttpHeaders headers) {
+        return headers.toString();
+//        StringBuilder sb = new StringBuilder();
+//        for (String key : headers.keySet()) {
+//            
+//            if (sb.length()==0) {
+//                sb.append(" {");
+//            } else {
+//                sb.append(", ");
+//            }
+//            sb.append("\"").append(key).append("\" : [ ");
+//            
+//            sb.append(headers.get(key).stream()
+//                .map( v -> "\"" + v.toString() + "\"")
+//                .collect( Collectors.joining( ", " ) ));
+//            sb.append(" ]");
+//        }
+//        
+//        return sb.append(" }").toString();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -105,7 +127,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
         
         long duration = System.currentTimeMillis()-startTime.get();
         MDC.put("status", ""+response.getStatus());
-        MDC.put("duration", ""+duration);
+        MDC.put("duration_ms", ""+duration);
         
         //MDC.put("response", getContentAsString(wrappedResponse.getContentAsByteArray(), this.maxPayloadLength, response.getCharacterEncoding()));
        
