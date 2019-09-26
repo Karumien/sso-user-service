@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
-    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework" level="WARN"/>
     <logger name="com.karumien" level="INFO"/>
     <!-- logger name="org.zalando.logbook" level="TRACE"/ -->
     <!-- logger name="com.karumien.cloud.sso.LoggingRequestInterceptor" level="DEBUG"/-->
     
     <springProperty scope="context" name="application_name" source="spring.application.name"/>
-    <springProperty scope="context" name="app_build" source="app.build"/>
-    <springProperty scope="context" name="app_version" source="app.version"/>
-    <springProperty scope="context" name="app_env" source="app.env"/>
     
     <!-- Logstash-Configuration -->
     <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">

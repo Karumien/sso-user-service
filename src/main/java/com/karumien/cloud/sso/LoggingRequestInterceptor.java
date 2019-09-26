@@ -6,9 +6,6 @@
  */
 package com.karumien.cloud.sso;
 
-
-import static net.logstash.logback.marker.Markers.appendRaw;
-
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
 
     // TODO spring config
-    private int maxPayloadLength = 1000;
+    //private int maxPayloadLength = 1000;
     
     private ThreadLocal<Long> startTime = new ThreadLocal<Long>();
     
@@ -115,11 +112,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
         startTime.remove();
         wrappedResponse.copyBodyToResponse();  
         
-        log.info(
-                //appendRaw("access_token", "{ access_token : { moje : 5 } }" )
-                //MDC.get("access_token"))
-                //, 
-                "integration-call");
+        log.info("integration-call");
         MDC.clear();
     }
 
