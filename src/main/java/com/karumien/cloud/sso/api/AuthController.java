@@ -8,6 +8,8 @@ package com.karumien.cloud.sso.api;
 
 import javax.validation.Valid;
 
+import org.apache.commons.codec.binary.Base64;
+import org.jboss.logging.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +71,11 @@ public class AuthController implements AuthApi  {
             break;
         }
         
+        if (response.getAccessToken() != null) {
+            MDC.put("access_token", decodeJWT(response.getAccessToken()));
+            System.out.println(decodeJWT(response.getAccessToken()));
+        }
+        
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     
@@ -90,6 +97,19 @@ public class AuthController implements AuthApi  {
     @Override
     public ResponseEntity<Policy> getPasswordPolicy() {
         return new ResponseEntity<>(authService.getPasswordPolicy(), HttpStatus.OK);
+    }
+    
+    private String decodeJWT(String jwtToken) {
+    
+        String[] split_string = jwtToken.split("\\.");
+        //String base64EncodedHeader = split_string[0];
+        String base64EncodedBody = split_string[1];
+        // String base64EncodedSignature = split_string[2];
+    
+        Base64 base64Url = new Base64(true);
+        // String header = new String(base64Url.decode(base64EncodedHeader));
+    
+        return new String(base64Url.decode(base64EncodedBody));
     }
     
 }

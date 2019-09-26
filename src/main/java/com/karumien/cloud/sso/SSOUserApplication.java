@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * Performance Service Application.
@@ -29,21 +30,12 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 //@EnableHystrix
 //@EnableHystrixDashboard
 //@EnableFeignClients
-//@EnableAspectJAutoProxy
+@EnableAspectJAutoProxy
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
 public class SSOUserApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SSOUserApplication.class, args);
     }
-    
-//    @Bean
-//    public CommonsRequestLoggingFilter requestLoggingFilter() {
-//        CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
-//        loggingFilter.setIncludeClientInfo(true);
-//        loggingFilter.setIncludeQueryString(true);
-//        loggingFilter.setIncludePayload(true);
-//        return loggingFilter;
-//    }
     
 }

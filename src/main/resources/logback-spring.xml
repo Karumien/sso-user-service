@@ -2,5 +2,96 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org.springframework" level="INFO"/>
+    <logger name="com.karumien" level="INFO"/>
+    <!-- logger name="org.zalando.logbook" level="TRACE"/ -->
+    <!-- logger name="com.karumien.cloud.sso.LoggingRequestInterceptor" level="DEBUG"/-->
     
+    <springProperty scope="context" name="application_name" source="spring.application.name"/>
+    <springProperty scope="context" name="app_build" source="app.build"/>
+    <springProperty scope="context" name="app_version" source="app.version"/>
+    <springProperty scope="context" name="app_env" source="app.env"/>
+    
+    <!-- Logstash-Configuration -->
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!-- destination>ew-elk.westeurope.cloudapp.azure.com:5010</destination-->
+        <destination>elk.elk:5010</destination>
+        <!-- encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{ "service_name":"sso-user-service" }</customFields>
+            <fieldNames>
+                <message>log_message</message>
+            </fieldNames>
+        </encoder-->
+        <keepAliveDuration>5 minutes</keepAliveDuration>
+        <encoder
+            class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+              <providers>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <version/>
+                <logLevel/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <context/>
+                <pattern>
+                    <omitEmptyFields>true</omitEmptyFields>
+                    <pattern>
+                        {
+                            "env" : "UAT",
+                            "trace": {
+                                "trace_id": "%mdc{X-B3-TraceId}",
+                                "span_id": "%mdc{X-B3-SpanId}",
+                                "parent_span_id": "%mdc{X-B3-ParentSpanId}",
+                                "exportable": "%mdc{X-Span-Export}"
+                            },
+                            "access_token": "%mdc{access_token}",
+                            "service_name": "sso-user-service",
+                            "context": {
+                                "crm_account_id": "%mdc{crmAccountId}",
+                                "crm_contact_id": "%mdc{crmContactId}",
+                                "nav4_id": "%mdc{nav4Id}",
+                                "module_id": "%mdc{moduleId}"                                
+                            }
+                        }
+                    </pattern>
+                </pattern><!-- "http": "#asJson{%message}", 
+                            "access_token": "#asJson{%mdc{access_token}}",
+                            ,
+                            "identity": {
+                                "crm_account_id": "%mdc{identityCrmAccountId}",
+                                "nav4_id": "%mdc{identityNav4Id}",
+                                "crm_contact_id": "%mdc{identityCrmContactId}",
+                                "identity_id": "%mdc{identityId}"
+                            }
+                            
+                             -->
+                <mdc>
+                    <excludeMdcKeyName>traceId</excludeMdcKeyName>
+                    <excludeMdcKeyName>spanId</excludeMdcKeyName>
+                    <excludeMdcKeyName>parentId</excludeMdcKeyName>
+                    <excludeMdcKeyName>spanExportable</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+                </mdc>
+                <logstashMarkers />
+                <stackTrace>
+                    <fieldName>stackTrace</fieldName>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <exclude>net\.sf\.cglib\..*</exclude>
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+                
+            </providers>
+        </encoder>        
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="logstash" />
+    </root>
+
 </configuration>

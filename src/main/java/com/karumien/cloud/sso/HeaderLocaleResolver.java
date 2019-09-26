@@ -35,7 +35,8 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 @Component
 public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
 
-    private static final List<Locale> SUPPORTED_LOCALES = Arrays.asList(new Locale("en"), new Locale("sk"), new Locale("cs"), new Locale("de"), new Locale("fr"));
+    private static final List<Locale> SUPPORTED_LOCALES = Arrays.asList(new Locale("en"), new Locale("sk"), new Locale("cs"), 
+            new Locale("de"), new Locale("fr"));
     
     /**
      * {@inheritDoc}
