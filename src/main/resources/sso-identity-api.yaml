@@ -65,7 +65,7 @@ paths:
       summary: "Remove existing Identity"
       operationId: deleteIdentity
       parameters:
-        - name: id
+        - name: crmContactId
           in: path
           description: Filtering by Identity Unique ID
           required: true

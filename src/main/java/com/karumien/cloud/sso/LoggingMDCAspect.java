@@ -65,7 +65,7 @@ public class LoggingMDCAspect {
       MDC.put("class_method", method.getName() + "()");
       
       RequestMapping requestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
-      if (requestMapping != null) {
+      if (requestMapping != null && requestMapping.path() != null && requestMapping.path().length > 0) {
           MDC.put("path", requestMapping.path()[0]);
       }
 
