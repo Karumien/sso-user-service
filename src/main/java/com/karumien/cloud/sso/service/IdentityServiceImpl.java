@@ -373,13 +373,16 @@ public class IdentityServiceImpl implements IdentityService {
         return getAllIdentityRoles(crmContactId).stream().filter(role -> role.getRoleId().equals(roleId)).findAny().isPresent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
 	public IdentityInfo getIdentityByNav4(String nav4Id) {
 		Optional<UserRepresentation> identity = keycloak.realm(realm).users().list().stream()
         .filter(g -> g.getAttributes() != null)
         .filter(g -> g.getAttributes().containsKey(ATTR_NAV4ID))
         .filter(g -> g.getAttributes().get(ATTR_NAV4ID).contains(nav4Id)).findFirst();
-        return mapping(identity.orElse(null));
+        return mapping(identity.orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id)));
 	}
 
 }
