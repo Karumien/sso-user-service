@@ -20,6 +20,7 @@ import com.karumien.cloud.sso.api.model.AuthorizationRequest;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AuthService;
 
 import io.swagger.annotations.Api;
@@ -67,8 +68,11 @@ public class AuthController implements AuthApi  {
         case CLIENT_CREDENTIALS:
             response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
             break;
+        case IMPERSONATE:
+            response = authService.loginByImpersonator(user.getRefreshToken(), user.getClientId(), user.getUsername());
+            break;            
         default:
-            break;
+            throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());
         }
         
         if (response.getAccessToken() != null) {

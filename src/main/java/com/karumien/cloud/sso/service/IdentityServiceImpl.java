@@ -89,7 +89,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmail(identityInfo.getEmail());
         
         identity.setEnabled(true);
-        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified() && !StringUtils.isEmpty(identityInfo.getEmail())));
+        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && !StringUtils.isEmpty(identityInfo.getEmail()));
 
         if (!StringUtils.isEmpty(identityInfo.getPhone())) {
             identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
@@ -217,7 +217,10 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void impersonateIdentity(String crmContactId) {
-        Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId)).orElseThrow(() -> new IdentityNotFoundException(crmContactId)).impersonate();
+        UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        Map<String, Object> map = user.impersonate();
+        System.out.println(map);
     }
 
     /**
@@ -225,7 +228,9 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void logoutIdentity(String crmContactId) {
-        Optional.ofNullable(keycloak.realm(realm).users().get(crmContactId)).orElseThrow(() -> new IdentityNotFoundException(crmContactId)).logout();
+        UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        user.logout();
     }
 
     /**

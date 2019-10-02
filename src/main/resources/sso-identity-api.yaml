@@ -273,7 +273,7 @@ paths:
       description: "Method for logout session of specified Identity"
       operationId: "logoutIdentity"
       parameters:
-        - name: icrmContactId
+        - name: crmContactId
           in: path
           description: Filtering by Identity unique CRM ID
           required: true

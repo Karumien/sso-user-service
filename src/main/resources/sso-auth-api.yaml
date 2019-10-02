@@ -86,7 +86,7 @@ definitions:
       username:
         type: string
         maxLength: 100
-        description: Identity ID of user - required for grant_type of type 'password' or 'impersonate' or 'pin'.
+        description: Identity ID of user - required for grant_type of type 'password' or 'pin' or in 'impersonate' use as requested user's userame.
       password:
         type: string
         maxLength: 100

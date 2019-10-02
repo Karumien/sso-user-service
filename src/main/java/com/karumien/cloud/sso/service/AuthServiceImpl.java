@@ -13,11 +13,15 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.token.TokenManager;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,9 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
+import com.karumien.cloud.sso.internal.ImpersonateConfig;
+import com.karumien.cloud.sso.internal.ImpersonateTokenManager;
 
 /**
  * Implementation of {@link AuthService} for authentication tokens management.
@@ -114,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
                 .realm(realm).clientId(clientId)
                 .username(username).password(password).build()
                 .tokenManager();
-
+        
         AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
         auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
@@ -208,6 +215,32 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return (T) extractedValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AuthorizationResponse loginByImpersonator(String refreshToken, String clientId, String username) {
+        
+        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
+        
+        List<UserRepresentation> users = keycloak.realm(realm).users().search(username);
+        if (users.isEmpty()) {
+            throw new IdentityNotFoundException("username = " + username);
+        }
+        
+        ImpersonateTokenManager tokenManager = new ImpersonateTokenManager(
+            new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, this.clientId, null, 
+                OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE), clientBuilder.build(), refreshToken);
+        
+        AuthorizationResponse auth = new AuthorizationResponse();
+        auth.setAccessToken(tokenManager.getAccessToken().getToken());
+        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
+        auth.setRefreshToken(tokenManager.refreshToken().getToken());
+        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
+        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
+        return auth;
     }
 
 }
