@@ -115,5 +115,14 @@ public class AuthController implements AuthApi  {
     
         return new String(base64Url.decode(base64EncodedBody));
     }
+
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public ResponseEntity<Void> generatePassword() {
+        return new ResponseEntity(authService.generatePassword(), HttpStatus.OK);
+    }
 }

@@ -22,6 +22,15 @@ paths:
       responses:
         200:
           description: Retrieve PublicKey of Realm
+  /auth/password/generate:
+    get:
+      summary: "Returns New Generated Password dependent on Policy definition"
+      operationId: "generatePassword"
+      produces:
+        - text/plain
+      responses:
+        '200':
+          description: "Generated New Password"
   /auth/password/policy:
     get:
       summary: "Returns Password Policy for Identities"

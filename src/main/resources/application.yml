@@ -31,6 +31,14 @@ keycloak:
   username: ${KEYCLOAK_USER:wagadmin}
   password: ${KEYCLOAK_PASSWORD:xara2002}
   client-id: ${KEYCLOAK_CLIENT_ID:admin-cli}
+generator:
+  password:
+    lowercase: ${GENERATOR_LOWERCASE:abcdefghijklmnopqrstuvwxyz}
+    uppercase: ${GENERATOR_UPPERCASE:ABCDEFGJKLMNPRSTUVWXYZ}
+    numbers: ${GENERATOR_NUMBERS:0123456789}
+    specials: ${GENERATOR_SPECIALS:'^$?!@%_-:#&'}
+    all: ${GENERATOR_ALL:'abcdefghijklmnopqrstuvwxyzABCDEFGJKLMNPRSTUVWXYZ0123456789^$?!@%_-:#&'}
+   
 #logbook:
 #  include:
 #    - /api/**

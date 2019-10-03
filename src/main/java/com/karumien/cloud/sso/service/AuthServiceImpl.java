@@ -51,8 +51,12 @@ public class AuthServiceImpl implements AuthService {
     @Value("${keycloak.client-id}")
     private String clientId;
     
+    
     @Autowired
     protected Keycloak keycloak;
+
+    @Autowired
+    private PasswordGeneratorService passwordGeneratorService;
 
     protected static PublicKey toPublicKey(String publicKeyString) {
         try {
@@ -241,6 +245,14 @@ public class AuthServiceImpl implements AuthService {
         auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
         auth.setTokenType(tokenManager.getAccessToken().getTokenType());
         return auth;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String generatePassword() {
+        return passwordGeneratorService.generate(getPasswordPolicy());
     }
 
 }
