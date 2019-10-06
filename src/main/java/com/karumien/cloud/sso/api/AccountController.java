@@ -276,6 +276,5 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> createIdentityCredentials(String crmAccountId, String crmContactId, Credentials credentials) {
         identityService.createIdentityCredentials(crmContactId, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
-        // return new ResponseEntity<Void>(accountService.updateCredentialsForIdentity(crmAccountId,crmContactId, credentials) ? HttpStatus.CREATED : HttpStatus.GONE);
     }
 }

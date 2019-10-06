@@ -244,19 +244,19 @@ paths:
       summary: Return all Identities registered for Account
       operationId: getAccountIdentities
       parameters:
-        - name: crmAccountId
-          in: path
+        - in: path
+          name: crmAccountId
           description: Filtering by Account CRM ID
           required: true
           type: string
-        - in: body
+        - in: query
           name: crmContactIds
           required: false
           description: CRM Contacts IDs
-          schema:
-            type: array
-            items: 
-              type: string
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
       responses:
         '200':
           description: Successfully returned Identities
@@ -313,19 +313,19 @@ paths:
       summary: "Get detail of the given Identity"
       operationId: getAccountIdentitiesRoles
       parameters:
-        - name: crmAccountId
-          in: path
+        - in: path
+          name: crmAccountId
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - in: body
+        - in: query
           name: crmContactIds
           required: false
           description: CRM Contacts IDs
-          schema:
-            type: array
-            items: 
-              type: string
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
       responses:
         '200':
           description: Successfully returned Identity's Roles
