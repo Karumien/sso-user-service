@@ -37,19 +37,19 @@ import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
-import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
+import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 
 
 /**
@@ -69,6 +69,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private IdentityService identityService;
+    
+    @Autowired
+    private SearchService searchService;
 
     private GroupRepresentation getMasterGroup() {
 
@@ -89,10 +92,8 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Optional<GroupRepresentation> findGroup(String crmAccountId) {
-        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes() != null)
-            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID))
-            .filter(g -> g.getAttributes().get(ATTR_CRM_ACCOUNT_ID)
-            .contains(crmAccountId)).findFirst();
+        return getMasterGroup().getSubGroups().stream()
+                .filter(g -> searchService.containsAttribute(g.getAttributes(), ATTR_CRM_ACCOUNT_ID, crmAccountId)).findFirst();
     }
 
     /**
@@ -166,13 +167,9 @@ public class AccountServiceImpl implements AccountService {
 
         // TODO viliam: Orica
         AccountInfo accountInfo = new AccountInfo();
-        accountInfo.setCrmAccountId(group.getAttributes().get(ATTR_CRM_ACCOUNT_ID).stream().findFirst().orElse(null));
-        if (group.getAttributes().get(ATTR_COMP_REG_NO) != null) {
-            accountInfo.setCompRegNo(group.getAttributes().get(ATTR_COMP_REG_NO).stream().findFirst().orElse(null));
-        }
-        if (group.getAttributes().get(ATTR_CONTACT_EMAIL) != null) {
-            accountInfo.setContactEmail(group.getAttributes().get(ATTR_CONTACT_EMAIL).stream().findFirst().orElse(null));
-        }
+        accountInfo.setCrmAccountId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
+        accountInfo.setCompRegNo(searchService.getSimpleAttribute(group.getAttributes(), ATTR_COMP_REG_NO).orElse(null));
+        accountInfo.setContactEmail(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CONTACT_EMAIL).orElse(null));
         accountInfo.setName(group.getName());
 
         return accountInfo;
@@ -203,7 +200,7 @@ public class AccountServiceImpl implements AccountService {
         Optional<IdentityInfo> identityFind = getAccountIdentities(crmAccountId, Arrays.asList(crmContactId))
                 .stream().filter(identity -> identity.getCrmContactId().equals(crmContactId))
                 .findAny();
-        return identityFind.orElse(null);
+        return identityFind.orElseThrow(() -> new IdentityNotFoundException(crmContactId));
     }
 
     /**
@@ -213,7 +210,11 @@ public class AccountServiceImpl implements AccountService {
     public List<IdentityInfo> getAccountIdentities(String crmAccountId, List<String> crmContactIds) {
         List<UserRepresentation> users = findGroupResource(crmAccountId)
             .orElseThrow(() -> new AccountNotFoundException(crmAccountId)).members();
-        return users.stream().map(user -> identityService.mapping(user)).collect(Collectors.toList());
+        return users.stream()
+                .filter(u -> CollectionUtils.isEmpty(crmContactIds) 
+                    || searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CRM_CONTACT_ID).isPresent()
+                      && crmContactIds.contains(searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CRM_CONTACT_ID).get()))
+                .map(user -> identityService.mapping(user)).collect(Collectors.toList());
     }
     
     /**
@@ -221,24 +222,14 @@ public class AccountServiceImpl implements AccountService {
      */
 	@Override
 	public boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId) {
-		UserResource user = keycloak.realm(realm).users().get(crmContactId);
-		user.leaveGroup(findGroup(crmAccountId).get().getId());
+	    IdentityInfo identityInfo = getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId);	    
+		identityService.deleteIdentity(identityInfo.getCrmContactId());
 		return true;
 	}
 
 	@Override
 	public boolean checkIfUserNameExist(String username) {
 		return keycloak.realm(realm).users().search(username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
-	}
-
-	@Override
-	public boolean updateCredentialsForIdentity(String crmAccountId, String crmContactId, Credentials credentials) {
-		IdentityInfo identity = getAccountIdentityBaseOnCrmContractId(crmAccountId, crmContactId);
-		UserRepresentation user = keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation();
-		if (credentials.getUsername() != null) {
-			user.setUsername(credentials.getUsername());
-		}
-		return true;
 	}
 
 }

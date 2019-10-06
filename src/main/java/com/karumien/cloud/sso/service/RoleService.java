@@ -31,6 +31,8 @@ public interface RoleService {
 
     String ATTR_TRANSLATION = "translation";
     
+    String ATTR_BINARY_MASK = "binaryMask";
+    
     /**
      * Function that create role base on input object to realm.
      * 

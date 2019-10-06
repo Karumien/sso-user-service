@@ -26,7 +26,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.Credentials;
@@ -104,14 +103,15 @@ public class IdentityServiceImpl implements IdentityService {
         if (!StringUtils.isEmpty(identityInfo.getLocale())) {
             identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
         }
+		if (!StringUtils.isEmpty(identityInfo.getNav4Id())) {
+			identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
+		}
+
         identity.singleAttribute(ATTR_CRM_CONTACT_ID, 
                 Optional.of(identityInfo.getCrmContactId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_CONTACT_ID)));
         identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
                 Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
-		if (!StringUtils.isEmpty(identityInfo.getNav4Id())) {
-			identity.singleAttribute(ATTR_NAV4ID,
-					Optional.of(identityInfo.getNav4Id()).orElseThrow(() -> new IdNotFoundException(ATTR_NAV4ID)));
-		}
+
         Response response = keycloak.realm(realm).users().create(identity);        
         identityInfo.setIdentityId(getCreatedId(response));
         
@@ -208,12 +208,12 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmailVerified(userRepresentation.isEmailVerified());
 
         
-        identity.setCrmAccountId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
-        identity.setCrmContactId(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_CONTACT_ID).orElse(null));
-        identity.setGlobalEmail(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
-        identity.setPhone(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
-        identity.setNav4Id(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
-        identity.setLocale(getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
+        identity.setCrmAccountId(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
+        identity.setCrmContactId(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_CONTACT_ID).orElse(null));
+        identity.setGlobalEmail(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
+        identity.setPhone(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
+        identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
+        identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
         return identity;
     }
@@ -345,20 +345,9 @@ public class IdentityServiceImpl implements IdentityService {
     public DriverPin getPinOfIdentityDriver(String crmContactId) {
         UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
         DriverPin pin = new DriverPin();
-        pin.setPin(getSimpleAttribute(user.getAttributes(), ATTR_DRIVER_PIN)
+        pin.setPin(searchService.getSimpleAttribute(user.getAttributes(), ATTR_DRIVER_PIN)
                 .orElseThrow(() -> new AttributeNotFoundException(ATTR_DRIVER_PIN)));
         return pin;        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
-        if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
-            return Optional.empty();
-        }
-        return attributes.get(attrName).stream().findFirst();
     }
 
 	private List<RoleRepresentation> getListOfRoleReprasentationBaseOnIds(List<String> roles) {

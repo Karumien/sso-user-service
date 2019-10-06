@@ -3,7 +3,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,20 +44,20 @@ import com.karumien.cloud.sso.exceptions.RoleNotFoundException;
  * Implementation {@link RuleService} for identity management.
  *
  * @author <a href="viliam.litavec@karumien.com">Viliam Litavec</a>
- * @since 1.0,  22. 8. 2019 18:59:57
+ * @since 1.0, 22. 8. 2019 18:59:57
  */
 @Service
-public class RoleServiceImpl implements RoleService{
+public class RoleServiceImpl implements RoleService {
 
     @Value("${keycloak.realm}")
     private String realm;
-    
+
     @Value("${keycloak.client-id}")
     private String clientId;
 
     @Autowired
     private Keycloak keycloak;
-        
+
     @Autowired
     private IdentityService identityService;
 
@@ -66,109 +66,115 @@ public class RoleServiceImpl implements RoleService{
 
     @Autowired
     private MessageSource messageSource;
-    
+
+    @Autowired
+    private SearchService searchService;
+
     /**
      * {@inheritDoc}
      */
-	@Override
-	public RoleInfo createRole(RoleInfo role) {
+    @Override
+    public RoleInfo createRole(RoleInfo role) {
 
-	    RoleRepresentation roleRepresentation = new RoleRepresentation();
-		roleRepresentation.setDescription(role.getDescription());
-		roleRepresentation.setName(role.getRoleId());
-		
-//		if (Boolean.TRUE.equals(role.isClientRole())) {
-//			org.keycloak.representations.idm.ClientRepresentation clientResource = keycloak.realm(realm).clients().findByClientId(role.getClientId()).get(0);
-//			keycloak.realm(realm).clients().get(clientResource.getId()).roles().create(roleRepresentation);
-//			return getClientsRoleBaseOnId(role.getRoleId(), role.getClientId());
-//		} else {
-		    keycloak.realm(realm).roles().create(roleRepresentation);
-		    return getRoleBaseOnId(role.getRoleId());
-//		}
-	}
+        RoleRepresentation roleRepresentation = new RoleRepresentation();
+        roleRepresentation.setDescription(role.getDescription());
+        roleRepresentation.setName(role.getRoleId());
 
-	/**
+        // if (Boolean.TRUE.equals(role.isClientRole())) {
+        // org.keycloak.representations.idm.ClientRepresentation clientResource =
+        // keycloak.realm(realm).clients().findByClientId(role.getClientId()).get(0);
+        // keycloak.realm(realm).clients().get(clientResource.getId()).roles().create(roleRepresentation);
+        // return getClientsRoleBaseOnId(role.getRoleId(), role.getClientId());
+        // } else {
+        keycloak.realm(realm).roles().create(roleRepresentation);
+        return getRoleBaseOnId(role.getRoleId());
+        // }
+    }
+
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public void deleteRole(String roleId) {
-	    try {
-	        keycloak.realm(realm).roles().deleteRole(roleId);
-	    } catch (NotFoundException e) {
+    @Override
+    public void deleteRole(String roleId) {
+        try {
+            keycloak.realm(realm).roles().deleteRole(roleId);
+        } catch (NotFoundException e) {
             throw new RoleNotFoundException(roleId);
         }
-//	    
-//	    
-//	    RoleInfo role = getRoleBaseOnId(id);
-//		
-//		RoleRepresentation roleRepresentation = new RoleRepresentation();
-//		roleRepresentation.setDescription(role.getDescription());
-//		roleRepresentation.setName(role.getName());
-//		roleRepresentation.setId(role.getId());
-//		
-//		keycloak.realm(realm).users().get(role.getClientId()).roles().realmLevel().remove(Arrays.asList(roleRepresentation));
-	}
+        //
+        //
+        // RoleInfo role = getRoleBaseOnId(id);
+        //
+        // RoleRepresentation roleRepresentation = new RoleRepresentation();
+        // roleRepresentation.setDescription(role.getDescription());
+        // roleRepresentation.setName(role.getName());
+        // roleRepresentation.setId(role.getId());
+        //
+        // keycloak.realm(realm).users().get(role.getClientId()).roles().realmLevel().remove(Arrays.asList(roleRepresentation));
+    }
 
-	/**
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public RoleInfo getRoleBaseOnId(String roleId) {
-	    return transformRoleToBaseRole(findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId))
-	            .toRepresentation());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
     @Override
-	public Optional<RoleResource> findRoleResource(String roleId) {
+    public RoleInfo getRoleBaseOnId(String roleId) {
+        return transformRoleToBaseRole(findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId)).toRepresentation());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RoleResource> findRoleResource(String roleId) {
         try {
             return Optional.of(keycloak.realm(realm).roles().get(roleId));
         } catch (NotFoundException e) {
             return Optional.empty();
         }
     }
-	
-	/**
+
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public void assignRoleToIdentity(String crmContactId, RoleInfo role) {
+    @Override
+    public void assignRoleToIdentity(String crmContactId, RoleInfo role) {
         UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
         RoleRepresentation realmRole = findRoleResource(role.getRoleId()).orElseThrow(() -> new RoleNotFoundException(role.getRoleId())).toRepresentation();
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         user.roles().realmLevel().add(Arrays.asList(realmRole));
         user.update(userRepresentation);
-	}
+    }
 
-	/**
+    /**
      * {@inheritDoc}
      */
-	@Override
-	public List<RoleInfo> getAllRolesOfIdentity(String crmContactId) {
+    @Override
+    public List<RoleInfo> getAllRolesOfIdentity(String crmContactId) {
         UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
-		return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective()
-		    .stream().map(role -> transformRoleToBaseRole(role)).collect(Collectors.toList());
-	}
+        return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
+                .map(role -> transformRoleToBaseRole(role)).collect(Collectors.toList());
+    }
 
-	/**
-	 * Funtion to remap {@link RoleRepresentation} to {@link RoleInfo}
-	 * @param role {@link RoleRepresentation} 
-	 * @return {@link RoleInfo}
-	 */	
-	private RoleInfo transformRoleToBaseRole(RoleRepresentation role) {
-		RoleInfo roleInfo = new RoleInfo();
-		roleInfo.setRoleId(role.getName());
-		roleInfo.setDescription(role.getDescription());
-		//role.setId(userClientRole.getId());
-		roleInfo.setTranslation(translate("role" + "." + role.getName().toLowerCase(), role.getAttributes(), LocaleContextHolder.getLocale(), roleInfo.getDescription()));
-		return roleInfo;
-	}
-	
+    /**
+     * Funtion to remap {@link RoleRepresentation} to {@link RoleInfo}
+     * 
+     * @param role
+     *            {@link RoleRepresentation}
+     * @return {@link RoleInfo}
+     */
+    private RoleInfo transformRoleToBaseRole(RoleRepresentation role) {
+        RoleInfo roleInfo = new RoleInfo();
+        roleInfo.setRoleId(role.getName());
+        roleInfo.setDescription(role.getDescription());
+        // role.setId(userClientRole.getId());
+        roleInfo.setTranslation(
+                translate("role" + "." + role.getName().toLowerCase(), role.getAttributes(), LocaleContextHolder.getLocale(), roleInfo.getDescription()));
+        return roleInfo;
+    }
+
     private String translate(String localeKey, Map<String, List<String>> attributes, Locale locale, String defaultTranslate) {
         String translate = null;
-        List<String> translates = attributes.get(ATTR_TRANSLATION + "["+locale.getLanguage()+"]");
+        List<String> translates = attributes.get(ATTR_TRANSLATION + "[" + locale.getLanguage() + "]");
         if (!CollectionUtils.isEmpty(translates)) {
             translate = translates.get(0);
         }
@@ -177,7 +183,7 @@ public class RoleServiceImpl implements RoleService{
             if (!CollectionUtils.isEmpty(translates)) {
                 translate = translates.get(0);
             }
-        }            
+        }
         if (translate == null) {
             translate = messageSource.getMessage(localeKey, null, locale);
             if (localeKey.equals(translate)) {
@@ -193,23 +199,23 @@ public class RoleServiceImpl implements RoleService{
     /**
      * {@inheritDoc}
      */
-	@Override
-	public void unassignRoleFromIdentity(String crmContactId, String roleId) {
+    @Override
+    public void unassignRoleFromIdentity(String crmContactId, String roleId) {
         UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
         RoleRepresentation realmRole = findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId)).toRepresentation();
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         user.roles().realmLevel().remove(Arrays.asList(realmRole));
         user.update(userRepresentation);
-	}
+    }
 
-	/**
+    /**
 	 * {@inheritDoc}
 	 */
     @Override
     public String getRolesBinary(UserRepresentation userRepresentation) {	
 
         StringBuilder binaryRule = new StringBuilder();
-        Optional<String> crmAccountId = identityService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CRM_ACCOUNT_ID);
+        Optional<String> crmAccountId = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CRM_ACCOUNT_ID);
         
         if (!crmAccountId.isPresent()) {
             return binaryRule.toString();
@@ -219,8 +225,8 @@ public class RoleServiceImpl implements RoleService{
 		keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().forEach(role ->
       		{
       		  Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
-      		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask") != null) {
-      			String stringMask = roleWithAttributes.get().toRepresentation().getAttributes().get("binaryMask").get(0);
+      		  if (roleWithAttributes.isPresent() &&  roleWithAttributes.get().toRepresentation().getAttributes().get(ATTR_BINARY_MASK) != null) {
+      			String stringMask = roleWithAttributes.get().toRepresentation().getAttributes().get(ATTR_BINARY_MASK).get(0);
       		    Integer binaryMask = Integer.valueOf(stringMask.substring(0,stringMask.length()-2), 2);
       			
       		    // TODO: use attribute module - no split?
@@ -246,12 +252,12 @@ public class RoleServiceImpl implements RoleService{
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public RoleInfo getClientsRoleBaseOnId(String roleId, String clientId) {
-		org.keycloak.representations.idm.ClientRepresentation clientResource =  keycloak.realm(realm).clients().findByClientId(clientId).get(0);
-		return transformRoleToBaseRole(keycloak.realm(realm).clients().get(clientResource.getId()).roles().get(roleId).toRepresentation());
-	}
-	
+     * {@inheritDoc}
+     */
+    @Override
+    public RoleInfo getClientsRoleBaseOnId(String roleId, String clientId) {
+        org.keycloak.representations.idm.ClientRepresentation clientResource = keycloak.realm(realm).clients().findByClientId(clientId).get(0);
+        return transformRoleToBaseRole(keycloak.realm(realm).clients().get(clientResource.getId()).roles().get(roleId).toRepresentation());
+    }
+
 }

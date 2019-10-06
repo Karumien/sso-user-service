@@ -7,6 +7,10 @@
 package com.karumien.cloud.sso.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.util.CollectionUtils;
 
 /**
  * Search Service for direct immutable access to KeyCloak DB for performance searching.
@@ -26,4 +30,18 @@ public interface SearchService {
      * @return {@link List} of User's IDs
      */
     List<String> findUserIdsByAttribute(String attribute, String value);
+    
+    default Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
+        if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
+            return Optional.empty();
+        }
+        return attributes.get(attrName).stream().findFirst();
+    }
+    
+    default boolean containsAttribute(Map<String, List<String>> attributes, String attrName, Object value) {        
+        if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
+            return false;
+        }
+        return attributes.get(attrName).contains(value);
+    }
 }
