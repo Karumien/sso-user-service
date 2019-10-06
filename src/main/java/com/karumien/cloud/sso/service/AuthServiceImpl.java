@@ -14,6 +14,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -24,6 +25,8 @@ import org.keycloak.admin.client.token.TokenManager;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,56 +50,58 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${keycloak.auth-server-url}")
     private String adminServerUrl;
-    
+
     @Value("${keycloak.client-id}")
     private String clientId;
-    
-    
+
     @Autowired
     protected Keycloak keycloak;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
 
     protected static PublicKey toPublicKey(String publicKeyString) {
         try {
-          byte[] publicBytes = Base64.getDecoder().decode(publicKeyString);
-          X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
-          KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-          return keyFactory.generatePublic(keySpec);
+            byte[] publicBytes = Base64.getDecoder().decode(publicKeyString);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            return keyFactory.generatePublic(keySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-          return null;
+            return null;
         }
-      }
-    
+    }
+
     /**
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
     @Override
     public String getPublicKey() {
-        
-//        List<KeyMetadataRepresentation> keys = keycloak.realm(REALM).get keys().getKeyMetadata().getKeys();
-//
-//        String publicKeyString = null;
-//        for (KeyMetadataRepresentation key : keys) {
-//          if (key.getKid().equals(jwsHeader.getKeyId())) {
-//            publicKeyString = key.getPublicKey();
-//            break;
-//          }
-//        }
 
-//        
-//        RealmResource realmResource = keycloak.realm(realm);
-//        KeyResource keys = realmResource.keys();
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getAlgorithm()));
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getCertificate()));
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getKid()));
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getProviderId()));
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getPublicKey()));
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getStatus()));
-//        keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getType()));
-        
+        // List<KeyMetadataRepresentation> keys = keycloak.realm(REALM).get keys().getKeyMetadata().getKeys();
+        //
+        // String publicKeyString = null;
+        // for (KeyMetadataRepresentation key : keys) {
+        // if (key.getKid().equals(jwsHeader.getKeyId())) {
+        // publicKeyString = key.getPublicKey();
+        // break;
+        // }
+        // }
+
+        //
+        // RealmResource realmResource = keycloak.realm(realm);
+        // KeyResource keys = realmResource.keys();
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getAlgorithm()));
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getCertificate()));
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getKid()));
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getProviderId()));
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getPublicKey()));
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getStatus()));
+        // keys.getKeyMetadata().getKeys().forEach(key -> System.out.println(key.getType()));
+
         ObjectMapper om = new ObjectMapper();
         Map<String, Object> realmInfo;
         try {
@@ -120,12 +125,9 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByUsernamePassword(String username, String password) {
-        TokenManager tokenManager = KeycloakBuilder.builder()
-                .serverUrl(adminServerUrl)
-                .realm(realm).clientId(clientId)
-                .username(username).password(password).build()
-                .tokenManager();
-        
+        TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm).clientId(clientId).username(username).password(password)
+                .build().tokenManager();
+
         AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
         auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
@@ -140,9 +142,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret) {
-        TokenManager tokenManager = KeycloakBuilder.builder()
-                .serverUrl(adminServerUrl).realm(realm)
-                .clientId(clientId).clientSecret(clientSecret).build()
+        TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm).clientId(clientId).clientSecret(clientSecret).build()
                 .tokenManager();
 
         AuthorizationResponse auth = new AuthorizationResponse();
@@ -159,8 +159,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByToken(String refreshToken) {
-        TokenManager tokenManager = 
-                Keycloak.getInstance(adminServerUrl, realm, clientId, refreshToken).tokenManager();
+        TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, clientId, refreshToken).tokenManager();
 
         AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
@@ -168,9 +167,9 @@ public class AuthServiceImpl implements AuthService {
         auth.setRefreshToken(tokenManager.refreshToken().getToken());
         auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
         auth.setTokenType(tokenManager.getAccessToken().getTokenType());
-        return auth;        
+        return auth;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -200,10 +199,43 @@ public class AuthServiceImpl implements AuthService {
         policy.setRegexPattern(extract("regexPattern", policyDescription, String.class));
         policy.setPasswordExpireDays(extract("forceExpiredPasswordChange", policyDescription, Integer.class));
         policy.setMinLength(extract("length", policyDescription, Integer.class));
+        policy.setTranslation(getPolicyTranslation(LocaleContextHolder.getLocale(), policy));
 
         return policy;
     }
-    
+
+    private String getPolicyTranslation(Locale locale, Policy policy) {
+
+        boolean finalAnd = false;
+        int minimalLength = policy.getMinLength() != null && policy.getMinLength() > 0 ? policy.getMinLength() : 8;
+
+        StringBuilder sb = new StringBuilder();
+        finalAnd = policyRule(sb, locale, "policy.description.lower", "s", policy.getMinLowerCase()) || finalAnd;
+        finalAnd = policyRule(sb, locale, "policy.description.upper", "s", policy.getMinUpperCase()) || finalAnd;
+        finalAnd = policyRule(sb, locale, "policy.description.number", "s", policy.getMinDigits()) || finalAnd;
+        finalAnd = policyRule(sb, locale, "policy.description.special", "s", policy.getMinSpecialChars()) || finalAnd;
+        finalAnd = policyRule(sb, locale, "policy.description.history", "", policy.getPasswordHistory()) || finalAnd;
+
+        if (finalAnd) {
+            sb.append(" ").append(messageSource.getMessage("policy.description.and", null, locale)).append(" ");
+        }
+
+        sb.append(messageSource.getMessage("policy.description.length", new Object[] { minimalLength }, locale)).append(".");
+
+        return sb.toString();
+    }
+
+    private boolean policyRule(StringBuilder sb, Locale locale, String key, String keyAdvances, Integer count) {
+
+        if (count == null || count <= 0) {
+            return false;
+        }
+
+        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.description", null, locale) + " " : ", ");
+        sb.append(messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
+        return true;
+    }
+
     @SuppressWarnings("unchecked")
     private <T> T extract(String code, String policyDescription, Class<T> clazz) {
 
@@ -226,18 +258,18 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByImpersonator(String refreshToken, String clientId, String username) {
-        
+
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
-        
+
         List<UserRepresentation> users = keycloak.realm(realm).users().search(username);
         if (users.isEmpty()) {
             throw new IdentityNotFoundException("username = " + username);
         }
-        
+
         ImpersonateTokenManager tokenManager = new ImpersonateTokenManager(
-            new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, this.clientId, null, 
-                OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE), clientBuilder.build(), refreshToken);
-        
+                new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
+                clientBuilder.build(), refreshToken);
+
         AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
         auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
@@ -246,7 +278,7 @@ public class AuthServiceImpl implements AuthService {
         auth.setTokenType(tokenManager.getAccessToken().getTokenType());
         return auth;
     }
-    
+
     /**
      * {@inheritDoc}
      */

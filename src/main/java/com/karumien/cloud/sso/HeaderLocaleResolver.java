@@ -26,6 +26,8 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
+import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
+
 /**
  * Prepare locale from X-LOCALE header.
  *
@@ -44,13 +46,24 @@ public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements 
     @Override
     public Locale resolveLocale(HttpServletRequest request) {
         String headerLang = request.getHeader("x-locale");
-        return headerLang == null || headerLang.isEmpty() ? Locale.getDefault() : Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES);
+        
+        if (StringUtils.isBlank(headerLang)) {
+            headerLang = request.getLocale() != null ? request.getLocale().getLanguage() : null;
+        } 
+    
+        if (headerLang != null && headerLang.contains("_")) {
+            headerLang = headerLang.substring(0,2);
+        };
+        
+        return StringUtils.isBlank(headerLang) || Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES) == null ?
+                Locale.forLanguageTag("en") : 
+                Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES);
     }
 
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
-        rs.setBasename("messages");
+        rs.setBasenames("i18n/messages");
         rs.setDefaultEncoding("UTF-8");
         rs.setUseCodeAsDefaultMessage(true);
         return rs;
@@ -60,6 +73,7 @@ public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements 
     public LocaleResolver localeResolver() {
         HeaderLocaleResolver headerLocaleResolver = new HeaderLocaleResolver();
         headerLocaleResolver.setDefaultLocale(Locale.forLanguageTag("en"));
+        headerLocaleResolver.setSupportedLocales(SUPPORTED_LOCALES);
         return headerLocaleResolver;
     }
 }

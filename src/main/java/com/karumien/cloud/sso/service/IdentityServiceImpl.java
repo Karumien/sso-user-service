@@ -62,6 +62,10 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private AccountService accountService;
+    
+    @Autowired
+    private SearchService searchService;
+    
 
     /**
      * {@inheritDoc}
@@ -181,10 +185,12 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentity(String crmContactId) {
-        return keycloak.realm(realm).users().list().stream()
-            .filter(g -> g.getAttributes() != null)
-            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
-            .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
+        String userId = searchService.findUserIdsByAttribute(ATTR_CRM_CONTACT_ID, crmContactId).stream().findFirst().orElse(null);
+        return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
+//   keycloak.realm(realm).users().list().stream()
+//            .filter(g -> g.getAttributes() != null)
+//            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
+//            .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
     }
 
     /**
@@ -383,11 +389,9 @@ public class IdentityServiceImpl implements IdentityService {
      */
 	@Override
 	public IdentityInfo getIdentityByNav4(String nav4Id) {
-		Optional<UserRepresentation> identity = keycloak.realm(realm).users().list().stream()
-        .filter(g -> g.getAttributes() != null)
-        .filter(g -> g.getAttributes().containsKey(ATTR_NAV4ID))
-        .filter(g -> g.getAttributes().get(ATTR_NAV4ID).contains(nav4Id)).findFirst();
-        return mapping(identity.orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id)));
+        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst().orElseThrow(
+                () -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+        return mapping(keycloak.realm(realm).users().get(userId).toRepresentation());
 	}
 
 }

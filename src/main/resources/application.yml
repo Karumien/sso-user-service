@@ -22,6 +22,7 @@ spring:
   jpa:
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+    open-in-view: false
     properties:
       hibernate:
         temp:

@@ -72,20 +72,22 @@ definitions:
         type: string
         description: "Unique Role ID (Role Name)"
         maxLength: 50
-      description:
+      description: 
         type: string
         description: "Role description"
         maxLength: 255
-      clientId:
+      crmAccountId:
         type: string
-        maxLength: 250
-        description: Client Id (for client roles)
-      clientRole:
-        type: boolean
-        description: "Identify Client Role (not realm role)"
-    example:
-      id: fd65248c-f3aa-4310-8fcf-91eacdd324xx
-      name: First Role
-      description: Role description
-      clientId: 9abedf80-7413-4751-9b73-84d07a32e11c
-      clientRole: true
+        description: Custom role for account
+      translation:
+        type: string
+        description: "Role translation"
+        maxLength: 255
+      roles:
+        type: array
+        items:
+          type: string
+      rights:
+        type: array
+        items:
+          type: string

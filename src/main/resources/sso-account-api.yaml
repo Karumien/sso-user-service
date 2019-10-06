@@ -730,6 +730,10 @@ definitions:
       crmAccountId:
         type: string
         description: Custom role for account
+      translation:
+        type: string
+        description: "Role translation"
+        maxLength: 255
       roles:
         type: array
         items:

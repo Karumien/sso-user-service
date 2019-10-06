@@ -16,6 +16,7 @@ package com.karumien.cloud.sso.service;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -30,7 +31,10 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -60,6 +64,9 @@ public class RoleServiceImpl implements RoleService{
     @Autowired
     private ModuleService moduleService;
 
+    @Autowired
+    private MessageSource messageSource;
+    
     /**
      * {@inheritDoc}
      */
@@ -155,9 +162,34 @@ public class RoleServiceImpl implements RoleService{
 		roleInfo.setRoleId(role.getName());
 		roleInfo.setDescription(role.getDescription());
 		//role.setId(userClientRole.getId());
+		roleInfo.setTranslation(translate("role" + "." + role.getName().toLowerCase(), role.getAttributes(), LocaleContextHolder.getLocale(), roleInfo.getDescription()));
 		return roleInfo;
 	}
 	
+    private String translate(String localeKey, Map<String, List<String>> attributes, Locale locale, String defaultTranslate) {
+        String translate = null;
+        List<String> translates = attributes.get(ATTR_TRANSLATION + "["+locale.getLanguage()+"]");
+        if (!CollectionUtils.isEmpty(translates)) {
+            translate = translates.get(0);
+        }
+        if (translate == null) {
+            translates = attributes.get(ATTR_TRANSLATION);
+            if (!CollectionUtils.isEmpty(translates)) {
+                translate = translates.get(0);
+            }
+        }            
+        if (translate == null) {
+            translate = messageSource.getMessage(localeKey, null, locale);
+            if (localeKey.equals(translate)) {
+                translate = null;
+            }
+        }
+        if (translate == null) {
+            translate = defaultTranslate;
+        }
+        return translate;
+    }
+
     /**
      * {@inheritDoc}
      */

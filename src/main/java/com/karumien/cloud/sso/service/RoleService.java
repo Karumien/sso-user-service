@@ -29,6 +29,8 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  */
 public interface RoleService {
 
+    String ATTR_TRANSLATION = "translation";
+    
     /**
      * Function that create role base on input object to realm.
      * 

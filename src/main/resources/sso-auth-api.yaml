@@ -217,3 +217,7 @@ definitions:
         type: string
         description: "REGEX pattern for password validation"
         example: ".*"
+      translation:
+        type: string
+        description: "Policy translation"
+        maxLength: 255

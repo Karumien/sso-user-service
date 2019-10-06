@@ -48,7 +48,7 @@ public class SwaggerConfiguration {
                 .name("x-locale")
                 .modelRef(new ModelRef("string"))
                 .parameterType("header")
-                .description("User's locale for apply, i.e. en, cs, cs_CZ")
+                .description("User's locale for apply, i.e. en, cs")
                 .required(false)
                 .build()))
 //            .globalResponseMessage(RequestMethod.GET, getCustomizedResponseMessages())                    
