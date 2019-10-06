@@ -11,6 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class SearchServiceTest {
     private SearchService searchService;
 
     @Test
+    @Ignore
     public void findUserIdsByAttribute() {
         
         List<String> usersIds = searchService.findUserIdsByAttribute(IdentityService.ATTR_CRM_CONTACT_ID, "11714");
