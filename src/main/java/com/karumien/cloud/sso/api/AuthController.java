@@ -6,6 +6,8 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.io.ByteArrayInputStream;
+
 import javax.validation.Valid;
 
 import org.apache.commons.codec.binary.Base64;
@@ -15,9 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jayway.jsonpath.JsonPath;
 import com.karumien.cloud.sso.api.handler.AuthApi;
 import com.karumien.cloud.sso.api.model.AuthorizationRequest;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
+import com.karumien.cloud.sso.api.model.ErrorCode;
+import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
@@ -50,6 +55,7 @@ public class AuthController implements AuthApi  {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public ResponseEntity<AuthorizationResponse> login(@Valid AuthorizationRequest user) {
         if (user.getGrantType() == null) {
@@ -58,21 +64,32 @@ public class AuthController implements AuthApi  {
         
         AuthorizationResponse response = null;
 
-        switch (user.getGrantType()) {
-        case REFRESH_TOKEN:
-            response = authService.loginByToken(user.getRefreshToken());
-            break;
-        case PASSWORD:
-            response = authService.loginByUsernamePassword(user.getUsername(), user.getPassword());
-            break;
-        case CLIENT_CREDENTIALS:
-            response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
-            break;
-        case IMPERSONATE:
-            response = authService.loginByImpersonator(user.getRefreshToken(), user.getClientId(), user.getUsername());
-            break;            
-        default:
-            throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());
+        try {
+            switch (user.getGrantType()) {
+            case REFRESH_TOKEN:
+                response = authService.loginByToken(user.getRefreshToken());
+                break;
+            case PASSWORD:
+                response = authService.loginByUsernamePassword(user.getUsername(), user.getPassword());
+                break;
+            case CLIENT_CREDENTIALS:
+                response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
+                break;
+            case IMPERSONATE:
+                response = authService.loginByImpersonator(user.getRefreshToken(), user.getClientId(), user.getUsername());
+                break;            
+            default:
+                throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());
+            }
+        
+        } catch (javax.ws.rs.BadRequestException e) {
+            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(400)
+                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
+            return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+        } catch (javax.ws.rs.NotAuthorizedException e) {
+            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(401)
+                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
+            return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
         }
         
         if (response.getAccessToken() != null) {

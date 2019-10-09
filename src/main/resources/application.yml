@@ -3,6 +3,7 @@
 #  version: '@project.version@'
 #  build: '@timestamp@'
 spring:
+#  devtools.restart.enabled=false
   application:
     name: ew-sso-api
   main:

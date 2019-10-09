@@ -125,8 +125,10 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByUsernamePassword(String username, String password) {
-        TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm).clientId(clientId).username(username).password(password)
-                .build().tokenManager();
+       
+        TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
+            .clientId(clientId).username(username).password(password)
+            .build().tokenManager();
 
         AuthorizationResponse auth = new AuthorizationResponse();
         auth.setAccessToken(tokenManager.getAccessToken().getToken());
@@ -134,7 +136,8 @@ public class AuthServiceImpl implements AuthService {
         auth.setRefreshToken(tokenManager.refreshToken().getToken());
         auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
         auth.setTokenType(tokenManager.getAccessToken().getTokenType());
-        return auth;
+            
+        return auth;            
     }
 
     /**

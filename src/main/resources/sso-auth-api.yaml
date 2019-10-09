@@ -55,10 +55,26 @@ paths:
           schema:
             $ref: '#/definitions/AuthorizationRequest'
       responses:
-        201:
+        '201':
           description: Successfully Login and Token return
           schema:
             $ref: '#/definitions/AuthorizationResponse'
+        '400':
+          description: "Can't login - Account not fully set up (reset password needed, ...) { errno = 400 }"
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+            example:
+              errno: 400
+              errcode: 'CLIENT_ERROR'
+              errmsg: Account not fully set up
+        '401':
+          description: Unauthorized - Invalid credentials { errno = 401 }
+          schema:
+            $ref: '#/definitions/ErrorMessage'
+            example:
+              errno: 401
+              errcode: 'CLIENT_ERROR'
+              errmsg: Invalid user credentials
   /auth/logout:
     post:
       summary: Logout of Authenticated User
