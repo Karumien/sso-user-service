@@ -83,11 +83,12 @@ public class AuthController implements AuthApi  {
             }
         
         } catch (javax.ws.rs.BadRequestException e) {
-            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(400)
+            // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
+            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
                     .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
-            return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(error, user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST);
         } catch (javax.ws.rs.NotAuthorizedException e) {
-            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(401)
+            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 401)
                     .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
             return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
         }

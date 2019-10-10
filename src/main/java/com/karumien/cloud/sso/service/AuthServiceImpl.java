@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
+import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.internal.ImpersonateConfig;
@@ -140,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthorizationResponse loginByUsernamePassword(String username, String password) {
        
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
-            .clientId(clientId).username(username).password(password)
+            .username(username).password(password).grantType(GrantType.PASSWORD.toString())
             .build().tokenManager();
             
         return mapping(tokenManager.getAccessToken());            
@@ -151,8 +152,9 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret) {
-        TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm).clientId(clientId).clientSecret(clientSecret).build()
-                .tokenManager();
+        TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl)
+            .realm(realm).clientId(clientId).clientSecret(clientSecret).grantType(GrantType.CLIENT_CREDENTIALS.toString())
+            .build().tokenManager();
 
         return mapping(tokenManager.getAccessToken());            
     }
