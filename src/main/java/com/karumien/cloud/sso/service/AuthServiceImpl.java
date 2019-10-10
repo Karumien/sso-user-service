@@ -22,6 +22,7 @@ import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.token.TokenManager;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +63,18 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
+
+    protected AuthorizationResponse mapping(AccessTokenResponse token) {
+        
+        AuthorizationResponse auth = new AuthorizationResponse();
+        auth.setAccessToken(token.getToken());
+        auth.setExpiresIn(token.getExpiresIn());
+        auth.setRefreshToken(token.getRefreshToken());
+        auth.setRefreshExpiresIn(token.getRefreshExpiresIn());
+        auth.setTokenType(token.getTokenType());
+        
+        return auth;           
+    }
 
     protected static PublicKey toPublicKey(String publicKeyString) {
         try {
@@ -129,17 +142,10 @@ public class AuthServiceImpl implements AuthService {
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
             .clientId(clientId).username(username).password(password)
             .build().tokenManager();
-
-        AuthorizationResponse auth = new AuthorizationResponse();
-        auth.setAccessToken(tokenManager.getAccessToken().getToken());
-        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
-        auth.setRefreshToken(tokenManager.refreshToken().getToken());
-        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
-        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
             
-        return auth;            
+        return mapping(tokenManager.getAccessToken());            
     }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -148,13 +154,7 @@ public class AuthServiceImpl implements AuthService {
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm).clientId(clientId).clientSecret(clientSecret).build()
                 .tokenManager();
 
-        AuthorizationResponse auth = new AuthorizationResponse();
-        auth.setAccessToken(tokenManager.getAccessToken().getToken());
-        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
-        auth.setRefreshToken(tokenManager.refreshToken().getToken());
-        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
-        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
-        return auth;
+        return mapping(tokenManager.getAccessToken());            
     }
 
     /**
@@ -164,13 +164,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthorizationResponse loginByToken(String refreshToken) {
         TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, clientId, refreshToken).tokenManager();
 
-        AuthorizationResponse auth = new AuthorizationResponse();
-        auth.setAccessToken(tokenManager.getAccessToken().getToken());
-        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
-        auth.setRefreshToken(tokenManager.refreshToken().getToken());
-        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
-        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
-        return auth;
+        return mapping(tokenManager.getAccessToken());            
     }
 
     /**
@@ -273,13 +267,7 @@ public class AuthServiceImpl implements AuthService {
                 new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
                 clientBuilder.build(), refreshToken);
 
-        AuthorizationResponse auth = new AuthorizationResponse();
-        auth.setAccessToken(tokenManager.getAccessToken().getToken());
-        auth.setExpiresIn(tokenManager.getAccessToken().getExpiresIn());
-        auth.setRefreshToken(tokenManager.refreshToken().getToken());
-        auth.setRefreshExpiresIn(tokenManager.refreshToken().getExpiresIn());
-        auth.setTokenType(tokenManager.getAccessToken().getTokenType());
-        return auth;
+        return mapping(tokenManager.getAccessToken());            
     }
 
     /**
