@@ -139,9 +139,10 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByUsernamePassword(String username, String password) {
-       
+        // FIXME: ClientId must be parametrized
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
-            .username(username).password(password).grantType(GrantType.PASSWORD.toString())
+            .clientId(clientId)
+            .username(username).password(password).grantType(GrantType.PASSWORD.toString())           
             .build().tokenManager();
             
         return mapping(tokenManager.getAccessToken());            
@@ -156,6 +157,7 @@ public class AuthServiceImpl implements AuthService {
             .realm(realm).clientId(clientId).clientSecret(clientSecret).grantType(GrantType.CLIENT_CREDENTIALS.toString())
             .build().tokenManager();
 
+        System.out.println(keycloak.realm(realm).toRepresentation().getSsoSessionIdleTimeout());
         return mapping(tokenManager.getAccessToken());            
     }
 
