@@ -195,4 +195,6 @@ public interface IdentityService {
      * @return {@link IdentityInfo} Identity we want to get
      */
 	IdentityInfo getIdentityByNav4(String nav4Id);
+
+    List<String> getUserRequiredActions(String username);
 }

@@ -7,12 +7,15 @@
 package com.karumien.cloud.sso.api;
 
 import java.io.ByteArrayInputStream;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.apache.commons.codec.binary.Base64;
 import org.jboss.logging.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,11 +25,13 @@ import com.karumien.cloud.sso.api.handler.AuthApi;
 import com.karumien.cloud.sso.api.model.AuthorizationRequest;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 import com.karumien.cloud.sso.api.model.ErrorCode;
+import com.karumien.cloud.sso.api.model.ErrorData;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.Policy;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AuthService;
+import com.karumien.cloud.sso.service.IdentityService;
 
 import io.swagger.annotations.Api;
 
@@ -42,6 +47,12 @@ public class AuthController implements AuthApi  {
 
     @Autowired
     private AuthService authService;
+    
+    @Autowired 
+    private IdentityService identityService;
+    
+    @Autowired
+    private MessageSource messageSource;
     
     /**
      * {@inheritDoc}
@@ -85,8 +96,13 @@ public class AuthController implements AuthApi  {
         } catch (javax.ws.rs.BadRequestException e) {
             // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
             ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
-                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
-            return new ResponseEntity(error, user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST);
+                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class))
+                    .errdata(identityService.getUserRequiredActions(
+                            user.getUsername()).stream().map(a -> new ErrorData()
+                                    .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
+                                    .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
+            );            
+            return new ResponseEntity(error, user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? HttpStatus.UNAUTHORIZED : HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (javax.ws.rs.NotAuthorizedException e) {
             ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 401)
                     .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
@@ -100,7 +116,7 @@ public class AuthController implements AuthApi  {
         
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    
+
     @Override
     public ResponseEntity<Void> logout(@Valid AuthorizationRequest user) {
     

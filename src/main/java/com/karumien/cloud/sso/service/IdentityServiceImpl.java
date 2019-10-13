@@ -382,5 +382,17 @@ public class IdentityServiceImpl implements IdentityService {
                 () -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         return mapping(keycloak.realm(realm).users().get(userId).toRepresentation());
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<String> getUserRequiredActions(String username) {
+	    if (StringUtils.isEmpty(username)) {
+	        return new ArrayList<>();
+	    }
+	    List<UserRepresentation> identities = keycloak.realm(realm).users().search(username);
+	    return identities.isEmpty() ? new ArrayList<>() : identities.get(0).getRequiredActions();
+	}
 
 }
