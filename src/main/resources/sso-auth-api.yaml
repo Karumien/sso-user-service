@@ -171,9 +171,6 @@ definitions:
         token_type:
           type: string
           description: Base type of token
-        nav4Id:
-          type: string
-          description: Identity's Unique NAV4 ID 
       example:
         access_token: rewrsthhgfh
         refresh_token: a3sdwer3twe
