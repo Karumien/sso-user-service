@@ -258,7 +258,7 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponse loginByImpersonator(String refreshToken, String clientId, String username) {
+    public AuthorizationResponse loginByImpersonator(String clientId, String refreshToken, String username) {
 
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
 
