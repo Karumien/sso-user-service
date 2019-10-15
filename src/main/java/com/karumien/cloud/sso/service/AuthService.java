@@ -39,13 +39,13 @@ public interface AuthService {
      */
     void logoutByToken(String token);
 
-    AuthorizationResponse loginByUsernamePassword(String username, String password);
+    AuthorizationResponse loginByUsernamePassword(String clientId, String username, String password);
 
     AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret);
 
-    AuthorizationResponse loginByToken(String refreshToken);
+    AuthorizationResponse loginByToken(String clientId, String refreshToken);
 
-    AuthorizationResponse loginByImpersonator(String refreshToken, String clienId, String username);
+    AuthorizationResponse loginByImpersonator(String clienId, String refreshToken, String username);
 
     String generatePassword();
 

@@ -78,16 +78,16 @@ public class AuthController implements AuthApi  {
         try {
             switch (user.getGrantType()) {
             case REFRESH_TOKEN:
-                response = authService.loginByToken(user.getRefreshToken());
+                response = authService.loginByToken(user.getClientId(), user.getRefreshToken());
                 break;
             case PASSWORD:
-                response = authService.loginByUsernamePassword(user.getUsername(), user.getPassword());
+                response = authService.loginByUsernamePassword(user.getClientId(), user.getUsername(), user.getPassword());
                 break;
             case CLIENT_CREDENTIALS:
                 response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
                 break;
             case IMPERSONATE:
-                response = authService.loginByImpersonator(user.getRefreshToken(), user.getClientId(), user.getUsername());
+                response = authService.loginByImpersonator(user.getClientId(), user.getRefreshToken(), user.getUsername());
                 break;            
             default:
                 throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());

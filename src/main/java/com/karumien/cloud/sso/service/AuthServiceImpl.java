@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
@@ -138,10 +139,9 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponse loginByUsernamePassword(String username, String password) {
-        // FIXME: ClientId must be parametrized
+    public AuthorizationResponse loginByUsernamePassword(String clientId, String username, String password) {
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
-            .clientId(clientId)
+            .clientId(StringUtils.isEmpty(clientId) ? this.clientId : clientId)
             .username(username).password(password).grantType(GrantType.PASSWORD.toString())           
             .build().tokenManager();
             
@@ -165,8 +165,8 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponse loginByToken(String refreshToken) {
-        TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, clientId, refreshToken).tokenManager();
+    public AuthorizationResponse loginByToken(String clientId, String refreshToken) {
+        TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, StringUtils.isEmpty(clientId) ? this.clientId : clientId, refreshToken).tokenManager();
 
         return mapping(tokenManager.getAccessToken());            
     }
@@ -268,7 +268,8 @@ public class AuthServiceImpl implements AuthService {
         }
 
         ImpersonateTokenManager tokenManager = new ImpersonateTokenManager(
-                new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
+                new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, 
+                        StringUtils.isEmpty(clientId) ? this.clientId : clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
                 clientBuilder.build(), refreshToken);
 
         return mapping(tokenManager.getAccessToken());            
