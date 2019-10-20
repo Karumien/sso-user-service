@@ -45,13 +45,13 @@ public class AccountServiceTest {
     public void crudAccount() {
         
         AccountInfo account = new AccountInfo();
-        account.setCrmAccountId(accountNumber);
+        account.setAccountNumber(accountNumber);
         account.setName("TEST_COMPANY_" + accountNumber);
         account.setCompRegNo("60255523");
         account.setContactEmail("info@firma.cz");
         
         AccountInfo accountCreated = accountService.createAccount(account);
-        Assert.assertEquals(accountCreated.getCrmAccountId(), accountNumber);
+        Assert.assertEquals(accountCreated.getAccountNumber(), accountNumber);
         Assert.assertEquals(accountCreated.getName(), "TEST_COMPANY_" + accountNumber);
         Assert.assertEquals(accountCreated.getCompRegNo(), "60255523");
         Assert.assertEquals(accountCreated.getContactEmail(), "info@firma.cz");
@@ -65,7 +65,7 @@ public class AccountServiceTest {
         Assert.assertFalse(accounts.isEmpty());
         
         AccountInfo accountFound = accountService.getAccount(accountNumber);
-        Assert.assertEquals(accountFound.getCrmAccountId(), accountNumber);
+        Assert.assertEquals(accountFound.getAccountNumber(), accountNumber);
         Assert.assertEquals(accountFound.getName(), "TEST_COMPANY_" + accountNumber);
         Assert.assertEquals(accountFound.getCompRegNo(), "60255523");
         Assert.assertEquals(accountFound.getContactEmail(), "info@firma.cz");

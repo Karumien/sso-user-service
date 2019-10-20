@@ -27,7 +27,7 @@ public interface AccountService {
 
     String ATTR_COMP_REG_NO = "compRegNo";
 
-    String ATTR_CRM_ACCOUNT_ID = "accountNumber";
+    String ATTR_ACCOUNT_NUMBER = "accountNumber";
 
     String ATTR_CONTACT_EMAIL = "contactEmail";
 

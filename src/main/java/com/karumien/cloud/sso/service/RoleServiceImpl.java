@@ -215,7 +215,7 @@ public class RoleServiceImpl implements RoleService {
     public String getRolesBinary(UserRepresentation userRepresentation) {	
 
         StringBuilder binaryRule = new StringBuilder();
-        Optional<String> accountNumber = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CRM_ACCOUNT_ID);
+        Optional<String> accountNumber = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER);
         
         if (!accountNumber.isPresent()) {
             return binaryRule.toString();

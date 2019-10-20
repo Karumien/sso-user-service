@@ -39,7 +39,7 @@ public class IdentityServiceTest {
     public void createAccount() throws Exception {
         
         IdentityInfo identity = new IdentityInfo();
-        identity.setCrmContactId("CRM00001");
+        identity.setContactNumber("CRM00001");
         identity.setFirstName("Ladislav");
         identity.setLastName("Stary");
         identity.setEmail("stary@seznam.cz");
@@ -48,11 +48,11 @@ public class IdentityServiceTest {
         Assert.assertEquals(identity.getFirstName(), userCreated.getFirstName());
         Assert.assertEquals(identity.getLastName(), userCreated.getLastName());
         Assert.assertEquals(identity.getEmail(), userCreated.getEmail());
-        Assert.assertNotNull(userCreated.getCrmContactId());
+        Assert.assertNotNull(userCreated.getContactNumber());
         Assert.assertNotNull(userCreated.getUsername());
         Assert.assertEquals(userCreated.getEmail(), userCreated.getUsername());
         
-        identityService.deleteIdentity(identity.getCrmContactId());
+        identityService.deleteIdentity(identity.getContactNumber());
     }
       
     @Test
@@ -64,7 +64,7 @@ public class IdentityServiceTest {
 		} catch (IdentityNotFoundException e) {
 			if (identity == null) {
 				identity = new IdentityInfo();
-				identity.setCrmContactId("CRM00001");
+				identity.setContactNumber("CRM00001");
 				identity.setFirstName("Ladislav");
 				identity.setLastName("Stary");
 				identity.setEmail("stary@seznam.cz");
@@ -73,8 +73,8 @@ public class IdentityServiceTest {
 		
         //IdentityInfo userCreated = 
                 identityService.createIdentity(identity);
-        List<RoleInfo> roles = identityService.getAllIdentityRoles(identity.getCrmContactId());
+        List<RoleInfo> roles = identityService.getAllIdentityRoles(identity.getContactNumber());
         Assert.assertNotNull(roles);       
-        identityService.deleteIdentity(identity.getCrmContactId());
+        identityService.deleteIdentity(identity.getContactNumber());
     }
 }

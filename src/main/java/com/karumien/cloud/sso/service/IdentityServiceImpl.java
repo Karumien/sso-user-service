@@ -85,7 +85,7 @@ public class IdentityServiceImpl implements IdentityService {
         UserRepresentation identity = new UserRepresentation();
 
         identity.setUsername(StringUtils.isEmpty(identityInfo.getUsername()) ?
-                "generated-" + identityInfo.getCrmContactId() : identityInfo.getUsername());
+                "generated-" + identityInfo.getContactNumber() : identityInfo.getUsername());
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
 
@@ -107,16 +107,16 @@ public class IdentityServiceImpl implements IdentityService {
 			identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
 		}
 
-        identity.singleAttribute(ATTR_CRM_CONTACT_ID, 
-                Optional.of(identityInfo.getCrmContactId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_CONTACT_ID)));
-        identity.singleAttribute(ATTR_CRM_ACCOUNT_ID, 
-                Optional.of(identityInfo.getCrmAccountId()).orElseThrow(() -> new IdNotFoundException(ATTR_CRM_ACCOUNT_ID)));
+        identity.singleAttribute(ATTR_CONTACT_NUMBER, 
+                Optional.of(identityInfo.getContactNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_CONTACT_NUMBER)));
+        identity.singleAttribute(ATTR_ACCOUNT_NUMBER, 
+                Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
 
         Response response = keycloak.realm(realm).users().create(identity);        
         identityInfo.setIdentityId(getCreatedId(response));
         
-        String groupId = accountService.findGroup(identityInfo.getCrmAccountId())
-            .orElseThrow(() -> new AccountNotFoundException(identityInfo.getCrmAccountId())).getId();
+        String groupId = accountService.findGroup(identityInfo.getAccountNumber())
+            .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber())).getId();
        
         keycloak.realm(realm).users().get(identityInfo.getIdentityId()).joinGroup(groupId);
             
@@ -185,7 +185,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_CRM_CONTACT_ID, contactNumber).stream().findFirst().orElse(null);
+        String userId = searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, contactNumber).stream().findFirst().orElse(null);
         return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
 //   keycloak.realm(realm).users().list().stream()
 //            .filter(g -> g.getAttributes() != null)
@@ -208,8 +208,8 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmailVerified(userRepresentation.isEmailVerified());
 
         
-        identity.setCrmAccountId(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
-        identity.setCrmContactId(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CRM_CONTACT_ID).orElse(null));
+        identity.setAccountNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
+        identity.setContactNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CONTACT_NUMBER).orElse(null));
         identity.setGlobalEmail(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
         identity.setPhone(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
         identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));

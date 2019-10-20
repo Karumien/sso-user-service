@@ -26,9 +26,9 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  */
 public interface IdentityService {
 
-    String ATTR_CRM_CONTACT_ID = "contactNumber";
+    String ATTR_CONTACT_NUMBER = "contactNumber";
 
-    String ATTR_CRM_ACCOUNT_ID = "accountNumber";
+    String ATTR_ACCOUNT_NUMBER = "accountNumber";
 
     String ATTR_GLOBAL_EMAIL = "globalEmail";
 

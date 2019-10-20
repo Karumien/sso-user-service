@@ -35,7 +35,7 @@ public class SearchServiceTest {
     @Ignore
     public void findUserIdsByAttribute() {
         
-        List<String> usersIds = searchService.findUserIdsByAttribute(IdentityService.ATTR_CRM_CONTACT_ID, "11714");
+        List<String> usersIds = searchService.findUserIdsByAttribute(IdentityService.ATTR_CONTACT_NUMBER, "11714");
         assertNotNull(usersIds);
         assertEquals(2, usersIds.size());
         

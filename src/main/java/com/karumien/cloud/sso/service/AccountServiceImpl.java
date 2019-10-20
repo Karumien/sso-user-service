@@ -93,7 +93,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Optional<GroupRepresentation> findGroup(String accountNumber) {
         return getMasterGroup().getSubGroups().stream()
-                .filter(g -> searchService.containsAttribute(g.getAttributes(), ATTR_CRM_ACCOUNT_ID, accountNumber)).findFirst();
+                .filter(g -> searchService.containsAttribute(g.getAttributes(), ATTR_ACCOUNT_NUMBER, accountNumber)).findFirst();
     }
 
     /**
@@ -118,7 +118,7 @@ public class AccountServiceImpl implements AccountService {
         GroupRepresentation group = new GroupRepresentation();
         group.setName(account.getName());
         group.setPath("/" + MASTER_GROUP + "/" + group.getName());
-        group.singleAttribute(ATTR_CRM_ACCOUNT_ID, account.getCrmAccountId());
+        group.singleAttribute(ATTR_ACCOUNT_NUMBER, account.getAccountNumber());
 
         if (!StringUtils.isEmpty(account.getCompRegNo())) {
             group.singleAttribute(ATTR_COMP_REG_NO, account.getCompRegNo());
@@ -132,7 +132,7 @@ public class AccountServiceImpl implements AccountService {
 
         // TODO: caches?
         keycloak.realm(realm).clearRealmCache();
-        return getAccount(account.getCrmAccountId());
+        return getAccount(account.getAccountNumber());
     }
 
     /**
@@ -167,7 +167,7 @@ public class AccountServiceImpl implements AccountService {
 
         // TODO viliam: Orica
         AccountInfo accountInfo = new AccountInfo();
-        accountInfo.setCrmAccountId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CRM_ACCOUNT_ID).orElse(null));
+        accountInfo.setAccountNumber(searchService.getSimpleAttribute(group.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
         accountInfo.setCompRegNo(searchService.getSimpleAttribute(group.getAttributes(), ATTR_COMP_REG_NO).orElse(null));
         accountInfo.setContactEmail(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CONTACT_EMAIL).orElse(null));
         accountInfo.setName(group.getName());
@@ -188,7 +188,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<AccountInfo> getAccounts() {
-        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes().containsKey(ATTR_CRM_ACCOUNT_ID)).map(g -> mapping(g))
+        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes().containsKey(ATTR_ACCOUNT_NUMBER)).map(g -> mapping(g))
                 .collect(Collectors.toList());
     }
 
@@ -198,7 +198,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public IdentityInfo getAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber) {
         Optional<IdentityInfo> identityFind = getAccountIdentities(accountNumber, Arrays.asList(contactNumber))
-                .stream().filter(identity -> identity.getCrmContactId().equals(contactNumber))
+                .stream().filter(identity -> identity.getContactNumber().equals(contactNumber))
                 .findAny();
         return identityFind.orElseThrow(() -> new IdentityNotFoundException(contactNumber));
     }
@@ -212,8 +212,8 @@ public class AccountServiceImpl implements AccountService {
             .orElseThrow(() -> new AccountNotFoundException(accountNumber)).members();
         return users.stream()
                 .filter(u -> CollectionUtils.isEmpty(contactNumbers) 
-                    || searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CRM_CONTACT_ID).isPresent()
-                      && contactNumbers.contains(searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CRM_CONTACT_ID).get()))
+                    || searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).isPresent()
+                      && contactNumbers.contains(searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).get()))
                 .map(user -> identityService.mapping(user)).collect(Collectors.toList());
     }
     
@@ -223,7 +223,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public boolean deleteAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber) {
 	    IdentityInfo identityInfo = getAccountIdentityBaseOnCrmContractId(accountNumber, contactNumber);	    
-		identityService.deleteIdentity(identityInfo.getCrmContactId());
+		identityService.deleteIdentity(identityInfo.getContactNumber());
 		return true;
 	}
 

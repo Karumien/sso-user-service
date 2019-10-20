@@ -97,13 +97,13 @@ public class ModuleServiceTest {
         module1.setDescription("TEST-MODULE-B");
 
         AccountInfo account = new AccountInfo();
-        account.setCrmAccountId(accountNumber);
+        account.setAccountNumber(accountNumber);
         account.setName("COMPANY" + moduleId);
         account.setCompRegNo("60255523");
         account.setContactEmail("info@firma.cz");
         
         AccountInfo account1 = new AccountInfo();
-        account1.setCrmAccountId(accountNumber + "1");
+        account1.setAccountNumber(accountNumber + "1");
         account1.setName("COMPANY" + moduleId + "B");
         account1.setCompRegNo("70255523");
         account1.setContactEmail("info@firma2.cz");
