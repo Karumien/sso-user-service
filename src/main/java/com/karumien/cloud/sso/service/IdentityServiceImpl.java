@@ -70,9 +70,9 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void deleteIdentity(String crmContactId) {
-        UserRepresentation user = findIdentity(crmContactId)
-            .orElseThrow(() -> new IdentityNotFoundException(crmContactId));        
+    public void deleteIdentity(String contactNumber) {
+        UserRepresentation user = findIdentity(contactNumber)
+            .orElseThrow(() -> new IdentityNotFoundException(contactNumber));        
         keycloak.realm(realm).users().delete(user.getId());
     }
     
@@ -147,9 +147,9 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void createIdentityCredentials(String crmContactId, Credentials newCredentials) {
+    public void createIdentityCredentials(String contactNumber, Credentials newCredentials) {
 
-        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         user.setEnabled(true);
         user.setUsername(newCredentials.getUsername());
         
@@ -175,22 +175,22 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo getIdentity(String crmContactId) {
-        return mapping(findIdentity(crmContactId)
-                .orElseThrow(() -> new IdentityNotFoundException(crmContactId)));
+    public IdentityInfo getIdentity(String contactNumber) {
+        return mapping(findIdentity(contactNumber)
+                .orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
     }
    
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<UserRepresentation> findIdentity(String crmContactId) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_CRM_CONTACT_ID, crmContactId).stream().findFirst().orElse(null);
+    public Optional<UserRepresentation> findIdentity(String contactNumber) {
+        String userId = searchService.findUserIdsByAttribute(ATTR_CRM_CONTACT_ID, contactNumber).stream().findFirst().orElse(null);
         return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
 //   keycloak.realm(realm).users().list().stream()
 //            .filter(g -> g.getAttributes() != null)
 //            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
-//            .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(crmContactId)).findFirst();
+//            .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(contactNumber)).findFirst();
     }
 
     /**
@@ -222,8 +222,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void impersonateIdentity(String crmContactId) {
-        UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void impersonateIdentity(String contactNumber) {
+        UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         Map<String, Object> map = user.impersonate();
         System.out.println(map);
@@ -233,8 +233,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void logoutIdentity(String crmContactId) {
-        UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void logoutIdentity(String contactNumber) {
+        UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         user.logout();
     }
@@ -251,8 +251,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public boolean assignRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-    	UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public boolean assignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
+    	UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
     	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);        
     	user.roles().realmLevel().add(list);
@@ -279,8 +279,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public boolean unassignRolesToIdentity(String crmContactId, @Valid List<String> roles) {
-        UserRepresentation userRepresentation = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public boolean unassignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
+        UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
         user.roles().realmLevel().remove(list);
@@ -292,16 +292,16 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public List<RoleInfo> getAllIdentityRoles(String crmContactId) {
-        return roleService.getAllRolesOfIdentity(crmContactId);
+    public List<RoleInfo> getAllIdentityRoles(String contactNumber) {
+        return roleService.getAllRolesOfIdentity(contactNumber);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void savePinOfIdentityDriver(String crmContactId, DriverPin pin) {
-        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void savePinOfIdentityDriver(String contactNumber, DriverPin pin) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         user.getAttributes().put(ATTR_DRIVER_PIN, Arrays.asList(pin.getPin()));
         keycloak.realm(realm).users().get(user.getId()).update(user);
     }
@@ -310,8 +310,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void removePinOfIdentityDriver(String crmContactId) {
-        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void removePinOfIdentityDriver(String contactNumber) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         user.getAttributes().remove(ATTR_DRIVER_PIN);
         keycloak.realm(realm).users().get(user.getId()).update(user);
     }
@@ -320,10 +320,10 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void resetPasswordByEmail(String crmContactId) {
-        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void resetPasswordByEmail(String contactNumber) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         if (StringUtils.isEmpty(user.getEmail()) || !user.isEmailVerified()) {
-            throw new IdentityEmailNotExistsOrVerifiedException(crmContactId);
+            throw new IdentityEmailNotExistsOrVerifiedException(contactNumber);
         }
         keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
     }
@@ -332,8 +332,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void blockIdentity(String crmContactId, boolean blockedStatus) {
-        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void blockIdentity(String contactNumber, boolean blockedStatus) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         user.setEnabled(!blockedStatus);
         keycloak.realm(realm).users().get(user.getId()).update(user);
     }
@@ -342,8 +342,8 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public DriverPin getPinOfIdentityDriver(String crmContactId) {
-        UserRepresentation user = findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public DriverPin getPinOfIdentityDriver(String contactNumber) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         DriverPin pin = new DriverPin();
         pin.setPin(searchService.getSimpleAttribute(user.getAttributes(), ATTR_DRIVER_PIN)
                 .orElseThrow(() -> new AttributeNotFoundException(ATTR_DRIVER_PIN)));
@@ -368,9 +368,9 @@ public class IdentityServiceImpl implements IdentityService {
 	 * {@inheritDoc}
 	 */
     @Override
-    public boolean isActiveRole(String roleId, String crmContactId) {
+    public boolean isActiveRole(String roleId, String contactNumber) {
         //FIXME: performance
-        return getAllIdentityRoles(crmContactId).stream().filter(role -> role.getRoleId().equals(roleId)).findAny().isPresent();
+        return getAllIdentityRoles(contactNumber).stream().filter(role -> role.getRoleId().equals(roleId)).findAny().isPresent();
     }
 
     /**

@@ -137,8 +137,8 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public void assignRoleToIdentity(String crmContactId, RoleInfo role) {
-        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void assignRoleToIdentity(String contactNumber, RoleInfo role) {
+        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         RoleRepresentation realmRole = findRoleResource(role.getRoleId()).orElseThrow(() -> new RoleNotFoundException(role.getRoleId())).toRepresentation();
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         user.roles().realmLevel().add(Arrays.asList(realmRole));
@@ -149,8 +149,8 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public List<RoleInfo> getAllRolesOfIdentity(String crmContactId) {
-        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public List<RoleInfo> getAllRolesOfIdentity(String contactNumber) {
+        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
                 .map(role -> transformRoleToBaseRole(role)).collect(Collectors.toList());
     }
@@ -200,8 +200,8 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public void unassignRoleFromIdentity(String crmContactId, String roleId) {
-        UserRepresentation userRepresentation = identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId));
+    public void unassignRoleFromIdentity(String contactNumber, String roleId) {
+        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         RoleRepresentation realmRole = findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId)).toRepresentation();
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         user.roles().realmLevel().remove(Arrays.asList(realmRole));
@@ -215,9 +215,9 @@ public class RoleServiceImpl implements RoleService {
     public String getRolesBinary(UserRepresentation userRepresentation) {	
 
         StringBuilder binaryRule = new StringBuilder();
-        Optional<String> crmAccountId = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CRM_ACCOUNT_ID);
+        Optional<String> accountNumber = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CRM_ACCOUNT_ID);
         
-        if (!crmAccountId.isPresent()) {
+        if (!accountNumber.isPresent()) {
             return binaryRule.toString();
         }
         
@@ -239,7 +239,7 @@ public class RoleServiceImpl implements RoleService {
     		});
 		    
 		
-		    List<String> modules = moduleService.getAccountModulesSimple(crmAccountId.get());
+		    List<String> modules = moduleService.getAccountModulesSimple(accountNumber.get());
 		
     		for (Entry<String, Integer> entry : maskMap.entrySet()) {
     		    String key = entry.getKey();

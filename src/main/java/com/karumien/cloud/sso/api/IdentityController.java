@@ -55,8 +55,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> deleteIdentity(String crmContactId) {
-        identityService.deleteIdentity(crmContactId);
+    public ResponseEntity<Void> deleteIdentity(String contactNumber) {
+        identityService.deleteIdentity(contactNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -73,16 +73,16 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> getIdentity(String crmContactId) {
-        return new ResponseEntity<>(identityService.getIdentity(crmContactId), HttpStatus.OK);
+    public ResponseEntity<IdentityInfo> getIdentity(String contactNumber) {
+        return new ResponseEntity<>(identityService.getIdentity(contactNumber), HttpStatus.OK);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> impersonateIdentity(String crmContactId) {
-        identityService.impersonateIdentity(crmContactId);
+    public ResponseEntity<Void> impersonateIdentity(String contactNumber) {
+        identityService.impersonateIdentity(contactNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -90,8 +90,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> logoutIdentity(String crmContactId) {
-        identityService.logoutIdentity(crmContactId);
+    public ResponseEntity<Void> logoutIdentity(String contactNumber) {
+        identityService.logoutIdentity(contactNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -99,58 +99,58 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> assignIdentityRole(String crmContactId, String roleId) {
-        return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+    public ResponseEntity<Void> assignIdentityRole(String contactNumber, String roleId) {
+        return new ResponseEntity<>(identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> unassignIdentityRole(String crmContactId, String roleId) {
+    public ResponseEntity<Void> unassignIdentityRole(String contactNumber, String roleId) {
         return new ResponseEntity<>(
-                identityService.unassignRolesToIdentity(crmContactId, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+                identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> assignIdentityRoles(String crmContactId, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.assignRolesToIdentity(crmContactId, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+    public ResponseEntity<Void> assignIdentityRoles(String contactNumber, @Valid List<String> roles) {
+        return new ResponseEntity<>(identityService.assignRolesToIdentity(contactNumber, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> unassignIdentityRoles(String crmContactId, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.unassignRolesToIdentity(crmContactId, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+    public ResponseEntity<Void> unassignIdentityRoles(String contactNumber, @Valid List<String> roles) {
+        return new ResponseEntity<>(identityService.unassignRolesToIdentity(contactNumber, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> getIdentityRole(String crmContactId, String roleId) {
+    public ResponseEntity<Void> getIdentityRole(String contactNumber, String roleId) {
         // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.getIdentityRole(crmContactId, roleId);
+        return IdentitiesApi.super.getIdentityRole(contactNumber, roleId);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<RoleInfo>> getIdentityRoles(String crmContactId) {
-        return new ResponseEntity<List<RoleInfo>>(identityService.getAllIdentityRoles(crmContactId), HttpStatus.OK);
+    public ResponseEntity<List<RoleInfo>> getIdentityRoles(String contactNumber) {
+        return new ResponseEntity<List<RoleInfo>>(identityService.getAllIdentityRoles(contactNumber), HttpStatus.OK);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> resetIdentityCredentials(String crmContactId) {
-        identityService.resetPasswordByEmail(crmContactId);
+    public ResponseEntity<Void> resetIdentityCredentials(String contactNumber) {
+        identityService.resetPasswordByEmail(contactNumber);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -158,8 +158,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> blockIdentity(String crmContactId) {
-        identityService.blockIdentity(crmContactId, true);
+    public ResponseEntity<Void> blockIdentity(String contactNumber) {
+        identityService.blockIdentity(contactNumber, true);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -167,8 +167,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> unblockIdentity(String crmContactId) {
-        identityService.blockIdentity(crmContactId, false);
+    public ResponseEntity<Void> unblockIdentity(String contactNumber) {
+        identityService.blockIdentity(contactNumber, false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -176,8 +176,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createDriverPin(String crmContactId, DriverPin pin) {
-        identityService.savePinOfIdentityDriver(crmContactId, pin);
+    public ResponseEntity<Void> createDriverPin(String contactNumber, DriverPin pin) {
+        identityService.savePinOfIdentityDriver(contactNumber, pin);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -185,8 +185,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> deleteDriverPin(String crmContactId) {
-        identityService.removePinOfIdentityDriver(crmContactId);
+    public ResponseEntity<Void> deleteDriverPin(String contactNumber) {
+        identityService.removePinOfIdentityDriver(contactNumber);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -194,8 +194,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<DriverPin> getDriverPin(String crmContactId) {
-        return new ResponseEntity<>(identityService.getPinOfIdentityDriver(crmContactId), HttpStatus.OK);
+    public ResponseEntity<DriverPin> getDriverPin(String contactNumber) {
+        return new ResponseEntity<>(identityService.getPinOfIdentityDriver(contactNumber), HttpStatus.OK);
     }
 
     /**
@@ -203,9 +203,9 @@ public class IdentityController implements IdentitiesApi {
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public ResponseEntity<Void> getIdentityRolesBinary(String crmContactId) {
+    public ResponseEntity<Void> getIdentityRolesBinary(String contactNumber) {
         String binaryRoles = roleService
-                .getRolesBinary(identityService.findIdentity(crmContactId).orElseThrow(() -> new IdentityNotFoundException(crmContactId)));
+                .getRolesBinary(identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
         return new ResponseEntity(binaryRoles, HttpStatus.OK);
     }
 
@@ -213,18 +213,18 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> exists(@Valid String username, @Valid String crmContactId, @Valid String nav4Id) {
+    public ResponseEntity<Void> exists(@Valid String username, @Valid String contactNumber, @Valid String nav4Id) {
         // TODO viliam.litavec: Need implementation
-        return IdentitiesApi.super.exists(username, crmContactId, nav4Id);
+        return IdentitiesApi.super.exists(username, contactNumber, nav4Id);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createIdentityNav4Credentials(String crmContactId, @Valid Credentials credentials) {
+    public ResponseEntity<Void> createIdentityNav4Credentials(String contactNumber, @Valid Credentials credentials) {
         // TODO viliam.litavec: Need implementation
-        return IdentitiesApi.super.createIdentityNav4Credentials(crmContactId, credentials);
+        return IdentitiesApi.super.createIdentityNav4Credentials(contactNumber, credentials);
     }
 
     /**

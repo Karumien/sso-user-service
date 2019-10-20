@@ -26,9 +26,9 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  */
 public interface IdentityService {
 
-    String ATTR_CRM_CONTACT_ID = "crmContactId";
+    String ATTR_CRM_CONTACT_ID = "contactNumber";
 
-    String ATTR_CRM_ACCOUNT_ID = "crmAccountId";
+    String ATTR_CRM_ACCOUNT_ID = "accountNumber";
 
     String ATTR_GLOBAL_EMAIL = "globalEmail";
 
@@ -56,45 +56,45 @@ public interface IdentityService {
     /**
      * Delete Identity in target SSO.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      */
-    void deleteIdentity(String crmContactId);
+    void deleteIdentity(String contactNumber);
     
     /**
      * Create/update Identity credentials
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @param credentials
      *            new credentials for Identity
      */
-    void createIdentityCredentials(String crmContactId, Credentials credentials);
+    void createIdentityCredentials(String contactNumber, Credentials credentials);
 
     /**
-     * Return base information about Identity by {@code crmContactId}.
+     * Return base information about Identity by {@code contactNumber}.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @return {@link IdentityInfo}
      */
-    IdentityInfo getIdentity(String crmContactId);
+    IdentityInfo getIdentity(String contactNumber);
 
     /**
      * Impersonate Identity by specified {@code id}.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      */
-    void impersonateIdentity(String crmContactId);
+    void impersonateIdentity(String contactNumber);
 
     /**
-     * Logout all sessions of Identity by specified {@code crmContactId}.
+     * Logout all sessions of Identity by specified {@code contactNumber}.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      */
-    void logoutIdentity(String crmContactId);
+    void logoutIdentity(String contactNumber);
 
     /**
      * Check exist Identity by username.
@@ -108,82 +108,82 @@ public interface IdentityService {
     /**
      * Assign selected list of roles to as current Identity
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to add to identity
      * @return {@link Boolean} return true if we successfully assign roles false if not
      */
-    boolean assignRolesToIdentity(String crmContactId, @Valid List<String> roles);
+    boolean assignRolesToIdentity(String contactNumber, @Valid List<String> roles);
 
     /**
      * Remove selected list of roles to as current Identity.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to remove from identity
      * @return {@link Boolean} return true if we successfully remove roles false if not
      */
-    boolean unassignRolesToIdentity(String crmContactId, @Valid List<String> roles);
+    boolean unassignRolesToIdentity(String contactNumber, @Valid List<String> roles);
 
     /**
      * Return all roles that are assigned to selected identity.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID we want to find roles for
      * @return {@link List} {@link RoleInfo} list of roles that identity have
      */
-    List<RoleInfo> getAllIdentityRoles(String crmContactId);
+    List<RoleInfo> getAllIdentityRoles(String contactNumber);
 
     /**
      * Function that save pin of Identity driver base on input.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @param pin
      *            {@link DriverPin} pin we want to add to the driver identity
      */
-    void savePinOfIdentityDriver(String crmContactId, DriverPin pin);
+    void savePinOfIdentityDriver(String contactNumber, DriverPin pin);
 
     /**
      * Function that remove pin of Identity driver.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      */
-    void removePinOfIdentityDriver(String crmContactId);
+    void removePinOfIdentityDriver(String contactNumber);
 
     /**
      * Initiate action for email change.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      */
-    void resetPasswordByEmail(String crmContactId);
+    void resetPasswordByEmail(String contactNumber);
 
-    Optional<UserRepresentation> findIdentity(String crmContactId);
+    Optional<UserRepresentation> findIdentity(String contactNumber);
 
     /**
      * Block/unblock Ientity.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @param blockedStatus
      *            new blocked status
      */
-    void blockIdentity(String crmContactId, boolean blockedStatus);
+    void blockIdentity(String contactNumber, boolean blockedStatus);
 
     /**
      * Return PIN of Identity type Driver.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            unique Identity CRM ID
      * @return {@link DriverPin} pin of the driver
      */
-    DriverPin getPinOfIdentityDriver(String crmContactId);
+    DriverPin getPinOfIdentityDriver(String contactNumber);
 
-    boolean isActiveRole(String roleId, String crmContactId);
+    boolean isActiveRole(String roleId, String contactNumber);
 
     void refreshBinaryRoles(UserRepresentation userRepresentation);
 

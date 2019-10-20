@@ -83,22 +83,22 @@ public interface RoleService {
     /**
      * Function that return all role that identity have signed
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            {@link String} ID of identity for what we want to find roles
      * 
      * @return {@link List} of {@link RoleInfo}
      */
-    List<RoleInfo> getAllRolesOfIdentity(String crmContactId);
+    List<RoleInfo> getAllRolesOfIdentity(String contactNumber);
 
     /**
      * Function that remove role from identity.
      * 
-     * @param crmContactId
+     * @param contactNumber
      *            {@link String} ID of identity from we want to remove role
      * @param roleId
      *            {@link String} id of role that we want to remove
      */
-    void unassignRoleFromIdentity(String crmContactId, String roleId);
+    void unassignRoleFromIdentity(String contactNumber, String roleId);
 
     /**
      * Return Role Resource by unique ID {@code roleId}.
@@ -110,7 +110,7 @@ public interface RoleService {
     Optional<RoleResource> findRoleResource(String roleId);
 
     /**
-     * Return roles binary representation for identity identified by {@code crmContactId}.
+     * Return roles binary representation for identity identified by {@code contactNumber}.
      * 
      * @param userRepresentation
      *            user represenation

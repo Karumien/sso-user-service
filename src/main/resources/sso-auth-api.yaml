@@ -55,8 +55,8 @@ paths:
           schema:
             $ref: '#/definitions/AuthorizationRequest'
       responses:
-        '201':
-          description: Successfully Login and Token return
+        '200':
+          description: Login Successful
           schema:
             $ref: '#/definitions/AuthorizationResponse'        
         '401':

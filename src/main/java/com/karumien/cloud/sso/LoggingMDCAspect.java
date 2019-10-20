@@ -42,7 +42,7 @@ import com.ctc.wstx.io.CharsetNames;
 @ConditionalOnExpression("${endpoint.aspect.enabled:true}")
 public class LoggingMDCAspect {
 
-  private final static List<String> MDC_CONTEXT = Arrays.asList("crmAccountId", "crmContactId", "moduleId", "nav4Id");
+  private final static List<String> MDC_CONTEXT = Arrays.asList("accountNumber", "contactNumber", "moduleId", "nav4Id");
     
   @Around("within(com.karumien.cloud.sso.api..*)")
   public Object prepareMDCContext(ProceedingJoinPoint joinPoint) throws Throwable {

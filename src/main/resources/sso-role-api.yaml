@@ -76,7 +76,7 @@ definitions:
         type: string
         description: "Role description"
         maxLength: 255
-      crmAccountId:
+      accountNumber:
         type: string
         description: Custom role for account
       translation:

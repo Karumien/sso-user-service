@@ -40,15 +40,15 @@ paths:
           schema:
             $ref: '#/definitions/AccountInfo'
         '409':
-          description: Account already exists (conflict crmAccountId)
-  /accounts/{crmAccountId}:
+          description: Account already exists (conflict accountNumber)
+  /accounts/{accountNumber}:
     get:
       summary: "Get detail of the given Account"
       description: "Method returns detail information about Account."
       operationId: "getAccount"
       parameters:
         - in: path
-          name: crmAccountId
+          name: accountNumber
           description: Filtering by Account CRM ID
           required: true
           type: string       
@@ -63,7 +63,7 @@ paths:
       summary: "Remove existing Account"
       operationId: "deleteAccount"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -73,12 +73,12 @@ paths:
           description: Successfully removed existing Account
         '410':
           description: Account Gone
-  /accounts/{crmAccountId}/modules:
+  /accounts/{accountNumber}/modules:
     get:
       summary: "Get Active Modules on Account"
       operationId: "getAccountModules"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -96,7 +96,7 @@ paths:
       summary: "Activate Modules on Account"
       operationId: "activateAccountModules"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -117,7 +117,7 @@ paths:
       summary: "Deactivate Modules on Account"
       operationId: "deactivateAccountModules"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -134,12 +134,12 @@ paths:
           description: Successfully deactivated Modules on Account
         '410':
           description: Account Gone
-  /accounts/{crmAccountId}/modules/{moduleId}:
+  /accounts/{accountNumber}/modules/{moduleId}:
     get:
       summary: "Get Active Module on Account"
       operationId: "getAccountModule"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -160,7 +160,7 @@ paths:
       summary: "Activate Module on Account"
       operationId: "activateAccountModule"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -181,7 +181,7 @@ paths:
       summary: "Deactivate Module on Account"
       operationId: "deactivateAccountModule"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -198,12 +198,12 @@ paths:
           description: Account Gone
         '422':
           description: Module not deactivated
-  /accounts/{crmAccountId}/roles:
+  /accounts/{accountNumber}/roles:
     get:
       summary: "Get Active Roles on Account"
       operationId: "getAccountRoles"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -217,13 +217,13 @@ paths:
               $ref: '#/definitions/RoleInfo'
         '410':
           description: Roles Gone
-  /accounts/{crmAccountId}/identities:
+  /accounts/{accountNumber}/identities:
     post:
       summary: Create Identity
       description: Create Identity in target SSO
       operationId: createAccountIdentity
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -239,18 +239,18 @@ paths:
           schema:
             $ref: '#/definitions/IdentityInfo'            
         '409':
-          description: Identity already exists (conflict username/crmContactId)
+          description: Identity already exists (conflict username/contactNumber)
     get:
       summary: Return all Identities registered for Account
       operationId: getAccountIdentities
       parameters:
         - in: path
-          name: crmAccountId
+          name: accountNumber
           description: Filtering by Account CRM ID
           required: true
           type: string
         - in: query
-          name: crmContactIds
+          name: contactNumbers
           required: false
           description: CRM Contacts IDs
           type: array
@@ -266,18 +266,18 @@ paths:
               $ref: '#/definitions/IdentityInfo'
         '410':
           description: Account Gone
-  /accounts/{crmAccountId}/identities/{crmContactId}:
+  /accounts/{accountNumber}/identities/{contactNumber}:
     get:
       summary: "Get detail of the given Identity"
       description: "Method returns detail information about Identity."
       operationId: getAccountIdentity
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -293,12 +293,12 @@ paths:
       summary: "Remove existing Identity"
       operationId: deleteAccountIdentity
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -308,18 +308,18 @@ paths:
           description: Successfully removed existing Identity
         '410':
           description: Identity Gone
-  /accounts/{crmAccountId}/identities/roles:
+  /accounts/{accountNumber}/identities/roles:
     get:
       summary: "Get detail of the given Identity"
       operationId: getAccountIdentitiesRoles
       parameters:
         - in: path
-          name: crmAccountId
+          name: accountNumber
           description: Filtering by Account unique CRM ID
           required: true
           type: string
         - in: query
-          name: crmContactIds
+          name: contactNumbers
           required: false
           description: CRM Contacts IDs
           type: array
@@ -335,17 +335,17 @@ paths:
               $ref: '#/definitions/IdentityRoleInfo'
         '410':
           description: Gone  
-  /accounts/{crmAccountId}/identities/{crmContactId}/rights:
+  /accounts/{accountNumber}/identities/{contactNumber}/rights:
     get:
       summary: "Get Identity's Rights Ids"
       operationId: getAccountIdentityRightIds
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -359,17 +359,17 @@ paths:
               type: string
         '410':
           description: Gone
-  /accounts/{crmAccountId}/identities/{crmContactId}/roles:
+  /accounts/{accountNumber}/identities/{contactNumber}/roles:
     get:
       summary: "Get Identity's Roles Ids"
       operationId: getAccountIdentityRoleIds
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -387,12 +387,12 @@ paths:
       summary: "Assign roles on Identity"
       operationId: assignAccountIdentityRoles
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -413,12 +413,12 @@ paths:
       summary: "Unassign roles on Identity"
       operationId: unassignAccountIdentityRoles
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -435,17 +435,17 @@ paths:
           description: Successfully removed roles of Identity
         '410':
           description: Identity Gone
-  /accounts/{crmAccountId}/identities/{crmContactId}/roles/{roleId}:
+  /accounts/{accountNumber}/identities/{contactNumber}/roles/{roleId}:
     get:
       summary: "Get assigned Roles on Identity"
       operationId: "getAccountIdentityRole"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -466,12 +466,12 @@ paths:
       summary: "Assign Role to Identity"
       operationId: "assignAccountIdentityRole"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -492,12 +492,12 @@ paths:
       summary: "Remove Role on Identity"
       operationId: "unassignAccountIdentityRole"
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -514,12 +514,12 @@ paths:
           description: Identity Gone
         '422':
           description: Role not unassigned
-  /accounts/{crmAccountId}/hierarchy:
+  /accounts/{accountNumber}/hierarchy:
     get:
       summary: Hierarchy definition for Account - modules and right groups (translated, filtered by activated services)
       operationId: getAccountHierarchy
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account CRM ID
           required: true
@@ -533,18 +533,18 @@ paths:
               $ref: '#/definitions/ModuleInfo'
         '410':
           description: Account Gone  
-  /accounts/{crmAccountId}/identities/{crmContactId}/credentials:
+  /accounts/{accountNumber}/identities/{contactNumber}/credentials:
     post:
       summary: "Add Account Identity credentials"
       description: "Method to create Identity credentials for given customer"
       operationId: createIdentityCredentials
       parameters:
-        - name: crmAccountId
+        - name: accountNumber
           in: path
           description: Filtering by Account unique CRM ID
           required: true
           type: string
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -579,16 +579,16 @@ definitions:
     type: object
     description: "Basic information about Identity"
     required:
-      - crmAccountId
-      - crmContactId
+      - accountNumber
+      - contactNumber
     properties:
       identityId:
         type: string
         description: Identity's ID 
-      crmAccountId:
+      accountNumber:
         type: string
         description: Identity's CRM Account ID
-      crmContactId:
+      contactNumber:
         type: string
         description: Identity's Unique ID 
       nav4Id:
@@ -626,8 +626,8 @@ definitions:
         description: "User's default Locale"
         maxLength: 50  
     example:
-      crmAccountId: 31034
-      crmContactId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      accountNumber: 31034
+      contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       lastName: Novak
       firstName: Karel
       email: KajaN@eurowag.com
@@ -636,13 +636,13 @@ definitions:
     type: object
     description: "Basic information Identity Roles"
     required:
-      - crmAccountId
-      - crmContactId
+      - accountNumber
+      - contactNumber
     properties:
-      crmAccountId:
+      accountNumber:
         type: string
         description: Identity's CRM Account ID
-      crmContactId:
+      contactNumber:
         type: string
         description: Identity's Unique ID 
       nav4Id:
@@ -656,10 +656,10 @@ definitions:
     type: object
     description: "Basic information about Account"
     required:
-      - crmAccountId
+      - accountNumber
       - name
     properties:
-      crmAccountId:
+      accountNumber:
         type: string
         description: Account CRM ID 
       name:
@@ -727,7 +727,7 @@ definitions:
         type: string
         description: "Role description"
         maxLength: 255
-      crmAccountId:
+      accountNumber:
         type: string
         description: Custom role for account
       translation:

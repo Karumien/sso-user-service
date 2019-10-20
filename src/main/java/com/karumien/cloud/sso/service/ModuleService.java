@@ -26,14 +26,14 @@ public interface ModuleService {
 
     void deleteModule(String moduleId);
 
-    void activateModules(List<String> modules, List<String> crmAccountId);
+    void activateModules(List<String> modules, List<String> accountNumber);
         
-    void deactivateModules(List<String> modules, List<String> crmAccountId);
+    void deactivateModules(List<String> modules, List<String> accountNumber);
 
-    List<ModuleInfo> getAccountModules(String crmAccountId);
+    List<ModuleInfo> getAccountModules(String accountNumber);
 
-    boolean isActiveModule(String moduleId, String crmAccountId);
+    boolean isActiveModule(String moduleId, String accountNumber);
 
-    List<String> getAccountModulesSimple(String crmAccountId);
+    List<String> getAccountModulesSimple(String accountNumber);
 
 }

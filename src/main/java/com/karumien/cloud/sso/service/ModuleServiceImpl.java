@@ -132,7 +132,7 @@ public class ModuleServiceImpl implements ModuleService {
      * {@inheritDoc}
      */
     @Override
-    public void activateModules(List<String> modules, List<String> crmAccountIds) {
+    public void activateModules(List<String> modules, List<String> accountNumbers) {
         
         // TODO: transactional?
         List<RoleRepresentation> rolesToAdd = modules.stream().map(moduleId -> findModule(moduleId))
@@ -140,12 +140,12 @@ public class ModuleServiceImpl implements ModuleService {
             .map(module -> module.get().toRepresentation())
             .collect(Collectors.toList());
         
-        crmAccountIds.stream().map(crmAccountId ->  accountService.findGroupResource(crmAccountId))
+        accountNumbers.stream().map(accountNumber ->  accountService.findGroupResource(accountNumber))
             .filter(accountResource -> accountResource.isPresent())
             .forEach(accountResource -> accountResource.get().roles().realmLevel().add(rolesToAdd));
 
-        crmAccountIds.stream().forEach(crmAccountId -> 
-            accountService.getAccountIdentities(crmAccountId, null).forEach(identity -> identityService.refreshBinaryRoles(
+        accountNumbers.stream().forEach(accountNumber -> 
+            accountService.getAccountIdentities(accountNumber, null).forEach(identity -> identityService.refreshBinaryRoles(
                 keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
 
     }
@@ -154,7 +154,7 @@ public class ModuleServiceImpl implements ModuleService {
      * {@inheritDoc}
      */
     @Override
-    public void deactivateModules(List<String> modules, List<String> crmAccountIds) {
+    public void deactivateModules(List<String> modules, List<String> accountNumbers) {
         
         // TODO: transactional?
         List<RoleRepresentation> rolesToRemove = modules.stream().map(moduleId -> findModule(moduleId))
@@ -162,12 +162,12 @@ public class ModuleServiceImpl implements ModuleService {
             .map(module -> module.get().toRepresentation())
             .collect(Collectors.toList());
         
-        crmAccountIds.stream().map(crmAccountId ->  accountService.findGroupResource(crmAccountId))
+        accountNumbers.stream().map(accountNumber ->  accountService.findGroupResource(accountNumber))
             .filter(accountResource -> accountResource.isPresent())
             .forEach(accountResource -> accountResource.get().roles().realmLevel().remove(rolesToRemove));
         
-        crmAccountIds.stream().forEach(crmAccountId -> 
-            accountService.getAccountIdentities(crmAccountId, null).forEach(identity -> identityService.refreshBinaryRoles(
+        accountNumbers.stream().forEach(accountNumber -> 
+            accountService.getAccountIdentities(accountNumber, null).forEach(identity -> identityService.refreshBinaryRoles(
                 keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
     }
 
@@ -175,9 +175,9 @@ public class ModuleServiceImpl implements ModuleService {
      * {@inheritDoc}
      */
     @Override
-    public List<ModuleInfo> getAccountModules(String crmAccountId) {
-        return accountService.findGroupResource(crmAccountId)
-            .orElseThrow(() -> new AccountNotFoundException(crmAccountId)).roles().realmLevel()
+    public List<ModuleInfo> getAccountModules(String accountNumber) {
+        return accountService.findGroupResource(accountNumber)
+            .orElseThrow(() -> new AccountNotFoundException(accountNumber)).roles().realmLevel()
             .listAll().stream().filter(role -> role.getName().startsWith(ROLE_PREFIX))
             .map(role -> mapping(role)).collect(Collectors.toList());                
     }
@@ -186,8 +186,8 @@ public class ModuleServiceImpl implements ModuleService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getAccountModulesSimple(String crmAccountId) {
-        List<ModuleInfo> info = getAccountModules(crmAccountId);
+    public List<String> getAccountModulesSimple(String accountNumber) {
+        List<ModuleInfo> info = getAccountModules(accountNumber);
         return info.stream().map(module -> module.getModuleId()).collect(Collectors.toList());                
     }
 
@@ -195,9 +195,9 @@ public class ModuleServiceImpl implements ModuleService {
      * {@inheritDoc}
      */
     @Override
-    public boolean isActiveModule(String moduleId, String crmAccountId) {
+    public boolean isActiveModule(String moduleId, String accountNumber) {
         //FIXME: performance
-        return getAccountModules(crmAccountId).stream().filter(module -> module.getModuleId().equals(moduleId)).findAny().isPresent();
+        return getAccountModules(accountNumber).stream().filter(module -> module.getModuleId().equals(moduleId)).findAny().isPresent();
     }
 
 }

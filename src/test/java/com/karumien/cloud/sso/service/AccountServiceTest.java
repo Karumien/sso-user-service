@@ -34,25 +34,25 @@ public class AccountServiceTest {
     @Autowired
     private AccountService accountService;
     
-    private static String crmAccountId;
+    private static String accountNumber;
     
     @BeforeClass
     public static void beforeClass() {
-        crmAccountId = "999" + new Random().nextInt(100);
+        accountNumber = "999" + new Random().nextInt(100);
     }
     
     @Test
     public void crudAccount() {
         
         AccountInfo account = new AccountInfo();
-        account.setCrmAccountId(crmAccountId);
-        account.setName("TEST_COMPANY_" + crmAccountId);
+        account.setCrmAccountId(accountNumber);
+        account.setName("TEST_COMPANY_" + accountNumber);
         account.setCompRegNo("60255523");
         account.setContactEmail("info@firma.cz");
         
         AccountInfo accountCreated = accountService.createAccount(account);
-        Assert.assertEquals(accountCreated.getCrmAccountId(), crmAccountId);
-        Assert.assertEquals(accountCreated.getName(), "TEST_COMPANY_" + crmAccountId);
+        Assert.assertEquals(accountCreated.getCrmAccountId(), accountNumber);
+        Assert.assertEquals(accountCreated.getName(), "TEST_COMPANY_" + accountNumber);
         Assert.assertEquals(accountCreated.getCompRegNo(), "60255523");
         Assert.assertEquals(accountCreated.getContactEmail(), "info@firma.cz");
 
@@ -64,13 +64,13 @@ public class AccountServiceTest {
         Assert.assertNotNull(accounts);
         Assert.assertFalse(accounts.isEmpty());
         
-        AccountInfo accountFound = accountService.getAccount(crmAccountId);
-        Assert.assertEquals(accountFound.getCrmAccountId(), crmAccountId);
-        Assert.assertEquals(accountFound.getName(), "TEST_COMPANY_" + crmAccountId);
+        AccountInfo accountFound = accountService.getAccount(accountNumber);
+        Assert.assertEquals(accountFound.getCrmAccountId(), accountNumber);
+        Assert.assertEquals(accountFound.getName(), "TEST_COMPANY_" + accountNumber);
         Assert.assertEquals(accountFound.getCompRegNo(), "60255523");
         Assert.assertEquals(accountFound.getContactEmail(), "info@firma.cz");
 
-        accountService.deleteAccount(crmAccountId);
+        accountService.deleteAccount(accountNumber);
     }
     
     @Test(expected = AccountNotFoundException.class)

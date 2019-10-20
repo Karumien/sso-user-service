@@ -44,8 +44,8 @@
                             },
                             "service_name": "sso-user-service",
                             "context": {
-                                "crm_account_id": "%mdc{crmAccountId}",
-                                "crm_contact_id": "%mdc{crmContactId}",
+                                "account_number": "%mdc{accountNumber}",
+                                "contact_number": "%mdc{contactNumber}",
                                 "nav4_id": "%mdc{nav4Id}",
                                 "module_id": "%mdc{moduleId}",
                                 "identity_id": "%mdc{identityId}"                                
@@ -61,10 +61,10 @@
                     <excludeMdcKeyName>traceId</excludeMdcKeyName>
                     <excludeMdcKeyName>duration_ms</excludeMdcKeyName>
                     <excludeMdcKeyName>moduleId</excludeMdcKeyName>
-                    <excludeMdcKeyName>crmAccountId</excludeMdcKeyName>
+                    <excludeMdcKeyName>accountNumber</excludeMdcKeyName>
                     <excludeMdcKeyName>access_token</excludeMdcKeyName>
                     <excludeMdcKeyName>headers_all</excludeMdcKeyName>
-                    <excludeMdcKeyName>crmContactId</excludeMdcKeyName>
+                    <excludeMdcKeyName>contactNumber</excludeMdcKeyName>
                     <excludeMdcKeyName>nav4Id</excludeMdcKeyName>
                     <excludeMdcKeyName>spanId</excludeMdcKeyName>
                     <excludeMdcKeyName>parentId</excludeMdcKeyName>

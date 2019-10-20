@@ -20,8 +20,8 @@ public class AccountDuplicateException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;
 
-    public AccountDuplicateException(String crmAccountId) {
-        super("Account exists: " + crmAccountId);
+    public AccountDuplicateException(String accountNumber) {
+        super("Account exists: " + accountNumber);
     }
     
 }

@@ -27,54 +27,54 @@ public interface AccountService {
 
     String ATTR_COMP_REG_NO = "compRegNo";
 
-    String ATTR_CRM_ACCOUNT_ID = "crmAccountId";
+    String ATTR_CRM_ACCOUNT_ID = "accountNumber";
 
     String ATTR_CONTACT_EMAIL = "contactEmail";
 
     AccountInfo createAccount(AccountInfo account);
 
-    AccountInfo getAccount(String crmAccountId);
+    AccountInfo getAccount(String accountNumber);
 
-    void deleteAccount(String crmAccountId);
+    void deleteAccount(String accountNumber);
 
     List<AccountInfo> getAccounts();
 
-    Optional<GroupRepresentation> findGroup(String crmAccountId);
+    Optional<GroupRepresentation> findGroup(String accountNumber);
 
-    Optional<GroupResource> findGroupResource(String crmAccountId);
+    Optional<GroupResource> findGroupResource(String accountNumber);
 
     /**
      * Return all identidities that are under this account
      * 
-     * @param crmAccountId
+     * @param accountNumber
      *            {@link String} id of account
-     * @param crmContactIds
+     * @param contactNumbers
      *            List of {@link String} id of identities for filter
      * @return {@link List} {@link IdentityInfo} list of identities
      */
-    List<IdentityInfo> getAccountIdentities(String crmAccountId, List<String> crmContactId);
+    List<IdentityInfo> getAccountIdentities(String accountNumber, List<String> contactNumber);
 
     /**
      * Return {@link IdentityInfo} for account and contractra ID
      * 
-     * @param crmAccountId
+     * @param accountNumber
      *            {@link String} Account ID
-     * @param crmContactId
+     * @param contactNumber
      *            {@link String} ID of contract
      * @return {@link IdentityInfo} identity info for selected crmContractId
      */
-    IdentityInfo getAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId);
+    IdentityInfo getAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber);
 
     /**
      * Remove identity from account members base on contract Id
      * 
-     * @param crmAccountId
+     * @param accountNumber
      *            {@link String} id of Account
-     * @param crmContactId
+     * @param contactNumber
      *            {@link String} ID of Contract
      * @return {@link Boolean} value if we ware successfull of not
      */
-    boolean deleteAccountIdentityBaseOnCrmContractId(String crmAccountId, String crmContactId);
+    boolean deleteAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber);
 
     /**
      * Check if this username is already used for some user

@@ -35,21 +35,21 @@ paths:
           schema:
             $ref: '#/definitions/IdentityInfo'
             example:
-              crmContactId: 6287994b-0245-4ca7-8eb4-777230b2f91f
-              crmAccountId: 31034
+              contactNumber: 6287994b-0245-4ca7-8eb4-777230b2f91f
+              accountNumber: 31034
               lastName: Novak
               firstName: Karel
               username: KajaN
               email: KajaN@eurowag.com
         '409':
-          description: Identity already exists (conflict username/crmContactId)
-  /identities/{crmContactId}:
+          description: Identity already exists (conflict username/contactNumber)
+  /identities/{contactNumber}:
     get:
       summary: "Get detail of the given Identity"
       description: "Method returns detail information about Identity."
       operationId: getIdentity
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -65,7 +65,7 @@ paths:
       summary: "Remove existing Identity"
       operationId: deleteIdentity
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity Unique ID
           required: true
@@ -75,13 +75,13 @@ paths:
           description: Successfully removed existing Identity
         '410':
           description: Identity Gone
-  /identities/{crmContactId}/credentials:
+  /identities/{contactNumber}/credentials:
     post:
       summary: "Create Identity credentials"
       description: "Method to create Identity credentials for given customer"
       operationId: createIdentityCredentials
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -126,7 +126,7 @@ paths:
       description: "Method to create Identity credentials for given customer"
       operationId: createIdentityNav4Credentials
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique NAV4 ID
           required: true
@@ -147,12 +147,12 @@ paths:
           description: Identity Gone
         '422':
           description: Can't create Identity's credentials
-  /identities/{crmContactId}/credentials/block:
+  /identities/{contactNumber}/credentials/block:
     put:
       summary: "Block Identity"
       operationId: blockIdentity
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -166,7 +166,7 @@ paths:
       summary: "Unblock Identity"
       operationId: unblockIdentity
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -176,13 +176,13 @@ paths:
           description: "Identity successfully unblocked"
         '410':
           description: Identity Gone
-  /identities/{crmContactId}/credentials/reset:
+  /identities/{contactNumber}/credentials/reset:
     post:
       summary: "Reset Identity credentials"
       description: "Method to reset Identity credentials"
       operationId: resetIdentityCredentials
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -194,13 +194,13 @@ paths:
           description: Identity Gone
         '422':
           description: Can't reset Identity's credentials
-  /identities/{crmContactId}/pin:
+  /identities/{contactNumber}/pin:
     post:
       summary: "Create/Reset Driver PIN"
       description: "Method to create/reset driver's PIN for given driver"
       operationId: "createDriverPin"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Driver Unique ID
           required: true
@@ -223,7 +223,7 @@ paths:
       summary: "Get Driver PIN"
       operationId: "getDriverPin"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Driver Unique ID
           required: true
@@ -241,7 +241,7 @@ paths:
       summary: "Delete Driver PIN"
       operationId: "deleteDriverPin"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Driver Unique ID
           required: true
@@ -251,13 +251,13 @@ paths:
           description: "Driver PIN has been deleted"
         '410':
           description: Driver Gone 
-  /identities/{crmContactId}/impersonate:
+  /identities/{contactNumber}/impersonate:
     post:
       summary: "Impersonate Identity"
       description: "Method for impersonation of specified Identity"
       operationId: "impersonateIdentity"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -267,13 +267,13 @@ paths:
           description: "Identity has been impersonated"
         '410':
           description: Identity Gone
-  /identities/{crmContactId}/logout:
+  /identities/{contactNumber}/logout:
     post:
       summary: "Logout Identity's session"
       description: "Method for logout session of specified Identity"
       operationId: "logoutIdentity"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
           required: true
@@ -283,12 +283,12 @@ paths:
           description: "Identity has been logged out of all sessions"
         '410':
           description: Identity Gone
-  /identities/{crmContactId}/roles/binary:
+  /identities/{contactNumber}/roles/binary:
     get:
       summary: "Get assigned Roles on Identity in Binary Representation"
       operationId: "getIdentityRolesBinary"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -300,12 +300,12 @@ paths:
           description: Identity's assigned Roles in Binary Representation 
         '410':
           description: Identity Gone  
-  /identities/{crmContactId}/roles:
+  /identities/{contactNumber}/roles:
     get:
       summary: "Get assigned Roles on Identity"
       operationId: "getIdentityRoles"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -323,7 +323,7 @@ paths:
       summary: "Assign roles on Identity"
       operationId: "assignIdentityRoles"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -344,7 +344,7 @@ paths:
       summary: "Unassign Roles on Identity"
       operationId: "unassignIdentityRoles"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -361,12 +361,12 @@ paths:
           description: Successfully unsassigned Roles from Identity
         '410':
           description: Identity Gone
-  /identities/{crmContactId}/roles/{roleId}:
+  /identities/{contactNumber}/roles/{roleId}:
     get:
       summary: "Get assigned Roles on Identity"
       operationId: "getIdentityRole"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -387,7 +387,7 @@ paths:
       summary: "Assign Role to Identity"
       operationId: "assignIdentityRole"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -408,7 +408,7 @@ paths:
       summary: "Remove Role on Identity"
       operationId: "unassignIdentityRole"
       parameters:
-        - name: crmContactId
+        - name: contactNumber
           in: path
           description: Filtering by Identity CRM ID
           required: true
@@ -436,7 +436,7 @@ paths:
           required: false
           type: string 
         - in: query
-          name: crmContactId
+          name: contactNumber
           description: Identity existency check by CRM Contact ID
           required: false
           type: string 
@@ -455,16 +455,16 @@ definitions:
     type: object
     description: "Basic information about Identity"
     required:
-      - crmAccountId
-      - crmContactId
+      - accountNumber
+      - contactNumber
     properties:
       identityId:
         type: string
         description: Identity's ID 
-      crmAccountId:
+      accountNumber:
         type: string
         description: Identity's CRM Account ID
-      crmContactId:
+      contactNumber:
         type: string
         description: Identity's Unique ID 
       nav4Id:
@@ -502,8 +502,8 @@ definitions:
         description: "User's default Locale"
         maxLength: 50  
     example:
-      crmAccountId: 31034
-      crmContactId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      accountNumber: 31034
+      contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       lastName: Novak
       firstName: Karel
       email: KajaN@eurowag.com
@@ -559,7 +559,7 @@ definitions:
         type: string
         description: "Role description"
         maxLength: 255
-      crmAccountId:
+      accountNumber:
         type: string
         description: Custom role for account
       translation:
