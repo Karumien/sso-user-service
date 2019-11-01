@@ -53,6 +53,7 @@ server:
   port: ${PORT:2205}
   servlet:
     contextPath: ${CONTEXT_PATH:/api/v1/iam}
+    swaggerPath: ${SWAGGER_PATH:/api/v1/iam}
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_URL:http://ew-sso-uat.westeurope.cloudapp.azure.com/auth}
   realm: ${KEYCLOAK_REALM:eurowag}

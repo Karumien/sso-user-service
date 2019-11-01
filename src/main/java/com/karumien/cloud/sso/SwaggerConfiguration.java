@@ -8,6 +8,9 @@ package com.karumien.cloud.sso;
 
 import java.util.Collections;
 
+import javax.servlet.ServletContext;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -18,6 +21,7 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -31,14 +35,22 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
+    @Value("${server.servlet.swaggerPath}")
+    private String swaggerPath;
     /**
      * Specification of REST Microservice API v1.0
      * 
      * @return {@link Docket} REST API specification
      */
     @Bean
-    public Docket api10() {
+    public Docket api10(ServletContext servletContext) {
         return new Docket(DocumentationType.SWAGGER_2).groupName("ew-sso-api-1.0")
+            .pathProvider(new RelativePathProvider(servletContext) {
+                @Override
+                public String getApplicationBasePath() {
+                    return swaggerPath;
+                }
+            })
             .select()
             .apis(RequestHandlerSelectors.basePackage("com.karumien.cloud.sso.api"))
             .paths(PathSelectors.any())
