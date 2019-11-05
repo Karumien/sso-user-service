@@ -34,13 +34,6 @@ paths:
           description: Successfully created
           schema:
             $ref: '#/definitions/IdentityInfo'
-            example:
-              contactNumber: 6287994b-0245-4ca7-8eb4-777230b2f91f
-              accountNumber: 31034
-              lastName: Novak
-              firstName: Karel
-              username: KajaN
-              email: KajaN@eurowag.com
         '409':
           description: Identity already exists (conflict username/contactNumber)
   /identities/{contactNumber}:
@@ -233,8 +226,6 @@ paths:
           description: "Driver PIN has been created/update"
           schema:
             $ref: '#/definitions/DriverPin'
-            example:
-              pin: "1234"
         '410':
           description: Driver or pin Gone  
     delete:
