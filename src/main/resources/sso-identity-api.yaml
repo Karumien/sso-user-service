@@ -3,7 +3,7 @@ info:
   description: EW REST API for SSO - Identity Service - Management of Identities (Users/Contacts)
   version: '1.0'
   termsOfService: 'http://www.karumien.com/terms/'
-  Identity:
+  contact:
     email: info@karumien.com
   title: Identity Service
   license:
