@@ -234,3 +234,49 @@ definitions:
         type: string
         description: "Policy translation"
         maxLength: 255
+  ErrorCode:
+    type: string
+    description: Master Error Code
+    enum:
+      - CLIENT_ERROR
+  ErrorData:
+    type: object
+    description: EW ErrorMessage model data
+    required:
+    - code
+    properties:
+      code:
+        type: string
+        description: ie. invalid-phone-number-format
+        maxLength: 50
+      attribute: 
+        type: string
+        maxLength: 250
+        description: ie. phoneNumberPrimary
+      description:
+        type: string
+        maxLength: 1000
+        description: ie. Invalid phone number format. Valid is XXX XXX XXX
+      data:
+        type: object
+  ErrorMessage:
+    type: object
+    description: EW ErrorMessage model
+    required:
+    - errno
+    - errcode
+    properties:
+      errno: 
+        type: integer
+        default: -1
+      errcode: 
+        $ref: "#/definitions/ErrorCode"
+      errmsg: 
+        type: string
+        maxLength: 250
+        description: Optional error message
+      errdata:
+        type: array
+        items:
+          $ref: "#/definitions/ErrorData"
+   

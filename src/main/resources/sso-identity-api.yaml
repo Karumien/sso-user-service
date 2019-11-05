@@ -126,7 +126,7 @@ paths:
       description: "Method to create Identity credentials for given customer"
       operationId: createIdentityNav4Credentials
       parameters:
-        - name: contactNumber
+        - name: nav4Id
           in: path
           description: Filtering by Identity unique NAV4 ID
           required: true
