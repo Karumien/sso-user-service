@@ -82,7 +82,7 @@ public class AuthController implements AuthApi  {
                 response = authService.loginByToken(user.getClientId(), user.getRefreshToken());
                 break;
             case PASSWORD:
-                response = authService.loginByUsernamePassword(user.getClientId(), user.getUsername(), user.getPassword());
+                response = authService.loginByUsernamePassword(user.getClientId(), user.getClientSecret(), user.getUsername(), user.getPassword());
                 break;
             case CLIENT_CREDENTIALS:
                 response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());

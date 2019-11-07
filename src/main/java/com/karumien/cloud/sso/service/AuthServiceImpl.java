@@ -140,9 +140,9 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponse loginByUsernamePassword(String clientId, String username, String password) {
+    public AuthorizationResponse loginByUsernamePassword(String clientId, String clientSecret, String username, String password) {
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
-            .clientId(StringUtils.isEmpty(clientId) ? this.clientId : clientId)
+            .clientId(StringUtils.isEmpty(clientId) ? this.clientId : clientId).clientSecret(clientSecret)
             .username(username).password(password).grantType(GrantType.PASSWORD.toString())           
             .build().tokenManager();
             

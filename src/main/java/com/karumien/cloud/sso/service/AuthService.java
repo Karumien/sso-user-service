@@ -40,7 +40,7 @@ public interface AuthService {
      */
     void logoutByToken(String token);
 
-    AuthorizationResponse loginByUsernamePassword(String clientId, String username, String password);
+    AuthorizationResponse loginByUsernamePassword(String clientId, String clientSecret, String username, String password);
 
     AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret);
 
@@ -51,5 +51,6 @@ public interface AuthService {
     String generatePassword();
 
     UsernamePolicy getUsernamePolicy();
+
 
 }
