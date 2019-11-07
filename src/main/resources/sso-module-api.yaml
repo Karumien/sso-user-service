@@ -96,15 +96,17 @@ definitions:
     properties:
       moduleId:
         type: string
-        example: "MODULE_TLM01"
+        example: "FINANCE"
         maxLength: 40
-      description:
+      name:
         type: string
-        example: "Map"
-        maxLength: 300
+        description: Name of group
+      translation:
+        type: string
+        description: Translated name of group
       businessPriority:
         type: integer
-        description: Order by priority (1 is highest priority/first)        
+        description: Order by priority (1 is highest priority/first)      
       groups:
         type: array
         items:
@@ -113,12 +115,20 @@ definitions:
     type: object
     description: Rigth's logical group
     properties:
-      code:
+      groupId:
         type: string
-        description: unique prefix ie. TLM_MOD
-      description:
+        description: unique prefix ie. FINANCE_TRANSACTION
+      name:
+        type: string
+        description: Name of group
+      translation:
         type: string
         description: Translated name of group
+      serviceId:
+        type: string
+        example: "SERVICE_TLM01"
+        maxLength: 40    
+        description: Filtered by buyed service by account
       businessPriority:
         type: integer
         description: Order by priority (1 is highest priority/first)

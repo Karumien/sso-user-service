@@ -29,8 +29,6 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  */
 public interface RoleService {
 
-    String ATTR_TRANSLATION = "translation";
-    
     String ATTR_BINARY_MASK = "binaryMask";
     
     /**
@@ -81,14 +79,14 @@ public interface RoleService {
     void assignRoleToIdentity(String clientId, RoleInfo role);
 
     /**
-     * Function that return all role that identity have signed
+     * Function that return all role that identity have assigned
      * 
      * @param contactNumber
      *            {@link String} ID of identity for what we want to find roles
      * 
      * @return {@link List} of {@link RoleInfo}
      */
-    List<RoleInfo> getAllRolesOfIdentity(String contactNumber);
+    List<RoleInfo> getRolesOfIdentity(String contactNumber);
 
     /**
      * Function that remove role from identity.
@@ -117,5 +115,15 @@ public interface RoleService {
      * @return {@link String} binary representation of roles of specified identity
      */
     String getRolesBinary(UserRepresentation userRepresentation);
+
+    /**
+     * Function that return all role that account have assigned
+     * 
+     * @param accountNumber
+     *            {@link String} ID of account for what we want to find roles
+     * 
+     * @return {@link List} of {@link RoleInfo}
+     */
+    List<RoleInfo> getRolesOfAccount(String accountNumber);
 
 }

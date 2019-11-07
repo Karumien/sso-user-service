@@ -1,6 +1,6 @@
 package com.karumien.cloud.sso.service;
 
-import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.PasswordPolicy;
 
 /**
  * Password Generator Service
@@ -10,6 +10,6 @@ import com.karumien.cloud.sso.api.model.Policy;
  */
 public interface PasswordGeneratorService {
 
-    String generate(Policy policy);
+    String generate(PasswordPolicy policy);
 
 }

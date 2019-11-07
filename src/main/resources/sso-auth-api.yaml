@@ -33,14 +33,24 @@ paths:
           description: "Generated New Password"
   /auth/password/policy:
     get:
-      summary: "Returns Password Policy for Identities"
+      summary: "Returns Password Policy"
       description: "Method for get Identity's password policy"
       operationId: "getPasswordPolicy"
       responses:
         '200':
           description: "Password Policy Settings"
           schema:
-            $ref: '#/definitions/Policy' 
+            $ref: '#/definitions/PasswordPolicy' 
+  /auth/username/policy:
+    get:
+      summary: "Returns Username Policy"
+      description: "Method for get Identity's username policy"
+      operationId: "getUsernamePolicy"
+      responses:
+        '200':
+          description: "Username Policy Settings"
+          schema:
+            $ref: '#/definitions/UsernamePolicy' 
   /auth/login:
     post:
       summary: Retrieve Authorization Token
@@ -176,7 +186,7 @@ definitions:
         refresh_token: a3sdwer3twe
         expires_in: 3600
         token_type: Bearer
-  Policy:
+  PasswordPolicy:
     type: object
     description: "Configuration object for Password Policy"
     properties:
@@ -185,11 +195,11 @@ definitions:
         description: "Full policy description"
       minSpecialChars:
         type: integer
-        description: "Minimum use special chars in password"
+        description: "Minimum use special chars"
         example: "1"       
       minUpperCase: 
         type: integer
-        description: "Minimum use upper case chars in password"
+        description: "Minimum use upper case chars"
         example: "1"
       minLength:
         type: integer
@@ -205,11 +215,11 @@ definitions:
         example: "3"
       minLowerCase:
         type: integer
-        description: "Minimum use lower case chars in password"
+        description: "Minimum use lower case chars"
         example: "1"
       minDigits:
         type: integer
-        description: "Minimum use digits in password"
+        description: "Minimum use digits"
         example: "1"
       passwordExpireDays:
         type: integer
@@ -234,6 +244,53 @@ definitions:
         type: string
         description: "Policy translation"
         maxLength: 255
+  UsernamePolicy:
+    type: object
+    description: "Configuration object for Username Policy"
+    properties:
+      value:
+        type: string
+        description: "Full policy description"
+      specialCharsOnly:
+        type: string
+        description: "Use only specified special chars"
+        default: "-_.@"
+      canSpecialCharStart:
+        type: boolean
+        description: "Can special char starts username"
+        default: false              
+      canSpecialCharEnd:
+        type: boolean
+        description: "Can special char ends username"
+        default: false              
+      canSpecialCharRepeated:
+        type: boolean
+        description: "Can special char repeated ie. a34..3"
+        default: false              
+      useUpperCase: 
+        type: boolean
+        description: "Use upper case chars"
+        default: false        
+      useLowerCase: 
+        type: boolean
+        description: "Use lower case chars"
+        default: true
+      minLength:
+        type: integer
+        description: "Minimum username length"
+        example: "8"
+      useDigits:
+        type: boolean
+        description: "Minimum use digits"
+        default: true
+      regexPattern:
+        type: string
+        description: "REGEX pattern for username validation"
+        example: ".*"
+      translation:
+        type: string
+        description: "Policy translation"
+        maxLength: 255  
   ErrorCode:
     type: string
     description: Master Error Code

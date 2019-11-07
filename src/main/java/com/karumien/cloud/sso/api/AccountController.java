@@ -27,6 +27,7 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
+import com.karumien.cloud.sso.service.RoleService;
 
 import io.swagger.annotations.Api;
 
@@ -48,6 +49,9 @@ public class AccountController implements AccountsApi {
 
     @Autowired
     private IdentityService identityService;
+    
+    @Autowired
+    private RoleService roleService;
 
     /**
      * {@inheritDoc}
@@ -238,8 +242,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<ModuleInfo>> getAccountHierarchy(String accountNumber) {
-        // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.getAccountHierarchy(accountNumber);
+        return new ResponseEntity<>(accountService.getAccountHierarchy(accountNumber), HttpStatus.OK);
     }
     
     /**
@@ -265,8 +268,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<RoleInfo>> getAccountRoles(String accountNumber) {
-        // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.getAccountRoles(accountNumber);
+        return new ResponseEntity<>(roleService.getRolesOfAccount(accountNumber), HttpStatus.OK);
     }
     
     /**
@@ -277,4 +279,5 @@ public class AccountController implements AccountsApi {
         identityService.createIdentityCredentials(contactNumber, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+    
 }

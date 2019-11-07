@@ -6,7 +6,7 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.PasswordPolicy;
 
 /**
  * Password Generator by Policy definition.
@@ -36,7 +36,7 @@ public class PasswordGeneratorServiceImpl implements PasswordGeneratorService {
      * {@inheritDoc}
      */
     @Override
-    public String generate(Policy policy) {
+    public String generate(PasswordPolicy policy) {
 
         Random random = new SecureRandom();
 

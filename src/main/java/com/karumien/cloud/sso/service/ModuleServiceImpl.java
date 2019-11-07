@@ -81,7 +81,6 @@ public class ModuleServiceImpl implements ModuleService {
         
         RoleInfo role = new RoleInfo();
         role.setRoleId(getRoleName(module.getModuleId()));
-        role.setDescription(module.getDescription());
 
         return mapping(roleService.createRole(role));
     }
@@ -107,7 +106,6 @@ public class ModuleServiceImpl implements ModuleService {
         //TODO viliam.litavec: Orika
         ModuleInfo module = new ModuleInfo();
         module.setModuleId(roleInfo.getRoleId().substring(ROLE_PREFIX.length()));
-        module.setDescription(roleInfo.getDescription());
         return module;
     }
 
@@ -120,7 +118,6 @@ public class ModuleServiceImpl implements ModuleService {
         //TODO viliam.litavec: Orika
         ModuleInfo module = new ModuleInfo();
         module.setModuleId(roleRepresentation.getName().substring(ROLE_PREFIX.length()));
-        module.setDescription(roleRepresentation.getDescription());
         return module;
     }
 

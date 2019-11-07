@@ -28,7 +28,8 @@ import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.GrantType;
-import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.PasswordPolicy;
+import com.karumien.cloud.sso.api.model.UsernamePolicy;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
@@ -133,8 +134,16 @@ public class AuthController implements AuthApi  {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Policy> getPasswordPolicy() {
+    public ResponseEntity<PasswordPolicy> getPasswordPolicy() {
         return new ResponseEntity<>(authService.getPasswordPolicy(), HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<UsernamePolicy> getUsernamePolicy() {
+        return new ResponseEntity<>(authService.getUsernamePolicy(), HttpStatus.OK);
     }
     
     private String decodeJWT(String jwtToken) {

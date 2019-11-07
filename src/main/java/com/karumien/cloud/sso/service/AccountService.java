@@ -14,6 +14,7 @@ import org.keycloak.representations.idm.GroupRepresentation;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.ModuleInfo;
 
 /**
  * Service provides scenarios for Account's management.
@@ -25,11 +26,21 @@ public interface AccountService {
 
     String MASTER_GROUP = "Accounts";
 
+    String SELFCARE_GROUP = "SelfCare";
+
     String ATTR_COMP_REG_NO = "compRegNo";
 
     String ATTR_ACCOUNT_NUMBER = "accountNumber";
 
     String ATTR_CONTACT_EMAIL = "contactEmail";
+
+    String ATTR_MODULE_ID = "moduleId";
+
+    String ATTR_RIGHT_GROUP_ID = "groupId";
+    
+    String ATTR_SERVICE_ID = "serviceId";
+
+    String ATTR_BUSINESS_PRIORITY = "businessPriority";
 
     AccountInfo createAccount(AccountInfo account);
 
@@ -55,18 +66,18 @@ public interface AccountService {
     List<IdentityInfo> getAccountIdentities(String accountNumber, List<String> contactNumber);
 
     /**
-     * Return {@link IdentityInfo} for account and contractra ID
+     * Return {@link IdentityInfo} for account and contact ID
      * 
      * @param accountNumber
      *            {@link String} Account ID
      * @param contactNumber
-     *            {@link String} ID of contract
+     *            {@link String} ID of contact
      * @return {@link IdentityInfo} identity info for selected crmContractId
      */
     IdentityInfo getAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber);
 
     /**
-     * Remove identity from account members base on contract Id
+     * Remove identity from account members base on contact Id
      * 
      * @param accountNumber
      *            {@link String} id of Account
@@ -84,4 +95,13 @@ public interface AccountService {
      * @return {@link Boolean} return true if user name was already used and false if not
      */
     boolean checkIfUserNameExist(String username);
+
+    /**
+     * Returns hierarchy information filtered by buyed services.
+     * 
+     * @param accountNumber
+     *            {@link String} id of Account
+     * @return {@link List} of {@link ModuleInfo} with right groups definitions
+     */
+    List<ModuleInfo> getAccountHierarchy(String accountNumber);
 }

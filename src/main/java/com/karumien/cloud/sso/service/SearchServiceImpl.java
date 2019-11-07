@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.karumien.cloud.sso.api.repository.GroupAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserAttributeRepository;
 
 /**
@@ -26,6 +27,9 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private UserAttributeRepository userAttributeRepository;
 
+    @Autowired
+    private GroupAttributeRepository groupAttributeRepository;
+
     /**
      * {@inheritDoc}
      */
@@ -35,4 +39,12 @@ public class SearchServiceImpl implements SearchService {
         return userAttributeRepository.findUserIdsByAttribute(attribute, value);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> findGroupIdsByAttribute(String attribute, String value) {
+        return groupAttributeRepository.findGroupIdsByAttribute(attribute, value);
+    }
 }

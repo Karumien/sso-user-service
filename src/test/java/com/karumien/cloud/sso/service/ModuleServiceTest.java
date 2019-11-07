@@ -55,11 +55,9 @@ public class ModuleServiceTest {
         
         ModuleInfo module = new ModuleInfo();
         module.setModuleId(moduleId);
-        module.setDescription("TEST-MODULE");
         
         ModuleInfo moduleCreated = moduleService.createModule(module);
         Assert.assertEquals(moduleCreated.getModuleId(), moduleId);
-        Assert.assertEquals(moduleCreated.getDescription(), "TEST-MODULE");
 
 //        ModuleInfo moduleUpdated = moduleService.udateModule(module);
 //        Assert.assertEquals(module.getModuleId(), "TEST" + id);
@@ -67,7 +65,6 @@ public class ModuleServiceTest {
                 
         ModuleInfo moduleFound = moduleService.getModule(moduleId);
         Assert.assertEquals(moduleFound.getModuleId(), moduleId);
-        Assert.assertEquals(moduleFound.getDescription(), "TEST-MODULE");
 
         moduleService.deleteModule(moduleId);
     }
@@ -90,12 +87,10 @@ public class ModuleServiceTest {
         
         ModuleInfo module = new ModuleInfo();
         module.setModuleId(moduleId);
-        module.setDescription("TEST-MODULE");
         
         ModuleInfo module1 = new ModuleInfo();
         module1.setModuleId(moduleId + "B");
-        module1.setDescription("TEST-MODULE-B");
-
+        
         AccountInfo account = new AccountInfo();
         account.setAccountNumber(accountNumber);
         account.setName("COMPANY" + moduleId);

@@ -41,12 +41,16 @@ import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.ModuleInfo;
+import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -72,16 +76,20 @@ public class AccountServiceImpl implements AccountService {
     
     @Autowired
     private SearchService searchService;
+    
+    @Autowired
+    private LocalizationService localizationService;
 
-    private GroupRepresentation getMasterGroup() {
+
+    private GroupRepresentation getMasterGroup(String groupKey) {
 
         // TODO viliam.litavec: Optimize performance - use stored group id for MASTER_GROUP
         try {
-            return keycloak.realm(realm).getGroupByPath("/" + MASTER_GROUP);
+            return keycloak.realm(realm).getGroupByPath("/" + groupKey);
         } catch (NotFoundException e) {
             // autocreate
             GroupRepresentation newMasterGroup = new GroupRepresentation();
-            newMasterGroup.setName(MASTER_GROUP);
+            newMasterGroup.setName(groupKey);
             keycloak.realm(realm).groups().add(newMasterGroup);
             return newMasterGroup;
         }
@@ -91,9 +99,13 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
-    public Optional<GroupRepresentation> findGroup(String accountNumber) {
-        return getMasterGroup().getSubGroups().stream()
-                .filter(g -> searchService.containsAttribute(g.getAttributes(), ATTR_ACCOUNT_NUMBER, accountNumber)).findFirst();
+    public Optional<GroupRepresentation> findGroup(String accountNumber) {        
+        String groupId = searchService.findGroupIdsByAttribute(ATTR_ACCOUNT_NUMBER, accountNumber).stream().findFirst().orElse(null);
+        return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
+//
+//        
+//        return getMasterGroup().getSubGroups().stream()
+//                .filter(g -> searchService.containsAttribute(g.getAttributes(), ATTR_ACCOUNT_NUMBER, accountNumber)).findFirst();
     }
 
     /**
@@ -128,11 +140,23 @@ public class AccountServiceImpl implements AccountService {
             group.singleAttribute(ATTR_CONTACT_EMAIL, account.getContactEmail());
         }
 
-        getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup().getId()).subGroup(group));
+        getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup(MASTER_GROUP).getId()).subGroup(group));
 
         // TODO: caches?
         keycloak.realm(realm).clearRealmCache();
         return getAccount(account.getAccountNumber());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
+        //AccountInfo accountInfo = getAccount(accountNumber);
+        //TODO: apply buyed services
+        return getMasterGroup(SELFCARE_GROUP).getSubGroups().stream()
+           .map(g -> mappingModule(g))
+           .collect(Collectors.toList());               
     }
 
     /**
@@ -174,7 +198,45 @@ public class AccountServiceImpl implements AccountService {
 
         return accountInfo;
     }
+    
+    private ModuleInfo mappingModule(GroupRepresentation group) {
 
+        // TODO viliam: Orica
+        ModuleInfo moduleInfo = new ModuleInfo();
+        moduleInfo.setName(group.getName());
+        moduleInfo.setModuleId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_MODULE_ID).orElse(null));
+        String businessPriority = searchService.getSimpleAttribute(group.getAttributes(), ATTR_BUSINESS_PRIORITY).orElse(null);
+        if (businessPriority != null) {
+            moduleInfo.setBusinessPriority(NumberUtils.parseNumber(businessPriority, Integer.class));
+        }
+        moduleInfo.setTranslation(localizationService.translate(
+                moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(), 
+                        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
+        
+        moduleInfo.setGroups(group.getSubGroups().stream()
+            .map(rg -> mappingRightGroup(rg))
+            .collect(Collectors.toList()));
+        return moduleInfo;
+    }
+    
+    private RightGroup mappingRightGroup(GroupRepresentation group) {
+
+        // TODO viliam: Orica
+        RightGroup rightGroup = new RightGroup();
+        rightGroup.setName(group.getName());
+        rightGroup.setGroupId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_RIGHT_GROUP_ID).orElse(null));
+        rightGroup.setServiceId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_SERVICE_ID).orElse(null));
+        String businessPriority = searchService.getSimpleAttribute(group.getAttributes(), ATTR_BUSINESS_PRIORITY).orElse(null);
+        if (businessPriority != null) {
+            rightGroup.setBusinessPriority(NumberUtils.parseNumber(businessPriority, Integer.class));
+        }
+        rightGroup.setTranslation(localizationService.translate(
+                rightGroup.getGroupId() == null ? null : "group" + "." + rightGroup.getGroupId().toLowerCase(), 
+                        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
+        
+        return rightGroup;
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -188,7 +250,9 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<AccountInfo> getAccounts() {
-        return getMasterGroup().getSubGroups().stream().filter(g -> g.getAttributes().containsKey(ATTR_ACCOUNT_NUMBER)).map(g -> mapping(g))
+        return getMasterGroup(MASTER_GROUP).getSubGroups().stream()
+                .filter(g -> g.getAttributes().containsKey(ATTR_ACCOUNT_NUMBER))
+                .map(g -> mapping(g))
                 .collect(Collectors.toList());
     }
 

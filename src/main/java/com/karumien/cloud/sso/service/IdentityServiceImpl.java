@@ -293,7 +293,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public List<RoleInfo> getAllIdentityRoles(String contactNumber) {
-        return roleService.getAllRolesOfIdentity(contactNumber);
+        return roleService.getRolesOfIdentity(contactNumber);
     }
 
     /**

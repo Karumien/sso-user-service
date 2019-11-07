@@ -14,27 +14,27 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.karumien.cloud.sso.api.entity.UserAttribute;
+import com.karumien.cloud.sso.api.entity.GroupAttribute;
 
 /**
- * Repository for operations on {@link UserAttribute}.
+ * Repository for operations on {@link GroupAttribute}.
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
- * @since 1.0, 4. 10. 2019 11:20:57
+ * @since 1.0, 6. 11. 2019 11:20:57
  */
 @Repository
-public interface UserAttributeRepository extends JpaSpecificationExecutor<UserAttribute>, JpaRepository<UserAttribute, String> {
+public interface GroupAttributeRepository extends JpaSpecificationExecutor<GroupAttribute>, JpaRepository<GroupAttribute, String> {
 
     /**
      * Search Users by UserAttribute name and value.
      * 
      * @param attribute
-     *            name ie contactNumber
+     *            name ie accountNumber
      * @param value
      *            specific value of attribute
      * @return {@link List} of User's IDs
      */
-    @Query("select ua.userId from UserAttribute ua where ua.name = :attribute and ua.value = :value")
-    List<String> findUserIdsByAttribute(@Param("attribute") String attribute, @Param("value") String value);
+    @Query("select ga.groupId from GroupAttribute ga where ga.name = :attribute and ga.value = :value")
+    List<String> findGroupIdsByAttribute(@Param("attribute") String attribute, @Param("value") String value);
 
 }

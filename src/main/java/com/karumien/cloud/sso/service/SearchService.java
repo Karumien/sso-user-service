@@ -24,12 +24,24 @@ public interface SearchService {
      * Search Users by UserAttribute name and value.
      * 
      * @param attribute
-     *            attribute name ie. crmContractId
+     *            attribute name ie. contactNumber
      * @param value
      *            specific value of attribute
      * @return {@link List} of User's IDs
      */
     List<String> findUserIdsByAttribute(String attribute, String value);
+
+    /**
+     * Search Groups by UserAttribute name and value.
+     * 
+     * @param attribute
+     *            attribute name ie. contactNumber
+     * @param value
+     *            specific value of attribute
+     * @return {@link List} of User's IDs
+     */
+    List<String> findGroupIdsByAttribute(String attribute, String value);
+
     
     default Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
         if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {

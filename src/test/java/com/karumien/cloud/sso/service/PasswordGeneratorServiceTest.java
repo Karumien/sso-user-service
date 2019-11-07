@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.PasswordPolicy;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -26,7 +26,7 @@ public class PasswordGeneratorServiceTest {
     @Test
     public void testMinLength() {
         
-        Policy policy = new Policy();
+        PasswordPolicy policy = new PasswordPolicy();
         assertEquals(passwordGeneratorService.generate(policy).length(), 6);        
         
         policy.setMinLength(16);
@@ -36,7 +36,7 @@ public class PasswordGeneratorServiceTest {
     @Test
     public void testFullPolicy() {
         
-        Policy policy = new Policy();
+        PasswordPolicy policy = new PasswordPolicy();
         policy.setMinLength(12);
         policy.setMinDigits(3);
         policy.setMinSpecialChars(3);

@@ -7,7 +7,8 @@
 package com.karumien.cloud.sso.service;
 
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
-import com.karumien.cloud.sso.api.model.Policy;
+import com.karumien.cloud.sso.api.model.PasswordPolicy;
+import com.karumien.cloud.sso.api.model.UsernamePolicy;
 
 /**
  * Service provides scenatios for authentication's tokens management.
@@ -29,7 +30,7 @@ public interface AuthService {
      * 
      * @return {@link Policy} configuration of Password Policy
      */
-    Policy getPasswordPolicy();
+    PasswordPolicy getPasswordPolicy();
 
     /**
      * Logout user by token.
@@ -48,5 +49,7 @@ public interface AuthService {
     AuthorizationResponse loginByImpersonator(String clienId, String refreshToken, String username);
 
     String generatePassword();
+
+    UsernamePolicy getUsernamePolicy();
 
 }
