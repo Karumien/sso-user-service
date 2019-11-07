@@ -152,7 +152,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-        //AccountInfo accountInfo = getAccount(accountNumber);
+        AccountInfo accountInfo = getAccount(accountNumber);
         //TODO: apply buyed services
         return getMasterGroup(SELFCARE_GROUP).getSubGroups().stream()
            .map(g -> mappingModule(g))
