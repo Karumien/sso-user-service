@@ -27,7 +27,6 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -102,10 +101,6 @@ public class AccountServiceImpl implements AccountService {
     public Optional<GroupRepresentation> findGroup(String accountNumber) {        
         String groupId = searchService.findGroupIdsByAttribute(ATTR_ACCOUNT_NUMBER, accountNumber).stream().findFirst().orElse(null);
         return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
-//
-//        
-//        return getMasterGroup().getSubGroups().stream()
-//                .filter(g -> searchService.containsAttribute(g.getAttributes(), ATTR_ACCOUNT_NUMBER, accountNumber)).findFirst();
     }
 
     /**
@@ -142,8 +137,7 @@ public class AccountServiceImpl implements AccountService {
 
         getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup(MASTER_GROUP).getId()).subGroup(group));
 
-        // TODO: caches?
-        keycloak.realm(realm).clearRealmCache();
+//        keycloak.realm(realm).clearRealmCache();
         return getAccount(account.getAccountNumber());
     }
     
@@ -152,7 +146,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-        AccountInfo accountInfo = getAccount(accountNumber);
+        getAccount(accountNumber);
         //TODO: apply buyed services
         return getMasterGroup(SELFCARE_GROUP).getSubGroups().stream()
            .map(g -> mappingModule(g))
@@ -260,11 +254,13 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo getAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber) {
-        Optional<IdentityInfo> identityFind = getAccountIdentities(accountNumber, Arrays.asList(contactNumber))
-                .stream().filter(identity -> identity.getContactNumber().equals(contactNumber))
-                .findAny();
-        return identityFind.orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+    public IdentityInfo getAccountIdentity(String accountNumber, String contactNumber) {
+        getAccount(accountNumber);
+        IdentityInfo identity = identityService.getIdentity(contactNumber);
+        if (accountNumber != null && accountNumber.equals(identity.getAccountNumber())) {
+            return identity;
+        }
+        throw new IdentityNotFoundException(contactNumber);
     }
 
     /**
@@ -285,9 +281,9 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
 	@Override
-	public boolean deleteAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber) {
-	    IdentityInfo identityInfo = getAccountIdentityBaseOnCrmContractId(accountNumber, contactNumber);	    
-		identityService.deleteIdentity(identityInfo.getContactNumber());
+	public boolean deleteAccountIdentity(String accountNumber, String contactNumber) {
+	    getAccountIdentity(accountNumber, contactNumber);	    
+		identityService.deleteIdentity(contactNumber);
 		return true;
 	}
 

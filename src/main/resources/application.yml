@@ -35,8 +35,8 @@ spring:
     console:
       enabled: false
   datasource:
-    url: jdbc:postgresql://${DB_ADDR:perf-db.postgres.database.azure.com}:${DB_PORT:5432}/${DB_DATABASE:perf}
-    username: ${DB_USER:perfdbadmin@perf-db}
+    url: jdbc:postgresql://${DB_ADDR:localhost}:${DB_PORT:5432}/${DB_DATABASE:postgres}
+    username: ${DB_USER:postgresadmin}
     password: ${DB_PASSWORD:admMe123}
     driverClassName: org.postgresql.Driver    
     testOnBorrow: true
@@ -55,7 +55,7 @@ server:
     contextPath: ${CONTEXT_PATH:/api/v1/iam}
     swaggerPath: ${SWAGGER_PATH:/api/v1/iam}
 keycloak:
-  auth-server-url: ${KEYCLOAK_AUTH_URL:http://ew-sso-uat.westeurope.cloudapp.azure.com/auth}
+  auth-server-url: ${KEYCLOAK_AUTH_URL:http://localhost/auth}
   realm: ${KEYCLOAK_REALM:eurowag}
   username: ${KEYCLOAK_USER:wagadmin}
   password: ${KEYCLOAK_PASSWORD:xara2002}

@@ -112,12 +112,12 @@ public class IdentityServiceImpl implements IdentityService {
         identity.singleAttribute(ATTR_ACCOUNT_NUMBER, 
                 Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
 
+        String groupId = accountService.findGroup(identityInfo.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber())).getId();
+
         Response response = keycloak.realm(realm).users().create(identity);        
         identityInfo.setIdentityId(getCreatedId(response));
         
-        String groupId = accountService.findGroup(identityInfo.getAccountNumber())
-            .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber())).getId();
-       
         keycloak.realm(realm).users().get(identityInfo.getIdentityId()).joinGroup(groupId);
             
         return identityInfo;
@@ -185,12 +185,12 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, contactNumber).stream().findFirst().orElse(null);
+        List<String> userIds = searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, contactNumber);
+        if (userIds.size() > 1) {
+            throw new IdentityDuplicateException(contactNumber);            
+        }        
+        String userId = userIds.stream().findFirst().orElse(null);
         return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
-//   keycloak.realm(realm).users().list().stream()
-//            .filter(g -> g.getAttributes() != null)
-//            .filter(g -> g.getAttributes().containsKey(ATTR_CRM_CONTACT_ID))
-//            .filter(g -> g.getAttributes().get(ATTR_CRM_CONTACT_ID).contains(contactNumber)).findFirst();
     }
 
     /**

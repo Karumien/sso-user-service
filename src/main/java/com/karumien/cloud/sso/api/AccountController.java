@@ -160,7 +160,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> getAccountIdentity(String accountNumber, String contactNumber) {
-        return new ResponseEntity<>(accountService.getAccountIdentityBaseOnCrmContractId(accountNumber, contactNumber), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.getAccountIdentity(accountNumber, contactNumber), HttpStatus.OK);
     }
 
     /**
@@ -168,7 +168,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> deleteAccountIdentity(String accountNumber, String contactNumber) {
-		return new ResponseEntity<>(accountService.deleteAccountIdentityBaseOnCrmContractId(accountNumber, contactNumber)? HttpStatus.OK : HttpStatus.GONE);
+		return new ResponseEntity<>(accountService.deleteAccountIdentity(accountNumber, contactNumber)? HttpStatus.OK : HttpStatus.GONE);
 	}
     
     /**

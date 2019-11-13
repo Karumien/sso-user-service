@@ -44,7 +44,7 @@ paths:
       parameters:
         - name: contactNumber
           in: path
-          description: Filtering by Identity unique CRM ID
+          description: Filtering by Identity unique CRM Contact Number
           required: true
           type: string       
       responses:
@@ -52,8 +52,10 @@ paths:
           description: Successfully returned Identity's info
           schema:
             $ref: '#/definitions/IdentityInfo'
+        '409':
+          description: Duplicate Identity by CRM Contact Number
         '410':
-          description: Gone
+          description: Identity Not Found
     delete:
       summary: "Remove existing Identity"
       operationId: deleteIdentity

@@ -74,7 +74,7 @@ public interface AccountService {
      *            {@link String} ID of contact
      * @return {@link IdentityInfo} identity info for selected crmContractId
      */
-    IdentityInfo getAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber);
+    IdentityInfo getAccountIdentity(String accountNumber, String contactNumber);
 
     /**
      * Remove identity from account members base on contact Id
@@ -85,7 +85,7 @@ public interface AccountService {
      *            {@link String} ID of Contract
      * @return {@link Boolean} value if we ware successfull of not
      */
-    boolean deleteAccountIdentityBaseOnCrmContractId(String accountNumber, String contactNumber);
+    boolean deleteAccountIdentity(String accountNumber, String contactNumber);
 
     /**
      * Check if this username is already used for some user
