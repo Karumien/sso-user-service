@@ -57,7 +57,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> deleteIdentity(String contactNumber) {
         identityService.deleteIdentity(contactNumber);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -100,7 +100,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRole(String contactNumber, String roleId) {
-        return new ResponseEntity<>(identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+        identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     /**
@@ -108,8 +109,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRole(String contactNumber, String roleId) {
-        return new ResponseEntity<>(
-                identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId)) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+        identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -117,7 +118,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRoles(String contactNumber, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.assignRolesToIdentity(contactNumber, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+        identityService.assignRolesToIdentity(contactNumber, roles);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     /**
@@ -125,7 +127,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRoles(String contactNumber, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.unassignRolesToIdentity(contactNumber, roles) ? HttpStatus.ACCEPTED : HttpStatus.NOT_EXTENDED);
+        identityService.unassignRolesToIdentity(contactNumber, roles);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -160,7 +163,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> blockIdentity(String contactNumber) {
         identityService.blockIdentity(contactNumber, true);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
     /**
@@ -169,7 +172,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> unblockIdentity(String contactNumber) {
         identityService.blockIdentity(contactNumber, false);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -187,7 +190,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> deleteDriverPin(String contactNumber) {
         identityService.removePinOfIdentityDriver(contactNumber);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**

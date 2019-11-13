@@ -112,9 +112,8 @@ public interface IdentityService {
      *            unique Identity CRM ID
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to add to identity
-     * @return {@link Boolean} return true if we successfully assign roles false if not
      */
-    boolean assignRolesToIdentity(String contactNumber, @Valid List<String> roles);
+    void assignRolesToIdentity(String contactNumber, @Valid List<String> roles);
 
     /**
      * Remove selected list of roles to as current Identity.
@@ -123,9 +122,8 @@ public interface IdentityService {
      *            unique Identity CRM ID
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to remove from identity
-     * @return {@link Boolean} return true if we successfully remove roles false if not
      */
-    boolean unassignRolesToIdentity(String contactNumber, @Valid List<String> roles);
+    void unassignRolesToIdentity(String contactNumber, @Valid List<String> roles);
 
     /**
      * Return all roles that are assigned to selected identity.

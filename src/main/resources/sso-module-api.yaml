@@ -26,7 +26,7 @@ paths:
             $ref: '#/definitions/ModuleInfo'
       responses:
         '201':
-          description: Successfully created
+          description: Successfully created Module
           schema:
             $ref: '#/definitions/ModuleInfo'
     get:
@@ -56,7 +56,7 @@ paths:
           schema:
             $ref: '#/definitions/ModuleInfo'
         '410':
-          description: Gone
+          description: Module not found
     put:
       summary: "Update informations about module"
       operationId: "updateModule"
@@ -67,12 +67,12 @@ paths:
           required: true
           type: string       
       responses:
-        '200':
+        '202':
           description: Successfully updated Module's Info
           schema:
             $ref: '#/definitions/ModuleInfo'
         '410':
-          description: Gone
+          description: Module not found
     delete:
       summary: "Remove existing Module"
       operationId: "deleteModule"
@@ -83,7 +83,7 @@ paths:
           required: true
           type: string       
       responses:
-        '200':
+        '204':
           description: Successfully removed existing Module
         '410':
           description: Module Gone

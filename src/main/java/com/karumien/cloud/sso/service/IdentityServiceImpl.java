@@ -251,13 +251,12 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public boolean assignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
+    public void assignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
     	UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
     	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);        
     	user.roles().realmLevel().add(list);
     	refreshBinaryRoles(userRepresentation);
-    	return true;
     }
 
     /**
@@ -279,13 +278,12 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public boolean unassignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
+    public void unassignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
         UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
         user.roles().realmLevel().remove(list);
         refreshBinaryRoles(userRepresentation);
-        return true;
     }
 
     /**

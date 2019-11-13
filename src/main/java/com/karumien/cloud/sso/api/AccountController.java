@@ -67,7 +67,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> deleteAccount(String accountNumber) {
         accountService.deleteAccount(accountNumber);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -111,7 +111,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> deactivateAccountModules(String accountNumber, @Valid List<String> modules) {
         moduleService.deactivateModules(modules, Arrays.asList(accountNumber));
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -168,7 +168,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> deleteAccountIdentity(String accountNumber, String contactNumber) {
-		return new ResponseEntity<>(accountService.deleteAccountIdentity(accountNumber, contactNumber)? HttpStatus.OK : HttpStatus.GONE);
+		return new ResponseEntity<>(accountService.deleteAccountIdentity(accountNumber, contactNumber)? HttpStatus.NO_CONTENT : HttpStatus.GONE);
 	}
     
     /**
@@ -176,7 +176,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.assignRolesToIdentity(contactNumber, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        identityService.assignRolesToIdentity(contactNumber, roles);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
     /**
@@ -193,7 +194,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> unassignAccountIdentityRoles(String accountNumber, String contactNumber, @Valid List<String> roles) {
-        return new ResponseEntity<>(identityService.unassignRolesToIdentity(contactNumber, roles) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        identityService.unassignRolesToIdentity(contactNumber, roles);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
@@ -201,7 +203,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
-        return new ResponseEntity<>(identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
     /**
@@ -209,7 +212,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> unassignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
-        return new ResponseEntity<>(identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId)) ? HttpStatus.OK : HttpStatus.NOT_EXTENDED);
+        identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
     /**

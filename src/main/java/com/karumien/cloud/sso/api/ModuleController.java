@@ -54,7 +54,7 @@ public class ModuleController implements ModulesApi {
     @Override
     public ResponseEntity<Void> deleteModule(String moduleId) {
         moduleService.deleteModule(moduleId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     /**
