@@ -295,21 +295,26 @@ paths:
           description: Identity Not Found  
   /identities/{contactNumber}/roles:
     get:
-      summary: "Get assigned Roles on Identity"
-      operationId: "getIdentityRoles"
+      summary: "Get Identity's Roles Ids"
+      operationId: getIdentityRoleIds
       parameters:
+#        - name: accountNumber
+#          in: path
+#          description: Filtering by Account unique CRM ID
+#          required: true
+#          type: string
         - name: contactNumber
           in: path
-          description: Filtering by Identity CRM ID
+          description: Filtering by Identity unique CRM ID
           required: true
-          type: string   
+          type: string       
       responses:
         '200':
-          description: Identity's assigned roles
+          description: Successfully returned Identity's Roles
           schema:
             type: array
             items:
-              $ref: '#/definitions/RoleInfo'
+              type: string
         '410':
           description: Identity Not Found
     put:

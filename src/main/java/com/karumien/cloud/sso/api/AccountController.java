@@ -8,7 +8,6 @@ package com.karumien.cloud.sso.api;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -179,15 +178,6 @@ public class AccountController implements AccountsApi {
         identityService.assignRolesToIdentity(contactNumber, roles);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<List<String>> getAccountIdentityRoleIds(String accountNumber, String contactNumber) {
-        return new ResponseEntity<>(
-            identityService.getAllIdentityRoles(contactNumber).stream().map(r -> r.getRoleId()).collect(Collectors.toList()), HttpStatus.OK);
-    }
 
     /**
      * {@inheritDoc}
@@ -254,8 +244,16 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<IdentityRoleInfo>> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers) {
-        // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.getAccountIdentitiesRoles(accountNumber, contactNumbers);
+        return new ResponseEntity<>(accountService.getAccountIdentitiesRoles(accountNumber, contactNumbers), HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<String>> getAccountIdentityRoleIds(String accountNumber, String contactNumber) {
+        getAccountIdentity(accountNumber, contactNumber);
+        return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber), HttpStatus.OK);
     }
     
     /**
@@ -263,8 +261,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<String>> getAccountIdentityRightIds(String accountNumber, String contactNumber) {
-        // TODO viliam.litavec: Need implementation
-        return AccountsApi.super.getAccountIdentityRightIds(accountNumber, contactNumber);
+        getAccountIdentity(accountNumber, contactNumber);
+        return new ResponseEntity<>(accountService.getAccountRightsOfIdentity(contactNumber), HttpStatus.OK);
     }
     
     /**
@@ -272,7 +270,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<RoleInfo>> getAccountRoles(String accountNumber) {
-        return new ResponseEntity<>(roleService.getRolesOfAccount(accountNumber), HttpStatus.OK);
+        return new ResponseEntity<>(accountService.getAccountRoles(accountNumber), HttpStatus.OK);
     }
     
     /**
@@ -280,6 +278,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> createIdentityCredentials(String accountNumber, String contactNumber, Credentials credentials) {
+        getAccountIdentity(accountNumber, contactNumber);
         identityService.createIdentityCredentials(contactNumber, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

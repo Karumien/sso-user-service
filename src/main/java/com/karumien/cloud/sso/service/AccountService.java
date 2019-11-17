@@ -9,12 +9,16 @@ package com.karumien.cloud.sso.service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 
 /**
  * Service provides scenarios for Account's management.
@@ -37,7 +41,7 @@ public interface AccountService {
     String ATTR_MODULE_ID = "moduleId";
 
     String ATTR_RIGHT_GROUP_ID = "groupId";
-    
+
     String ATTR_SERVICE_ID = "serviceId";
 
     String ATTR_BUSINESS_PRIORITY = "businessPriority";
@@ -58,9 +62,9 @@ public interface AccountService {
      * Return all identidities that are under this account
      * 
      * @param accountNumber
-     *            {@link String} id of account
+     *            Account CRM ID
      * @param contactNumbers
-     *            List of {@link String} id of identities for filter
+     *            IDs of identities for filter
      * @return {@link List} {@link IdentityInfo} list of identities
      */
     List<IdentityInfo> getAccountIdentities(String accountNumber, List<String> contactNumber);
@@ -69,9 +73,9 @@ public interface AccountService {
      * Return {@link IdentityInfo} for account and contact ID
      * 
      * @param accountNumber
-     *            {@link String} Account ID
+     *            Account CRM ID
      * @param contactNumber
-     *            {@link String} ID of contact
+     *            Contact CRM ID
      * @return {@link IdentityInfo} identity info for selected crmContractId
      */
     IdentityInfo getAccountIdentity(String accountNumber, String contactNumber);
@@ -80,9 +84,9 @@ public interface AccountService {
      * Remove identity from account members base on contact Id
      * 
      * @param accountNumber
-     *            {@link String} id of Account
+     *            Account CRM ID
      * @param contactNumber
-     *            {@link String} ID of Contract
+     *            Contact CRM ID
      * @return {@link Boolean} value if we ware successfull of not
      */
     boolean deleteAccountIdentity(String accountNumber, String contactNumber);
@@ -91,7 +95,7 @@ public interface AccountService {
      * Check if this username is already used for some user
      * 
      * @param username
-     *            {@link String} user name to check
+     *            username to check
      * @return {@link Boolean} return true if user name was already used and false if not
      */
     boolean checkIfUserNameExist(String username);
@@ -100,8 +104,21 @@ public interface AccountService {
      * Returns hierarchy information filtered by buyed services.
      * 
      * @param accountNumber
-     *            {@link String} id of Account
+     *            Account CRM ID
      * @return {@link List} of {@link ModuleInfo} with right groups definitions
      */
     List<ModuleInfo> getAccountHierarchy(String accountNumber);
+
+    /**
+     * Return roles for account (global and custom)
+     * 
+     * @param accountNumber
+     *            Account CRM ID
+     * @return
+     */
+    List<RoleInfo> getAccountRoles(String accountNumber);
+
+    List<String> getAccountRightsOfIdentity(String contactNumber);
+
+    List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers);
 }

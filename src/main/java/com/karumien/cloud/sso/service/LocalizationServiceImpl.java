@@ -40,14 +40,16 @@ public class LocalizationServiceImpl implements LocalizationService {
     @Override
     public String translate(String localeKey, Map<String, List<String>> attributes, Locale locale, String defaultTranslate) {
         String translate = null;
-        List<String> translates = attributes.get(ATTR_TRANSLATION + "[" + locale.getLanguage() + "]");
-        if (!CollectionUtils.isEmpty(translates)) {
-            translate = translates.get(0);
-        }
-        if (translate == null) {
-            translates = attributes.get(ATTR_TRANSLATION);
+        if (attributes != null) {
+            List<String> translates = attributes.get(ATTR_TRANSLATION + "[" + locale.getLanguage() + "]");
             if (!CollectionUtils.isEmpty(translates)) {
                 translate = translates.get(0);
+            }
+            if (translate == null) {
+                translates = attributes.get(ATTR_TRANSLATION);
+                if (!CollectionUtils.isEmpty(translates)) {
+                    translate = translates.get(0);
+                }
             }
         }
         if (translate == null && localeKey != null) {

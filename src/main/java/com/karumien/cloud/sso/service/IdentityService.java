@@ -16,7 +16,6 @@ import org.keycloak.representations.idm.UserRepresentation;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.RoleInfo;
 
 /**
  * Service provides scenarios for Identity's management.
@@ -60,7 +59,7 @@ public interface IdentityService {
      *            unique Identity CRM ID
      */
     void deleteIdentity(String contactNumber);
-    
+
     /**
      * Create/update Identity credentials
      * 
@@ -125,15 +124,7 @@ public interface IdentityService {
      */
     void unassignRolesToIdentity(String contactNumber, @Valid List<String> roles);
 
-    /**
-     * Return all roles that are assigned to selected identity.
-     * 
-     * @param contactNumber
-     *            unique Identity CRM ID we want to find roles for
-     * @return {@link List} {@link RoleInfo} list of roles that identity have
-     */
-    List<RoleInfo> getAllIdentityRoles(String contactNumber);
-
+ 
     /**
      * Function that save pin of Identity driver base on input.
      * 
@@ -189,10 +180,29 @@ public interface IdentityService {
 
     /**
      * Return identity base on nav4Id from request parameter
-     * @param nav4Id {@link String} nav4Id id of identity we want to find
+     * 
+     * @param nav4Id
+     *            {@link String} nav4Id id of identity we want to find
      * @return {@link IdentityInfo} Identity we want to get
      */
-	IdentityInfo getIdentityByNav4(String nav4Id);
+    IdentityInfo getIdentityByNav4(String nav4Id);
 
+    /**
+     * Returns list of user's required actions.
+     * 
+     * @param username
+     *            unique username
+     * @return {@link List} of {@link String} user's required actions
+     */
     List<String> getUserRequiredActions(String username);
+
+    /**
+     * Create/update Identity credentials
+     * 
+     * @param nav4Id
+     *            unique Identity nav4Id
+     * @param credentials
+     *            new credentials for Identity
+     */
+    void createIdentityCredentialsNav4(String nav4Id, @Valid Credentials credentials);
 }

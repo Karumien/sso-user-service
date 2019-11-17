@@ -20,7 +20,6 @@ import com.karumien.cloud.sso.api.handler.IdentitiesApi;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.RoleService;
@@ -64,8 +63,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createIdentityCredentials(String id, @Valid Credentials credentials) {
-        identityService.createIdentityCredentials(id, credentials);
+    public ResponseEntity<Void> createIdentityCredentials(String contactNumber, @Valid Credentials credentials) {
+        identityService.createIdentityCredentials(contactNumber, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -136,16 +135,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> getIdentityRole(String contactNumber, String roleId) {
-        // TODO viliam.litavec: Impl
-        return IdentitiesApi.super.getIdentityRole(contactNumber, roleId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<List<RoleInfo>> getIdentityRoles(String contactNumber) {
-        return new ResponseEntity<List<RoleInfo>>(identityService.getAllIdentityRoles(contactNumber), HttpStatus.OK);
+        return new ResponseEntity<>(identityService.isActiveRole(roleId, contactNumber) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     /**
@@ -217,17 +207,31 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> exists(@Valid String username, @Valid String contactNumber, @Valid String nav4Id) {
-        // TODO viliam.litavec: Need implementation
-        return IdentitiesApi.super.exists(username, contactNumber, nav4Id);
+        
+        if (username != null) {
+            return new ResponseEntity<>(identityService.isIdentityExists(username) ? HttpStatus.OK : HttpStatus.GONE);
+        }
+
+        if (contactNumber != null) {
+            identityService.getIdentity(contactNumber);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        if (nav4Id != null) {
+            identityService.getIdentityByNav4(nav4Id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createIdentityNav4Credentials(String contactNumber, @Valid Credentials credentials) {
-        // TODO viliam.litavec: Need implementation
-        return IdentitiesApi.super.createIdentityNav4Credentials(contactNumber, credentials);
+    public ResponseEntity<Void> createIdentityNav4Credentials(String nav4Id, @Valid Credentials credentials) {
+        identityService.createIdentityCredentialsNav4(nav4Id, credentials);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
@@ -237,6 +241,14 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<IdentityInfo> getIdentityNav4(String nav4Id) {
     	IdentityInfo identity = identityService.getIdentityByNav4(nav4Id);
     	return new ResponseEntity<IdentityInfo>(identity, identity != null ? HttpStatus.OK : HttpStatus.GONE);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<String>> getIdentityRoleIds(String contactNumber) {
+        return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber), HttpStatus.OK);
     }
 
 }

@@ -13,8 +13,6 @@
  */
 package com.karumien.cloud.sso.service;
 
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 
 @RunWith(SpringRunner.class)
@@ -72,9 +69,7 @@ public class IdentityServiceTest {
         }
 		
         //IdentityInfo userCreated = 
-                identityService.createIdentity(identity);
-        List<RoleInfo> roles = identityService.getAllIdentityRoles(identity.getContactNumber());
-        Assert.assertNotNull(roles);       
+        identityService.createIdentity(identity);
         identityService.deleteIdentity(identity.getContactNumber());
     }
 }

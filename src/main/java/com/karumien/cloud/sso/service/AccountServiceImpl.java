@@ -27,10 +27,12 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
@@ -48,8 +50,10 @@ import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
+import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -76,6 +80,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private SearchService searchService;
     
+    @Autowired
+    private RoleService roleService;
+
     @Autowired
     private LocalizationService localizationService;
 
@@ -268,6 +275,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public List<IdentityInfo> getAccountIdentities(String accountNumber, List<String> contactNumbers) {
+        // TODO: performance - search over DB (searchService)
         List<UserRepresentation> users = findGroupResource(accountNumber)
             .orElseThrow(() -> new AccountNotFoundException(accountNumber)).members();
         return users.stream()
@@ -287,9 +295,46 @@ public class AccountServiceImpl implements AccountService {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean checkIfUserNameExist(String username) {
 		return keycloak.realm(realm).users().search(username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<RoleInfo> getAccountRoles(String accountNumber) {
+	    return roleService.getAccountRoles(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), false);
+	}
+	
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public List<String> getAccountRightsOfIdentity(String contactNumber) {
+        return roleService.getIdentityRights(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), contactNumber);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers) {
+	    // TODO: performance?
+	    List<IdentityRoleInfo> roles = new ArrayList<>();
+	    for (IdentityInfo info : getAccountIdentities(accountNumber, contactNumbers)) {
+	        IdentityRoleInfo role = new IdentityRoleInfo();
+	        role.setAccountNumber(info.getAccountNumber());
+	        role.setContactNumber(info.getContactNumber());
+	        role.setNav4Id(info.getNav4Id());
+	        role.setRoles(roleService.getIdentityRoles(info.getContactNumber()));
+	        roles.add(role);
+	    }
+	    return roles;
 	}
 
 }

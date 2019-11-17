@@ -3,7 +3,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@ package com.karumien.cloud.sso.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.representations.idm.UserRepresentation;
 
@@ -30,7 +31,7 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
 public interface RoleService {
 
     String ATTR_BINARY_MASK = "binaryMask";
-    
+
     /**
      * Function that create role base on input object to realm.
      * 
@@ -79,14 +80,14 @@ public interface RoleService {
     void assignRoleToIdentity(String clientId, RoleInfo role);
 
     /**
-     * Function that return all role that identity have assigned
+     * Returns all roles that identity have assigned.
      * 
      * @param contactNumber
      *            {@link String} ID of identity for what we want to find roles
      * 
-     * @return {@link List} of {@link RoleInfo}
+     * @return {@link List} of {@link RoleInfo} all roles that identity have assigned
      */
-    List<RoleInfo> getRolesOfIdentity(String contactNumber);
+    List<String> getIdentityRoles(String contactNumber);
 
     /**
      * Function that remove role from identity.
@@ -111,19 +112,30 @@ public interface RoleService {
      * Return roles binary representation for identity identified by {@code contactNumber}.
      * 
      * @param userRepresentation
-     *            user represenation
+     *            user representation
      * @return {@link String} binary representation of roles of specified identity
      */
     String getRolesBinary(UserRepresentation userRepresentation);
 
     /**
-     * Function that return all role that account have assigned
+     * Returns all roles that account have assigned.
      * 
-     * @param accountNumber
-     *            {@link String} ID of account for what we want to find roles
+     * @param groupResource
+     *            account for what we want to find roles
+     * @param effective
+     *            roles effective counted or original selected
      * 
-     * @return {@link List} of {@link RoleInfo}
+     * @return {@link List} of {@link RoleInfo} all roles that account have assigned
      */
-    List<RoleInfo> getRolesOfAccount(String accountNumber);
+    List<RoleInfo> getAccountRoles(GroupResource groupResource, boolean effective);
+
+    /**
+     * Returns all rights that identity have assigned.
+//     * @param contactNumber
+//     *            {@link String} ID of identity for what we want to find roles
+     * 
+     * @return {@link List} of {@link RoleInfo} all rights that identity have assigned
+     */
+    List<String> getIdentityRights(GroupResource groupResource, String contactNumber);
 
 }

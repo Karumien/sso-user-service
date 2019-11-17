@@ -31,7 +31,6 @@ import org.springframework.util.StringUtils;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
-import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
@@ -148,8 +147,23 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void createIdentityCredentials(String contactNumber, Credentials newCredentials) {
-
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        createCredentials(user, newCredentials);
+
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createIdentityCredentialsNav4(String nav4Id, @Valid Credentials newCredentials) {
+        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst().orElseThrow(
+                () -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+        createCredentials(keycloak.realm(realm).users().get(userId).toRepresentation(), newCredentials);
+    }
+
+    private void createCredentials(UserRepresentation user, Credentials newCredentials) {
+        
         user.setEnabled(true);
         user.setUsername(newCredentials.getUsername());
         
@@ -168,7 +182,6 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (BadRequestException e) {
             throw new PolicyPasswordException(newCredentials.getPassword());
         }
-
     }
 
     /**
@@ -290,14 +303,6 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public List<RoleInfo> getAllIdentityRoles(String contactNumber) {
-        return roleService.getRolesOfIdentity(contactNumber);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void savePinOfIdentityDriver(String contactNumber, DriverPin pin) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         user.getAttributes().put(ATTR_DRIVER_PIN, Arrays.asList(pin.getPin()));
@@ -367,8 +372,7 @@ public class IdentityServiceImpl implements IdentityService {
 	 */
     @Override
     public boolean isActiveRole(String roleId, String contactNumber) {
-        //FIXME: performance
-        return getAllIdentityRoles(contactNumber).stream().filter(role -> role.getRoleId().equals(roleId)).findAny().isPresent();
+        return roleService.getIdentityRoles(contactNumber).contains(roleId);
     }
 
     /**
