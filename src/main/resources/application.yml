@@ -6,6 +6,7 @@ spring:
 #  devtools.restart.enabled=false
   application:
     name: ew-sso-api
+    env: ${ENVIRONMENT:dev}
   main:
     log-startup-info: false
     allow-bean-definition-overriding: true
@@ -35,7 +36,7 @@ spring:
     console:
       enabled: false
   datasource:
-    url: jdbc:postgresql://${DB_ADDR:localhost}:${DB_PORT:5432}/${DB_DATABASE:postgres}
+    url: jdbc:postgresql://${DB_ADDR:localhost}:${DB_PORT:5432}/${DB_DATABASE:postgres}?${JDBC_PARAMS:}
     username: ${DB_USER:postgresadmin}
     password: ${DB_PASSWORD:admMe123}
     driverClassName: org.postgresql.Driver    
