@@ -40,7 +40,7 @@
 		
 		<logstash-logback.version>6.2</logstash-logback.version>
 		<commons-io.version>2.6</commons-io.version>
-		<keycloak.version>7.0.0</keycloak.version>
+		<keycloak.version>8.0.0</keycloak.version>
 		
 		<maven-bundle-plugin.version>4.2.0</maven-bundle-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
