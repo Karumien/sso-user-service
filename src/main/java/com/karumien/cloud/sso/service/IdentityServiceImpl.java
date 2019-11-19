@@ -25,7 +25,9 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.Credentials;
@@ -38,6 +40,7 @@ import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
+import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
 
 
 /**
@@ -79,37 +82,101 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
+    public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo) {
+        
+        UserRepresentation user = findIdentity(contactNumber)
+                .orElseThrow(() -> new IdentityNotFoundException(contactNumber));        
+        
+        if (StringUtils.hasText(identityInfo.getUsername())) {
+            user.setUsername(identityInfo.getUsername());  
+        }
+        
+        user.setFirstName(identityInfo.getFirstName());
+        user.setLastName(identityInfo.getLastName());
+        user.setEmail(identityInfo.getEmail());
+        user.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && !StringUtils.hasText(identityInfo.getEmail()));
+        
+        if (StringUtils.hasText(identityInfo.getPhone())) {
+            user.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
+        } else {
+            user.getAttributes().remove(ATTR_PHONE);
+        } 
+        if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
+            user.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
+        } else {
+            user.getAttributes().remove(ATTR_GLOBAL_EMAIL);
+        } 
+
+        user.singleAttribute(ATTR_LOCALE, StringUtils.hasText(identityInfo.getLocale()) ? 
+                identityInfo.getLocale() : LocaleContextHolder.getLocale().getLanguage());
+       
+        UserResource userResource = keycloak.realm(realm).users().get(user.getId());
+        
+        try {
+            userResource.update(user);
+        } catch (BadRequestException e) {
+            throw new UpdateIdentityException(e.getMessage());
+        }
+        
+        return getIdentity(contactNumber);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IdentityInfo createIdentity(@Valid IdentityInfo identityInfo) {
 
         UserRepresentation identity = new UserRepresentation();
 
-        identity.setUsername(StringUtils.isEmpty(identityInfo.getUsername()) ?
-                "generated-" + identityInfo.getContactNumber() : identityInfo.getUsername());
+        // TODO: Username Policy validation
+        String username = identityInfo.getUsername();
+        
+        if (!StringUtils.hasText(identityInfo.getUsername())) {
+            username = "generated-" + identityInfo.getContactNumber();
+            if (!StringUtils.hasText(identityInfo.getNav4Id())) {
+                username += "-n4-" + identityInfo.getNav4Id();
+            }
+        }
+        
+        if (isIdentityExists(username)) {
+            throw new IdentityDuplicateException("Identity with same username already exists"); 
+        }
+        
+        identity.setUsername(username);
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
-
         identity.setEmail(identityInfo.getEmail());
+        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && !StringUtils.hasText(identityInfo.getEmail()));
         
         identity.setEnabled(true);
-        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && !StringUtils.isEmpty(identityInfo.getEmail()));
-
-        if (!StringUtils.isEmpty(identityInfo.getPhone())) {
-            identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
-        }
-        if (!StringUtils.isEmpty(identityInfo.getGlobalEmail())) {
-            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
-        }
-        if (!StringUtils.isEmpty(identityInfo.getLocale())) {
-            identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
-        }
-		if (!StringUtils.isEmpty(identityInfo.getNav4Id())) {
-			identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
-		}
 
         identity.singleAttribute(ATTR_CONTACT_NUMBER, 
                 Optional.of(identityInfo.getContactNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_CONTACT_NUMBER)));
         identity.singleAttribute(ATTR_ACCOUNT_NUMBER, 
                 Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
+        
+        // TODO: Persistent lock?
+		if (StringUtils.hasText(identityInfo.getNav4Id())) {
+		    if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_NAV4ID, identityInfo.getNav4Id()))) {
+		        throw new IdentityDuplicateException("Identity with same nav4Id already exists"); 
+		    }
+			identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
+		} else {		    
+		    if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, identityInfo.getContactNumber()))) {
+                throw new IdentityDuplicateException("Identity with same contactNumber already exists, use nav4Id for uniqueness"); 
+            }
+		}
+
+        if (StringUtils.hasText(identityInfo.getPhone())) {
+            identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
+        }
+        if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
+            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
+        }
+        if (StringUtils.hasText(identityInfo.getLocale())) {
+            identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
+        }
 
         String groupId = accountService.findGroup(identityInfo.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber())).getId();
@@ -279,7 +346,7 @@ public class IdentityServiceImpl implements IdentityService {
     public void refreshBinaryRoles(UserRepresentation userRepresentation) {        
         UserResource userResource = keycloak.realm(realm).users().get(userRepresentation.getId());
         String binaryRoles = roleService.getRolesBinary(userRepresentation);
-        if (StringUtils.isEmpty(binaryRoles)) {
+        if (!StringUtils.hasText(binaryRoles)) {
             userRepresentation.getAttributes().remove(ATTR_BINARY_RIGHTS);
         } else {
             userRepresentation.getAttributes().put(ATTR_BINARY_RIGHTS, Arrays.asList(binaryRoles));
@@ -325,7 +392,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void resetPasswordByEmail(String contactNumber) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        if (StringUtils.isEmpty(user.getEmail()) || !user.isEmailVerified()) {
+        if (StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
             throw new IdentityEmailNotExistsOrVerifiedException(contactNumber);
         }
         keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
@@ -390,7 +457,7 @@ public class IdentityServiceImpl implements IdentityService {
 	 */
 	@Override
 	public List<String> getUserRequiredActions(String username) {
-	    if (StringUtils.isEmpty(username)) {
+	    if (!StringUtils.hasText(username)) {
 	        return new ArrayList<>();
 	    }
 	    List<UserRepresentation> identities = keycloak.realm(realm).users().search(username);

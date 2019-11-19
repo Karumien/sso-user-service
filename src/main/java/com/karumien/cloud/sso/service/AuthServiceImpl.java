@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthorizationResponse loginByUsernamePassword(String clientId, String clientSecret, String username, String password) {
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
-            .clientId(StringUtils.isEmpty(clientId) ? this.clientId : clientId).clientSecret(clientSecret)
+            .clientId(StringUtils.hasText(clientId) ? clientId : this.clientId).clientSecret(clientSecret)
             .username(username).password(password).grantType(GrantType.PASSWORD.toString())           
             .build().tokenManager();
             
@@ -167,7 +167,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByToken(String clientId, String refreshToken) {
-        TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, StringUtils.isEmpty(clientId) ? this.clientId : clientId, refreshToken).tokenManager();
+        TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, StringUtils.hasText(clientId) ? clientId : this.clientId, refreshToken).tokenManager();
 
         return mapping(tokenManager.getAccessToken());            
     }
@@ -340,7 +340,7 @@ public class AuthServiceImpl implements AuthService {
 
         ImpersonateTokenManager tokenManager = new ImpersonateTokenManager(
                 new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, 
-                        StringUtils.isEmpty(clientId) ? this.clientId : clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
+                        StringUtils.hasText(clientId) ? clientId : this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
                 clientBuilder.build(), refreshToken);
 
         return mapping(tokenManager.getAccessToken());            

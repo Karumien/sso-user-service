@@ -282,5 +282,13 @@ public class AccountController implements AccountsApi {
         identityService.createIdentityCredentials(contactNumber, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> updateAccountIdentity(String accountNumber, String contactNumber, @Valid IdentityInfo identity) {
+        getAccountIdentity(accountNumber, contactNumber);
+        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
+    }
 }

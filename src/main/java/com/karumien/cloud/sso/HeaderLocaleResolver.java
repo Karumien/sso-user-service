@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
-import net.logstash.logback.encoder.org.apache.commons.lang3.StringUtils;
 
 /**
  * Prepare locale from X-LOCALE header.
@@ -47,7 +47,7 @@ public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements 
     public Locale resolveLocale(HttpServletRequest request) {
         String headerLang = request.getHeader("x-locale");
         
-        if (StringUtils.isBlank(headerLang)) {
+        if (!StringUtils.hasText(headerLang)) {
             headerLang = request.getLocale() != null ? request.getLocale().getLanguage() : null;
         } 
     
@@ -55,7 +55,7 @@ public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements 
             headerLang = headerLang.substring(0,2);
         };
         
-        return StringUtils.isBlank(headerLang) || Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES) == null ?
+        return !StringUtils.hasText(headerLang) || Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES) == null ?
                 Locale.forLanguageTag("en") : 
                 Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES);
     }

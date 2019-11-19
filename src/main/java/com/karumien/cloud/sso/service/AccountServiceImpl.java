@@ -134,11 +134,11 @@ public class AccountServiceImpl implements AccountService {
         group.setPath("/" + MASTER_GROUP + "/" + group.getName());
         group.singleAttribute(ATTR_ACCOUNT_NUMBER, account.getAccountNumber());
 
-        if (!StringUtils.isEmpty(account.getCompRegNo())) {
+        if (StringUtils.hasText(account.getCompRegNo())) {
             group.singleAttribute(ATTR_COMP_REG_NO, account.getCompRegNo());
         }
 
-        if (!StringUtils.isEmpty(account.getContactEmail())) {
+        if (StringUtils.hasText(account.getContactEmail())) {
             group.singleAttribute(ATTR_CONTACT_EMAIL, account.getContactEmail());
         }
 

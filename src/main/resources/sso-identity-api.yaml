@@ -53,7 +53,35 @@ paths:
           schema:
             $ref: '#/definitions/IdentityInfo'
         '409':
-          description: Duplicate Identity by CRM Contact Number
+          description: Duplicate Identity with same CRM ContactNumber
+        '410':
+          description: Identity Not Found
+    put:
+      summary: Update Identity
+      operationId: updateIdentity
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string       
+        - name: identity
+          in: body
+          description: The Identity to update
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+      responses:
+        '202':
+          description: Successfully updated
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '409':
+          description: Conflict in username/CRM Contact Number/Navision 4 ID
         '410':
           description: Identity Not Found
     delete:
@@ -68,6 +96,8 @@ paths:
       responses:
         '204':
           description: Successfully removed existing Identity
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
         '410':
           description: Identity Not Found
   /identities/{contactNumber}/credentials:

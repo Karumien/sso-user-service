@@ -251,4 +251,11 @@ public class IdentityController implements IdentitiesApi {
         return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber), HttpStatus.OK);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> updateIdentity(String contactNumber, @Valid IdentityInfo identity) {
+        return new ResponseEntity<>( identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
+    }
 }

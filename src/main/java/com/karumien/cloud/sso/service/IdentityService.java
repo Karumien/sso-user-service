@@ -9,8 +9,6 @@ package com.karumien.cloud.sso.service;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.Valid;
-
 import org.keycloak.representations.idm.UserRepresentation;
 
 import com.karumien.cloud.sso.api.model.Credentials;
@@ -112,7 +110,7 @@ public interface IdentityService {
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to add to identity
      */
-    void assignRolesToIdentity(String contactNumber, @Valid List<String> roles);
+    void assignRolesToIdentity(String contactNumber, List<String> roles);
 
     /**
      * Remove selected list of roles to as current Identity.
@@ -122,9 +120,9 @@ public interface IdentityService {
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to remove from identity
      */
-    void unassignRolesToIdentity(String contactNumber, @Valid List<String> roles);
+    void unassignRolesToIdentity(String contactNumber, List<String> roles);
 
- 
+
     /**
      * Function that save pin of Identity driver base on input.
      * 
@@ -204,5 +202,16 @@ public interface IdentityService {
      * @param credentials
      *            new credentials for Identity
      */
-    void createIdentityCredentialsNav4(String nav4Id, @Valid Credentials credentials);
+    void createIdentityCredentialsNav4(String nav4Id, Credentials credentials);
+
+    /**
+     * Update identity by specified changes.
+     * 
+     * @param contactNumber
+     *            unique Identity CRM ID
+     * @param identity
+     *            changes
+     * @return {@link IdentityInfo} saved identity after changes
+     */
+    IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
 }
