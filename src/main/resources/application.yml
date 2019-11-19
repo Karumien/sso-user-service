@@ -56,7 +56,7 @@ server:
     contextPath: ${CONTEXT_PATH:/api/v1/iam}
     swaggerPath: ${SWAGGER_PATH:/api/v1/iam}
 keycloak:
-  auth-server-url: ${KEYCLOAK_AUTH_URL:http://localhost/auth}
+  auth-server-url: ${KEYCLOAK_SERVER_AUTH_URL:http://localhost/auth}
   realm: ${KEYCLOAK_REALM:eurowag}
   username: ${KEYCLOAK_USER:wagadmin}
   password: ${KEYCLOAK_PASSWORD:xara2002}
