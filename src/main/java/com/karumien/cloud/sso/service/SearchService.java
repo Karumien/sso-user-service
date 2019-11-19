@@ -41,7 +41,6 @@ public interface SearchService {
      * @return {@link List} of User's IDs
      */
     List<String> findGroupIdsByAttribute(String attribute, String value);
-
     
     default Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
         if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
