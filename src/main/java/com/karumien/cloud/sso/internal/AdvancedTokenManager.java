@@ -31,19 +31,19 @@ import org.keycloak.representations.AccessTokenResponse;
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 1. 10. 2019 23:27:38 
  */
-public class ImpersonateTokenManager {
+public class AdvancedTokenManager {
 
     private static final long DEFAULT_MIN_VALIDITY = 30;
 
     private AccessTokenResponse currentToken;
     private long expirationTime;
     private long minTokenValidity = DEFAULT_MIN_VALIDITY;
-    private final ImpersonateConfig config;
+    private final AdvancedTokenConfig config;
     private final TokenService tokenService;
     private final String accessTokenGrantType;
     private final String authToken;
 
-    public ImpersonateTokenManager(ImpersonateConfig config, ResteasyClient client, String authToken) {        
+    public AdvancedTokenManager(AdvancedTokenConfig config, ResteasyClient client, String authToken) {        
         this.config = config;
         this.authToken = authToken;
         ResteasyWebTarget target = client.target(config.getServerUrl());
@@ -84,6 +84,10 @@ public class ImpersonateTokenManager {
                 .param(SUBJECT_TOKEN, this.authToken);
         }
                 
+        if (REFRESH_TOKEN.equals(accessTokenGrantType)) {
+            form.param(REFRESH_TOKEN, this.authToken);
+        }
+
         if (config.isPublicClient()) {
             form.param(CLIENT_ID, config.getClientId());
         }

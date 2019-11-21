@@ -147,7 +147,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
         identity.setEmail(identityInfo.getEmail());
-        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && !StringUtils.hasText(identityInfo.getEmail()));
+        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
         
         identity.setEnabled(true);
 
@@ -216,7 +216,6 @@ public class IdentityServiceImpl implements IdentityService {
     public void createIdentityCredentials(String contactNumber, Credentials newCredentials) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         createCredentials(user, newCredentials);
-
     }
     
     /**

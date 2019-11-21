@@ -37,8 +37,8 @@ import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.PasswordPolicy;
 import com.karumien.cloud.sso.api.model.UsernamePolicy;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
-import com.karumien.cloud.sso.internal.ImpersonateConfig;
-import com.karumien.cloud.sso.internal.ImpersonateTokenManager;
+import com.karumien.cloud.sso.internal.AdvancedTokenConfig;
+import com.karumien.cloud.sso.internal.AdvancedTokenManager;
 
 /**
  * Implementation of {@link AuthService} for authentication tokens management.
@@ -158,7 +158,6 @@ public class AuthServiceImpl implements AuthService {
             .realm(realm).clientId(clientId).clientSecret(clientSecret).grantType(GrantType.CLIENT_CREDENTIALS.toString())
             .build().tokenManager();
 
-        System.out.println(keycloak.realm(realm).toRepresentation().getSsoSessionIdleTimeout());
         return mapping(tokenManager.getAccessToken());            
     }
 
@@ -167,8 +166,14 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByToken(String clientId, String refreshToken) {
-        TokenManager tokenManager = Keycloak.getInstance(adminServerUrl, realm, StringUtils.hasText(clientId) ? clientId : this.clientId, refreshToken).tokenManager();
 
+        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
+
+        AdvancedTokenManager tokenManager = new AdvancedTokenManager(
+                new AdvancedTokenConfig(this.adminServerUrl, realm, null, null, 
+                        StringUtils.hasText(clientId) ? clientId : this.clientId, null, OAuth2Constants.REFRESH_TOKEN),
+                clientBuilder.build(), refreshToken);
+        
         return mapping(tokenManager.getAccessToken());            
     }
 
@@ -338,8 +343,8 @@ public class AuthServiceImpl implements AuthService {
             throw new IdentityNotFoundException("username = " + username);
         }
 
-        ImpersonateTokenManager tokenManager = new ImpersonateTokenManager(
-                new ImpersonateConfig(this.adminServerUrl, realm, users.get(0).getId(), null, 
+        AdvancedTokenManager tokenManager = new AdvancedTokenManager(
+                new AdvancedTokenConfig(this.adminServerUrl, realm, users.get(0).getId(), null, 
                         StringUtils.hasText(clientId) ? clientId : this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
                 clientBuilder.build(), refreshToken);
 

@@ -30,6 +30,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -324,14 +325,19 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers) {
-	    // TODO: performance?
+	    
+        // TODO: https://jira.eurowag.com/browse/P572-313
+	    Set<String> accountRoles = getAccountRoles(accountNumber).stream().map(r -> r.getRoleId()).collect(Collectors.toSet());
+	        
+        // TODO: performance?
 	    List<IdentityRoleInfo> roles = new ArrayList<>();
 	    for (IdentityInfo info : getAccountIdentities(accountNumber, contactNumbers)) {
 	        IdentityRoleInfo role = new IdentityRoleInfo();
 	        role.setAccountNumber(info.getAccountNumber());
 	        role.setContactNumber(info.getContactNumber());
 	        role.setNav4Id(info.getNav4Id());
-	        role.setRoles(roleService.getIdentityRoles(info.getContactNumber()));
+	        role.setRoles(roleService.getIdentityRoles(info.getContactNumber()).stream()
+	                .filter(k -> accountRoles.contains(k)).collect(Collectors.toList()));
 	        roles.add(role);
 	    }
 	    return roles;

@@ -9,6 +9,7 @@ package com.karumien.cloud.sso.internal;
 import static org.keycloak.OAuth2Constants.CLIENT_CREDENTIALS;
 import static org.keycloak.OAuth2Constants.PASSWORD;
 import static org.keycloak.OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE;
+import static org.keycloak.OAuth2Constants.REFRESH_TOKEN;
 
 /**
  * Added missing functionality of impersonate by login method.
@@ -16,7 +17,7 @@ import static org.keycloak.OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE;
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 2. 10. 2019 0:23:22 
  */
-public class ImpersonateConfig {
+public class AdvancedTokenConfig {
 
     private String serverUrl;
     private String realm;
@@ -26,11 +27,11 @@ public class ImpersonateConfig {
     private String clientSecret;
     private String grantType;
 
-    public ImpersonateConfig(String serverUrl, String realm, String username, String password, String clientId, String clientSecret) {
+    public AdvancedTokenConfig(String serverUrl, String realm, String username, String password, String clientId, String clientSecret) {
         this(serverUrl, realm, username, password, clientId, clientSecret, PASSWORD);
     }
 
-    public ImpersonateConfig(String serverUrl, String realm, String username, String password, String clientId, String clientSecret, String grantType) {
+    public AdvancedTokenConfig(String serverUrl, String realm, String username, String password, String clientId, String clientSecret, String grantType) {
         this.serverUrl = serverUrl;
         this.realm = realm;
         this.username = username;
@@ -103,7 +104,8 @@ public class ImpersonateConfig {
     }
 
     public static void checkGrantType(String grantType) {
-        if (grantType != null && !PASSWORD.equals(grantType) && !CLIENT_CREDENTIALS.equals(grantType) && !TOKEN_EXCHANGE_GRANT_TYPE.equals(grantType)) {
+        if (grantType != null && !PASSWORD.equals(grantType) && !CLIENT_CREDENTIALS.equals(grantType) 
+                && !TOKEN_EXCHANGE_GRANT_TYPE.equals(grantType) && !REFRESH_TOKEN.equals(grantType)) {
             throw new IllegalArgumentException("Unsupported grantType: " + grantType +
                     " (only " + PASSWORD + ", " + CLIENT_CREDENTIALS + " and " + TOKEN_EXCHANGE_GRANT_TYPE + " are supported)");
         }

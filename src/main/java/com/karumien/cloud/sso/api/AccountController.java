@@ -8,6 +8,7 @@ package com.karumien.cloud.sso.api;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -253,7 +254,12 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<List<String>> getAccountIdentityRoleIds(String accountNumber, String contactNumber) {
         getAccountIdentity(accountNumber, contactNumber);
-        return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber), HttpStatus.OK);
+        
+        // TODO: https://jira.eurowag.com/browse/P572-313
+        return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber).stream()
+                .filter(k -> accountService.getAccountRoles(accountNumber).stream()
+                        .map(r -> r.getRoleId()).collect(Collectors.toSet())
+                            .contains(k)).collect(Collectors.toList()), HttpStatus.OK);
     }
     
     /**
