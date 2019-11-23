@@ -285,7 +285,6 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setUsername(userRepresentation.getUsername());
         identity.setEmail(userRepresentation.getEmail());
         identity.setEmailVerified(userRepresentation.isEmailVerified());
-
         
         identity.setAccountNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
         identity.setContactNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CONTACT_NUMBER).orElse(null));
@@ -294,6 +293,10 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
+        
+        identity.setCrmAccountId(identity.getAccountNumber());
+        identity.setCrmContactId(identity.getContactNumber());
+        
         return identity;
     }
 

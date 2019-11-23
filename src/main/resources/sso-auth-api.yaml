@@ -78,7 +78,7 @@ paths:
 #              errcode: 'CLIENT_ERROR'
 #              errmsg: Invalid user credentials
         '422':
-          description: "Can't login - Account not fully set up (reset password needed, ...) { errno = 400 }"
+          description: "Can't login - Account not fully set up { errno = 400 }, see #/definitions/ErrorDataCodeLogin"
           schema:
             $ref: '#/definitions/ErrorMessage'
 #           example:
@@ -296,6 +296,14 @@ definitions:
     description: Master Error Code
     enum:
       - CLIENT_ERROR
+  ErrorDataCodeLogin:
+    type: string
+    description: Error codes for attributes
+    enum:
+      - configure-totp
+      - update-password
+      - update-profile
+      - verify-email
   ErrorData:
     type: object
     description: EW ErrorMessage model data

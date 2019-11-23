@@ -529,6 +529,12 @@ definitions:
         type: string
         description: "User's default Locale"
         maxLength: 50  
+      crmAccountId:
+        type: string
+        description: Backward Compatibility
+      crmContactId:
+        type: string
+        description: Backward Compatibility 
     example:
       accountNumber: 31034
       contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx

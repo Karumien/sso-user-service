@@ -197,7 +197,9 @@ public class AccountServiceImpl implements AccountService {
         accountInfo.setCompRegNo(searchService.getSimpleAttribute(group.getAttributes(), ATTR_COMP_REG_NO).orElse(null));
         accountInfo.setContactEmail(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CONTACT_EMAIL).orElse(null));
         accountInfo.setName(group.getName());
-
+        
+        accountInfo.setCrmAccountId(accountInfo.getAccountNumber());
+        
         return accountInfo;
     }
     

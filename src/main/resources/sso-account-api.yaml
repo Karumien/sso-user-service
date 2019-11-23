@@ -597,7 +597,7 @@ paths:
         '410':
           description: Identity or Account not found
         '422':
-          description: "Can't create Identity's credentials - Error Codes for Attributes: #/definitions/ErrorCodeCredentials"
+          description: "Can't create Identity's credentials - Error Codes for Attributes: #/definitions/ErrorDataCodeCredentials"
           schema:
             $ref: '#/definitions/ErrorMessage'
 definitions:
@@ -606,7 +606,7 @@ definitions:
     description: Master Error Code
     enum:
       - CLIENT_ERROR
-  ErrorCodeCredentials:
+  ErrorDataCodeCredentials:
     type: string
     description: Error codes for attributes
     enum:
@@ -662,6 +662,12 @@ definitions:
         type: string
         description: "User's default Locale"
         maxLength: 50  
+      crmAccountId:
+        type: string
+        description: Backward Compatibility
+      crmContactId:
+        type: string
+        description: Backward Compatibility 
     example:
       accountNumber: 31034
       contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx
@@ -711,6 +717,9 @@ definitions:
         type: string
         description: "Contact Email"
         maxLength: 200
+      crmAccountId:
+        type: string
+        description: Backward Compatibility
     example:
       id: 31034
       name: Some AUTODOPRAVA, s.r.o.
