@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
+import javax.ws.rs.NotAuthorizedException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.jboss.logging.MDC;
@@ -94,7 +95,7 @@ public class AuthController implements AuthApi  {
             case PIN:
                 IdentityInfo identity = authService.loginByPin(user.getClientId(), user.getUsername(), user.getPin());
                 if (identity == null) {
-                    return new ResponseEntity(HttpStatus.FORBIDDEN);
+                    throw new NotAuthorizedException(user.getUsername());
                 } else {
                     return new ResponseEntity(identity, HttpStatus.ACCEPTED);
                 }
@@ -113,8 +114,23 @@ public class AuthController implements AuthApi  {
             );            
             return new ResponseEntity(error, user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? HttpStatus.UNAUTHORIZED : HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (javax.ws.rs.NotAuthorizedException e) {
-            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 401)
-                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
+            
+            int errorNo = 401;
+            switch (user.getGrantType()) {
+            case CLIENT_CREDENTIALS:
+                errorNo = 402;
+                break;
+            case PIN:
+                errorNo = 403;
+                break;
+            default:
+                errorNo = 400;
+                break;
+            }
+            
+            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(errorNo)
+                    .errmsg(errorNo == 403 ? messageSource.getMessage("user.invalid.pin", null, LocaleContextHolder.getLocale()) :
+                            JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
             return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
         }
         
