@@ -479,9 +479,8 @@ public class IdentityServiceImpl implements IdentityService {
 	 * {@inheritDoc}
 	 */
     @Override
-    public IdentityInfo findIdentityByUsername(String username) {
-        return mapping(keycloak.realm(realm).users().search(username)
-            .stream().findFirst().orElseThrow(() -> new IdentityNotFoundException("username " + username)));
+    public Optional<UserRepresentation> findIdentityByUsername(String username) {
+        return keycloak.realm(realm).users().search(username).stream().findFirst();
     }
 
 }

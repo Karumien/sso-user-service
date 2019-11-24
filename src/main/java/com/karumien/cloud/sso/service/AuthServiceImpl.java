@@ -70,6 +70,9 @@ public class AuthServiceImpl implements AuthService {
     private IdentityService identityService;
 
     @Autowired
+    private RoleService roleService;
+
+    @Autowired
     private PasswordGeneratorService passwordGeneratorService;
 
     protected AuthorizationResponse mapping(AccessTokenResponse token) {
@@ -189,12 +192,16 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
             
-        IdentityInfo identityInfo = identityService.findIdentityByUsername(username);
+        UserRepresentation user = identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
+        IdentityInfo identityInfo = identityService.mapping(user);
         try {
-            return pin.equals(identityService.getPinOfIdentityDriver(identityInfo.getContactNumber()).getPin()) ? identityInfo : null;
+            if (pin.equals(identityService.getPinOfIdentityDriver(identityInfo.getContactNumber()).getPin())) {
+                identityInfo.setBinaryRights(roleService.getRolesBinary(user));
+                return identityInfo;
+            }
         } catch (AttributeNotFoundException e) {
-            return null;
         }
+        return null;
     }
 
     /**

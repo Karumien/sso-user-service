@@ -215,5 +215,5 @@ public interface IdentityService {
      */
     IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
 
-    IdentityInfo findIdentityByUsername(String username);
+    Optional<UserRepresentation> findIdentityByUsername(String username);
 }
