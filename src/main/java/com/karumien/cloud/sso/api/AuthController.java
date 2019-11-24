@@ -98,7 +98,6 @@ public class AuthController implements AuthApi  {
                 } else {
                     return new ResponseEntity(identity, HttpStatus.ACCEPTED);
                 }
-                break;            
             default:
                 throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());
             }
