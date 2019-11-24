@@ -214,4 +214,6 @@ public interface IdentityService {
      * @return {@link IdentityInfo} saved identity after changes
      */
     IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
+
+    IdentityInfo findIdentityByUsername(String username);
 }

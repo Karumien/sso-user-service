@@ -150,6 +150,14 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
         
         identity.setEnabled(true);
+        
+        // backward compatibility
+        if (!StringUtils.hasText(identityInfo.getAccountNumber())) {
+            identityInfo.setAccountNumber(identityInfo.getCrmAccountId());
+        }
+        if (!StringUtils.hasText(identityInfo.getContactNumber())) {
+            identityInfo.setContactNumber(identityInfo.getCrmContactId());
+        }
 
         identity.singleAttribute(ATTR_CONTACT_NUMBER, 
                 Optional.of(identityInfo.getContactNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_CONTACT_NUMBER)));
@@ -329,6 +337,7 @@ public class IdentityServiceImpl implements IdentityService {
         return !keycloak.realm(realm).users().search(username).isEmpty();
     }
 
+    
     /**
      * {@inheritDoc}
      */
@@ -465,5 +474,14 @@ public class IdentityServiceImpl implements IdentityService {
 	    List<UserRepresentation> identities = keycloak.realm(realm).users().search(username);
 	    return identities.isEmpty() ? new ArrayList<>() : identities.get(0).getRequiredActions();
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public IdentityInfo findIdentityByUsername(String username) {
+        return mapping(keycloak.realm(realm).users().search(username)
+            .stream().findFirst().orElseThrow(() -> new IdentityNotFoundException("username " + username)));
+    }
 
 }

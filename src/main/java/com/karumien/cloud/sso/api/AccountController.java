@@ -151,10 +151,10 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, @Valid List<String> contactNumbers) {
-    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, contactNumbers), HttpStatus.OK);
+    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
+    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers), HttpStatus.OK);
     }
-    
+        
     /**
      * {@inheritDoc}
      */

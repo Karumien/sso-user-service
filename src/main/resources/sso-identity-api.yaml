@@ -255,7 +255,7 @@ paths:
           type: string       
       responses:
         '200':
-          description: "Driver PIN has been created/update"
+          description: "Driver PIN"
           schema:
             $ref: '#/definitions/DriverPin'
         '410':
@@ -535,6 +535,9 @@ definitions:
       crmContactId:
         type: string
         description: Backward Compatibility 
+      binaryRights:
+        type: string
+        description: "User's rights"
     example:
       accountNumber: 31034
       contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx

@@ -142,7 +142,7 @@ public class ModuleServiceImpl implements ModuleService {
             .forEach(accountResource -> accountResource.get().roles().realmLevel().add(rolesToAdd));
 
         accountNumbers.stream().forEach(accountNumber -> 
-            accountService.getAccountIdentities(accountNumber, null).forEach(identity -> identityService.refreshBinaryRoles(
+            accountService.getAccountIdentities(accountNumber, null, null).forEach(identity -> identityService.refreshBinaryRoles(
                 keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
 
     }
@@ -164,7 +164,7 @@ public class ModuleServiceImpl implements ModuleService {
             .forEach(accountResource -> accountResource.get().roles().realmLevel().remove(rolesToRemove));
         
         accountNumbers.stream().forEach(accountNumber -> 
-            accountService.getAccountIdentities(accountNumber, null).forEach(identity -> identityService.refreshBinaryRoles(
+            accountService.getAccountIdentities(accountNumber, null, null).forEach(identity -> identityService.refreshBinaryRoles(
                 keycloak.realm(realm).users().get(identity.getIdentityId()).toRepresentation())));
     }
 

@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.service;
 
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
+import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.PasswordPolicy;
 import com.karumien.cloud.sso.api.model.UsernamePolicy;
 
@@ -28,7 +29,7 @@ public interface AuthService {
     /**
      * Returns configuration of Password Policy
      * 
-     * @return {@link Policy} configuration of Password Policy
+     * @return {@link PasswordPolicy} configuration of Password Policy
      */
     PasswordPolicy getPasswordPolicy();
 
@@ -47,6 +48,8 @@ public interface AuthService {
     AuthorizationResponse loginByToken(String clientId, String refreshToken);
 
     AuthorizationResponse loginByImpersonator(String clienId, String refreshToken, String username);
+
+    IdentityInfo loginByPin(String clientId, String username, String pin);
 
     String generatePassword();
 

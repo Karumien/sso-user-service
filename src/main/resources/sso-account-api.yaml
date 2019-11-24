@@ -250,6 +250,11 @@ paths:
           required: true
           type: string
         - in: query
+          name : roleId
+          type: string
+          description: Filtered by roleId
+          required: false
+        - in: query
           name: contactNumbers
           required: false
           description: CRM Contacts IDs
@@ -668,6 +673,9 @@ definitions:
       crmContactId:
         type: string
         description: Backward Compatibility 
+      binaryRights:
+        type: string
+        description: "User's rights"
     example:
       accountNumber: 31034
       contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx

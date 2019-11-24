@@ -69,6 +69,10 @@ paths:
           description: Login Successful
           schema:
             $ref: '#/definitions/AuthorizationResponse'        
+        '202':
+          description: Pin Accepted
+          schema:
+            $ref: '#/definitions/IdentityInfo'        
         '401':
           description: Unauthorized - Invalid credentials { errno = 401 }
           schema:
@@ -344,4 +348,62 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/ErrorData"
-   
+  IdentityInfo:
+    type: object
+    description: "Basic information about Identity"
+    required:
+      - accountNumber
+      - contactNumber
+    properties:
+      identityId:
+        type: string
+        description: Identity's ID 
+      accountNumber:
+        type: string
+        description: Identity's CRM Account ID
+      contactNumber:
+        type: string
+        description: Identity's Unique ID 
+      nav4Id:
+        type: string
+        description: Identity's Unique NAV4 ID 
+      lastName:
+        type: string
+        description: "Last name/ surname of the Identity"
+        maxLength: 50
+      firstName:
+        type: string
+        description: "First name of the Identity"
+        maxLength: 50
+      username:
+        type: string
+        description: "Unique username"
+        maxLength: 50
+      email:
+        type: string
+        description: "Primary email used primary for password reset"
+        maxLength: 100
+      emailVerified:
+        type: boolean
+        description: "Verified status of itentity email"
+      phone:
+        type: string
+        description: "Phone used primary for OTP"
+        maxLength: 30
+      globalEmail:
+        type: string
+        description: "Contact email - can be company global"
+        maxLength: 100
+      locale:
+        type: string
+        description: "User's default Locale"
+        maxLength: 50  
+      crmAccountId:
+        type: string
+        description: Backward Compatibility
+      crmContactId:
+        type: string
+        description: Backward Compatibility
+      binaryRights:
+        type: string
+        description: "User's rights"

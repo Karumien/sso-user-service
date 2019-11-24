@@ -34,8 +34,10 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 import com.karumien.cloud.sso.api.model.GrantType;
+import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.PasswordPolicy;
 import com.karumien.cloud.sso.api.model.UsernamePolicy;
+import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.internal.AdvancedTokenConfig;
 import com.karumien.cloud.sso.internal.AdvancedTokenManager;
@@ -63,6 +65,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private MessageSource messageSource;
+    
+    @Autowired
+    private IdentityService identityService;
 
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
@@ -175,6 +180,21 @@ public class AuthServiceImpl implements AuthService {
                 clientBuilder.build(), refreshToken);
         
         return mapping(tokenManager.getAccessToken());            
+    }
+    
+    @Override
+    public IdentityInfo loginByPin(String clientId, String username, String pin) {
+        
+        if (!StringUtils.hasText(pin)) {
+            return null;
+        }
+            
+        IdentityInfo identityInfo = identityService.findIdentityByUsername(username);
+        try {
+            return pin.equals(identityService.getPinOfIdentityDriver(identityInfo.getContactNumber()).getPin()) ? identityInfo : null;
+        } catch (AttributeNotFoundException e) {
+            return null;
+        }
     }
 
     /**

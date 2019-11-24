@@ -63,11 +63,13 @@ public interface AccountService {
      * 
      * @param accountNumber
      *            Account CRM ID
+     * @param roleId
+     *            Filtered by roleId
      * @param contactNumbers
      *            IDs of identities for filter
      * @return {@link List} {@link IdentityInfo} list of identities
      */
-    List<IdentityInfo> getAccountIdentities(String accountNumber, List<String> contactNumber);
+    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber);
 
     /**
      * Return {@link IdentityInfo} for account and contact ID

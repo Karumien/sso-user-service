@@ -277,15 +277,22 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
-    public List<IdentityInfo> getAccountIdentities(String accountNumber, List<String> contactNumbers) {
+    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
+        
         // TODO: performance - search over DB (searchService)
         List<UserRepresentation> users = findGroupResource(accountNumber)
             .orElseThrow(() -> new AccountNotFoundException(accountNumber)).members();
-        return users.stream()
+        
+        List<IdentityInfo> identities = users.stream()
                 .filter(u -> CollectionUtils.isEmpty(contactNumbers) 
                     || searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).isPresent()
                       && contactNumbers.contains(searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).get()))
-                .map(user -> identityService.mapping(user)).collect(Collectors.toList());
+                .map(user -> identityService.mapping(user))
+                .collect(Collectors.toList());
+        
+        return StringUtils.hasText(roleId) ? identities.stream()
+                .filter(i -> roleService.getIdentityRoles(i.getContactNumber()).contains(roleId))
+                .collect(Collectors.toList()) : identities;
     }
     
     /**
@@ -333,7 +340,7 @@ public class AccountServiceImpl implements AccountService {
 	        
         // TODO: performance?
 	    List<IdentityRoleInfo> roles = new ArrayList<>();
-	    for (IdentityInfo info : getAccountIdentities(accountNumber, contactNumbers)) {
+	    for (IdentityInfo info : getAccountIdentities(accountNumber, null, contactNumbers)) {
 	        IdentityRoleInfo role = new IdentityRoleInfo();
 	        role.setAccountNumber(info.getAccountNumber());
 	        role.setContactNumber(info.getContactNumber());
