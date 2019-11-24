@@ -115,7 +115,7 @@ public class AuthController implements AuthApi  {
             return new ResponseEntity(error, user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? HttpStatus.UNAUTHORIZED : HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (javax.ws.rs.NotAuthorizedException e) {
             
-            int errorNo = 401;
+            int errorNo = 400;
             switch (user.getGrantType()) {
             case CLIENT_CREDENTIALS:
                 errorNo = 402;
@@ -124,7 +124,6 @@ public class AuthController implements AuthApi  {
                 errorNo = 403;
                 break;
             default:
-                errorNo = 400;
                 break;
             }
             
