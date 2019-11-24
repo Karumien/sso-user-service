@@ -94,9 +94,9 @@ public class AuthController implements AuthApi  {
             case PIN:
                 IdentityInfo identity = authService.loginByPin(user.getClientId(), user.getUsername(), user.getPin());
                 if (identity == null) {
-                    new ResponseEntity(HttpStatus.UNAUTHORIZED);
+                    return new ResponseEntity(HttpStatus.UNAUTHORIZED);
                 } else {
-                    new ResponseEntity(identity, HttpStatus.ACCEPTED);
+                    return new ResponseEntity(identity, HttpStatus.ACCEPTED);
                 }
                 break;            
             default:
