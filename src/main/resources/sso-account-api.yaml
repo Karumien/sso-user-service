@@ -620,9 +620,9 @@ definitions:
   IdentityInfo:
     type: object
     description: "Basic information about Identity"
-    required:
-      - accountNumber
-      - contactNumber
+#    required:
+#      - accountNumber
+#      - contactNumber
     properties:
       identityId:
         type: string
