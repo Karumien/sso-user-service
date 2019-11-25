@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
@@ -345,8 +346,14 @@ public class IdentityServiceImpl implements IdentityService {
     public void assignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
     	UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
     	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
-        List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);        
-    	user.roles().realmLevel().add(list);
+    	
+    	// remove unused
+    	user.roles().realmLevel().remove(user.roles().realmLevel().listAll().stream()
+	        .filter(actualRole -> !roles.contains(actualRole.getId())).collect(Collectors.toList()));
+
+    	// add new
+    	user.roles().realmLevel().add(getListOfRoleReprasentationBaseOnIds(roles));
+    	
     	refreshBinaryRoles(userRepresentation);
     }
 
