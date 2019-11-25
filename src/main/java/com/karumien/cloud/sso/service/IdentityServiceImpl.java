@@ -347,11 +347,11 @@ public class IdentityServiceImpl implements IdentityService {
     	UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
     	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
     	
-    	// remove unused
+    	// remove unused roles
     	user.roles().realmLevel().remove(user.roles().realmLevel().listAll().stream()
 	        .filter(actualRole -> !roles.contains(actualRole.getId())).collect(Collectors.toList()));
 
-    	// add new
+    	// add new roles
     	user.roles().realmLevel().add(getListOfRoleReprasentationBaseOnIds(roles));
     	
     	refreshBinaryRoles(userRepresentation);
