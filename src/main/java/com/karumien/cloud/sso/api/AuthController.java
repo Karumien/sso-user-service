@@ -126,27 +126,47 @@ public class AuthController implements AuthApi  {
                 identityService.createIdentityCredentialsByUsername(user.getUsername(), newCredentials);
                 user.setPassword(user.getNewPassword());
                 user.setNewPassword(null);
-                login(user);
+                return login(user);
             }
             
             return new ResponseEntity(error, user.getGrantType() == GrantType.PASSWORD ? HttpStatus.UNPROCESSABLE_ENTITY : HttpStatus.UNAUTHORIZED);
         } catch (javax.ws.rs.NotAuthorizedException e) {
             
-            int errorNo = 400;
+            int errorNo = 0;
+            String errorMsg = null;
+
+            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(errorNo).errmsg(errorMsg);
+            
             switch (user.getGrantType()) {
             case CLIENT_CREDENTIALS:
                 errorNo = 402;
                 break;
             case PIN:
                 errorNo = 403;
+                errorMsg = messageSource.getMessage("user.invalid.pin", null, LocaleContextHolder.getLocale());
+                break;
+            case PASSWORD:
+                errorNo = 404;
+
+                // account is temporarily locked
+                if (identityService.isIdentityTemporaryLocked(user.getUsername())) {
+                    errorMsg = messageSource.getMessage("user.temporary.locked", null, LocaleContextHolder.getLocale());
+                    error.addErrdataItem(
+                        new ErrorData()
+                            .description(messageSource.getMessage("user.temporary.locked", null, LocaleContextHolder.getLocale()))
+                            .code("temporary-locked"));
+                }                
                 break;
             default:
+                errorNo = 400;
                 break;
             }
+
+            if (StringUtils.hasText(errorMsg)) {
+                errorMsg = JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class);
+            }
+            error.errno(errorNo).errmsg(errorMsg);
             
-            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(errorNo)
-                    .errmsg(errorNo == 403 ? messageSource.getMessage("user.invalid.pin", null, LocaleContextHolder.getLocale()) :
-                            JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));
             return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
         }
         

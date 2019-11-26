@@ -227,4 +227,6 @@ public interface IdentityService {
 
     Optional<UserRepresentation> findIdentityByUsername(String username);
 
+    boolean isIdentityTemporaryLocked(String username);
+
 }

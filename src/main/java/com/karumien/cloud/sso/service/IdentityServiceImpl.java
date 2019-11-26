@@ -230,7 +230,7 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void createIdentityCredentialsByUsername(String username, Credentials newCredentials) {
+    public void createIdentityCredentialsByUsername(String username, Credentials newCredentials) {        
         UserRepresentation user = findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException(" username = " + username));
         createCredentials(user, newCredentials);
     }
@@ -254,14 +254,22 @@ public class IdentityServiceImpl implements IdentityService {
                 
         UserResource userResource = keycloak.realm(realm).users().get(user.getId());
         
-        CredentialRepresentation newCredential = new CredentialRepresentation();
-        newCredential.setType(CredentialRepresentation.PASSWORD);
-        newCredential.setValue(newCredentials.getPassword());
-        newCredential.setTemporary(Boolean.TRUE.equals(newCredential.isTemporary()));
+        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+        credentialRepresentation.setValue(newCredentials.getPassword());
+        
+        if (Boolean.TRUE.equals(newCredentials.isTemporary())) {
+            user.getRequiredActions().add(AuthService.USER_ACTION_UPDATE_PASSWORD);
+            credentialRepresentation.setTemporary(true);
+        } else {
+            user.getRequiredActions().remove(AuthService.USER_ACTION_UPDATE_PASSWORD);
+            credentialRepresentation.setTemporary(false);
+        }
         
         try {
+            userResource.resetPassword(credentialRepresentation);
             userResource.update(user);
-            userResource.resetPassword(newCredential);
+            
         } catch (BadRequestException e) {
             throw new PolicyPasswordException(newCredentials.getPassword());
         }
@@ -343,9 +351,17 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public boolean isIdentityExists(String username) {
-        return !keycloak.realm(realm).users().search(username).isEmpty();
+        return findIdentityByUsername(username).isPresent();
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isIdentityTemporaryLocked(String username) {
+        Optional<UserRepresentation> user = findIdentityByUsername(username);
+        return user.isPresent() && Boolean.TRUE.equals(keycloak.realm(realm).attackDetection().bruteForceUserStatus(user.get().getId()).get("disabled"));
+    }
     
     /**
      * {@inheritDoc}
