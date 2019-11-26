@@ -146,6 +146,10 @@ definitions:
         type: string
         maxLength: 10
         description: Driver's pin - required for grant_type of type 'pin'.
+      newPassword:
+        type: string
+        maxLength: 100
+        description: For scenario temporary password / required for grant_type of type 'password' and temporary password flow.
     example:
       password:
         grant_type: password

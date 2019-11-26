@@ -6,8 +6,6 @@
  */
 package com.karumien.cloud.sso.api;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +42,7 @@ public class ModuleController implements ModulesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<ModuleInfo> createModule(@Valid ModuleInfo module) {
+    public ResponseEntity<ModuleInfo> createModule(ModuleInfo module) {
         return new ResponseEntity<>(moduleService.createModule(module), HttpStatus.CREATED);
     }
 

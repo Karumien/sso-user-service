@@ -9,8 +9,6 @@ package com.karumien.cloud.sso.service;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.Valid;
-
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
 
@@ -122,5 +120,5 @@ public interface AccountService {
 
     List<String> getAccountRightsOfIdentity(String contactNumber);
 
-    List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers);
+    List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers);
 }

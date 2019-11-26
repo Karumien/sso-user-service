@@ -8,8 +8,8 @@ package com.karumien.cloud.sso.internal;
 
 import static org.keycloak.OAuth2Constants.CLIENT_CREDENTIALS;
 import static org.keycloak.OAuth2Constants.PASSWORD;
-import static org.keycloak.OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE;
 import static org.keycloak.OAuth2Constants.REFRESH_TOKEN;
+import static org.keycloak.OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE;
 
 /**
  * Added missing functionality of impersonate by login method.

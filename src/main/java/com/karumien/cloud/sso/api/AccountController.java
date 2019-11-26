@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +55,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<AccountInfo> createAccount(@Valid AccountInfo account) {
+    public ResponseEntity<AccountInfo> createAccount(AccountInfo account) {
         return new ResponseEntity<>(accountService.createAccount(account), HttpStatus.CREATED);
     }
 
@@ -100,7 +98,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> activateAccountModules(String accountNumber, @Valid List<String> modules) {
+    public ResponseEntity<Void> activateAccountModules(String accountNumber, List<String> modules) {
         moduleService.activateModules(modules, Arrays.asList(accountNumber));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -109,7 +107,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> deactivateAccountModules(String accountNumber, @Valid List<String> modules) {
+    public ResponseEntity<Void> deactivateAccountModules(String accountNumber, List<String> modules) {
         moduleService.deactivateModules(modules, Arrays.asList(accountNumber));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -143,7 +141,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> createAccountIdentity(String accountNumber, @Valid IdentityInfo identity) {
+    public ResponseEntity<IdentityInfo> createAccountIdentity(String accountNumber, IdentityInfo identity) {
         return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.OK);
     }
     
@@ -175,7 +173,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, @Valid List<String> roles) {
+    public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.assignRolesToIdentity(contactNumber, roles);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -184,7 +182,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> unassignAccountIdentityRoles(String accountNumber, String contactNumber, @Valid List<String> roles) {
+    public ResponseEntity<Void> unassignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.unassignRolesToIdentity(contactNumber, roles);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -227,7 +225,7 @@ public class AccountController implements AccountsApi {
 //     * {@inheritDoc}
 //     */
 //    @Override
-//    public ResponseEntity<Void> createIdentityCredentials(String accountNumber, String contactNumber, @Valid Credentials credentials) {
+//    public ResponseEntity<Void> createIdentityCredentials(String accountNumber, String contactNumber, Credentials credentials) {
 //        identityService.createIdentityCredentials(contactNumber, credentials);
 //        return new ResponseEntity<>(HttpStatus.CREATED);
 //    }
@@ -244,7 +242,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityRoleInfo>> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers) {
+    public ResponseEntity<List<IdentityRoleInfo>> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
         return new ResponseEntity<>(accountService.getAccountIdentitiesRoles(accountNumber, contactNumbers), HttpStatus.OK);
     }
     
@@ -293,7 +291,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> updateAccountIdentity(String accountNumber, String contactNumber, @Valid IdentityInfo identity) {
+    public ResponseEntity<IdentityInfo> updateAccountIdentity(String accountNumber, String contactNumber, IdentityInfo identity) {
         getAccountIdentity(accountNumber, contactNumber);
         return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
     }

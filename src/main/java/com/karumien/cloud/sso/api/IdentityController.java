@@ -9,8 +9,6 @@ package com.karumien.cloud.sso.api;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +44,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> createIdentity(@Valid IdentityInfo Identity) {
+    public ResponseEntity<IdentityInfo> createIdentity(IdentityInfo Identity) {
         return new ResponseEntity<>(identityService.createIdentity(Identity), HttpStatus.CREATED);
     }
 
@@ -63,7 +61,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createIdentityCredentials(String contactNumber, @Valid Credentials credentials) {
+    public ResponseEntity<Void> createIdentityCredentials(String contactNumber, Credentials credentials) {
         identityService.createIdentityCredentials(contactNumber, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -116,7 +114,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> assignIdentityRoles(String contactNumber, @Valid List<String> roles) {
+    public ResponseEntity<Void> assignIdentityRoles(String contactNumber, List<String> roles) {
         identityService.assignRolesToIdentity(contactNumber, roles);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -125,7 +123,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> unassignIdentityRoles(String contactNumber, @Valid List<String> roles) {
+    public ResponseEntity<Void> unassignIdentityRoles(String contactNumber, List<String> roles) {
         identityService.unassignRolesToIdentity(contactNumber, roles);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -206,7 +204,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> exists(@Valid String username, @Valid String contactNumber, @Valid String nav4Id) {
+    public ResponseEntity<Void> exists(String username, String contactNumber, String nav4Id) {
         
         if (username != null) {
             return new ResponseEntity<>(identityService.isIdentityExists(username) ? HttpStatus.OK : HttpStatus.GONE);
@@ -229,7 +227,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> createIdentityNav4Credentials(String nav4Id, @Valid Credentials credentials) {
+    public ResponseEntity<Void> createIdentityNav4Credentials(String nav4Id, Credentials credentials) {
         identityService.createIdentityCredentialsNav4(nav4Id, credentials);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -255,7 +253,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> updateIdentity(String contactNumber, @Valid IdentityInfo identity) {
+    public ResponseEntity<IdentityInfo> updateIdentity(String contactNumber, IdentityInfo identity) {
         return new ResponseEntity<>( identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
     }
 }

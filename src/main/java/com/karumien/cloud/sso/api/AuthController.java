@@ -9,7 +9,6 @@ package com.karumien.cloud.sso.api;
 import java.io.ByteArrayInputStream;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
 import javax.ws.rs.NotAuthorizedException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -19,12 +18,14 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jayway.jsonpath.JsonPath;
 import com.karumien.cloud.sso.api.handler.AuthApi;
 import com.karumien.cloud.sso.api.model.AuthorizationRequest;
 import com.karumien.cloud.sso.api.model.AuthorizationResponse;
+import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
@@ -71,7 +72,7 @@ public class AuthController implements AuthApi  {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public ResponseEntity<AuthorizationResponse> login(@Valid AuthorizationRequest user) {
+    public ResponseEntity<AuthorizationResponse> login(AuthorizationRequest user) {
         if (user.getGrantType() == null) {
             throw new IllegalArgumentException("grant_type can't be emoty");
         }
@@ -111,8 +112,24 @@ public class AuthController implements AuthApi  {
                             user.getUsername()).stream().map(a -> new ErrorData()
                                     .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
                                     .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
-            );            
-            return new ResponseEntity(error, user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? HttpStatus.UNAUTHORIZED : HttpStatus.UNPROCESSABLE_ENTITY);
+            );        
+            
+            // update-password flow
+            if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && "update-password".equals(error.getErrdata().get(0).getCode())) {
+
+                Credentials newCredentials = new Credentials();
+                newCredentials.setTemporary(false);
+                newCredentials.setPassword(user.getNewPassword());
+                newCredentials.setUsername(user.getUsername());
+                newCredentials.setCurrentPassword(user.getPassword());
+                
+                identityService.createIdentityCredentialsByUsername(user.getUsername(), newCredentials);
+                user.setPassword(user.getNewPassword());
+                user.setNewPassword(null);
+                login(user);
+            }
+            
+            return new ResponseEntity(error, user.getGrantType() == GrantType.PASSWORD ? HttpStatus.UNPROCESSABLE_ENTITY : HttpStatus.UNAUTHORIZED);
         } catch (javax.ws.rs.NotAuthorizedException e) {
             
             int errorNo = 400;
@@ -142,7 +159,7 @@ public class AuthController implements AuthApi  {
     }
 
     @Override
-    public ResponseEntity<Void> logout(@Valid AuthorizationRequest user) {
+    public ResponseEntity<Void> logout(AuthorizationRequest user) {
     
         if (user.getGrantType() != GrantType.REFRESH_TOKEN) {
             throw new IllegalArgumentException("Use grant_type refresh_token for logout");

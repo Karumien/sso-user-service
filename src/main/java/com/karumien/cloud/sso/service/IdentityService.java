@@ -69,6 +69,16 @@ public interface IdentityService {
     void createIdentityCredentials(String contactNumber, Credentials credentials);
 
     /**
+     * Create/update Identity credentials
+     * 
+     * @param username
+     *            unique Identity username
+     * @param credentials
+     *            new credentials for Identity
+     */
+    void createIdentityCredentialsByUsername(String username, Credentials newCredentials);
+
+    /**
      * Return base information about Identity by {@code contactNumber}.
      * 
      * @param contactNumber
@@ -216,4 +226,5 @@ public interface IdentityService {
     IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
 
     Optional<UserRepresentation> findIdentityByUsername(String username);
+
 }

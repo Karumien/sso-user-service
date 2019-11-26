@@ -6,8 +6,6 @@
  */
 package com.karumien.cloud.sso.api;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +34,7 @@ public class RoleController implements RolesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<RoleInfo> createRole(@Valid RoleInfo role) {
+    public ResponseEntity<RoleInfo> createRole(RoleInfo role) {
         return new ResponseEntity<>(roleService.createRole(role), HttpStatus.CREATED);
     }
     

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
@@ -126,7 +125,7 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo createIdentity(@Valid IdentityInfo identityInfo) {
+    public IdentityInfo createIdentity(IdentityInfo identityInfo) {
 
         UserRepresentation identity = new UserRepresentation();
 
@@ -231,7 +230,16 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void createIdentityCredentialsNav4(String nav4Id, @Valid Credentials newCredentials) {
+    public void createIdentityCredentialsByUsername(String username, Credentials newCredentials) {
+        UserRepresentation user = findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException(" username = " + username));
+        createCredentials(user, newCredentials);
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createIdentityCredentialsNav4(String nav4Id, Credentials newCredentials) {
         String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst().orElseThrow(
                 () -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         createCredentials(keycloak.realm(realm).users().get(userId).toRepresentation(), newCredentials);
@@ -343,7 +351,7 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void assignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
+    public void assignRolesToIdentity(String contactNumber, List<String> roles) {
     	UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
     	UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
     	
@@ -376,7 +384,7 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void unassignRolesToIdentity(String contactNumber, @Valid List<String> roles) {
+    public void unassignRolesToIdentity(String contactNumber, List<String> roles) {
         UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
         List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);

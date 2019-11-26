@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
@@ -333,7 +332,7 @@ public class AccountServiceImpl implements AccountService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, @Valid List<String> contactNumbers) {
+	public List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
 	    
         // TODO: https://jira.eurowag.com/browse/P572-313
 	    Set<String> accountRoles = getAccountRoles(accountNumber).stream().map(r -> r.getRoleId()).collect(Collectors.toSet());
