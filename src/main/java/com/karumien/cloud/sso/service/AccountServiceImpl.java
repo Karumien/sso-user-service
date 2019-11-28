@@ -114,6 +114,15 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
+    public Optional<GroupRepresentation> findGroupByCompRegNo(String compRegNo) {        
+        String groupId = searchService.findGroupIdsByAttribute(ATTR_COMP_REG_NO, compRegNo).stream().findFirst().orElse(null);
+        return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<GroupResource> findGroupResource(String accountNumber) {
 
         Optional<GroupRepresentation> group = findGroup(accountNumber);
@@ -186,6 +195,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountInfo getAccount(String accountNumber) {
         return mapping(findGroup(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AccountInfo getAccountByCompRegNo(String compRegNo) {
+        return mapping(findGroupByCompRegNo(compRegNo).orElseThrow(() -> new AccountNotFoundException("compReqgNo = " + compRegNo)));
     }
 
     private AccountInfo mapping(GroupRepresentation group) {

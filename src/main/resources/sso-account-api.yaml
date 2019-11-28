@@ -73,6 +73,26 @@ paths:
           description: Successfully removed existing Account
         '410':
           description: Account not found
+  /accounts/exists:
+    get:
+      summary: "Check if exist Identity by specified attributes"
+      operationId: exists
+      parameters:
+        - in: query
+          name: compRegNo
+          description: Account existency check by Company Registration Number
+          required: false
+          type: string 
+        - in: query
+          name: accountNumber
+          description: Account existency check by CRM Account Number
+          required: false
+          type: string 
+      responses:
+        '200':
+          description: Found Identity specified by filter
+        '410':
+          description: Identity specified by filter not found
   /accounts/{accountNumber}/modules:
     get:
       summary: "Get Active Modules on Account"
@@ -425,8 +445,8 @@ paths:
               type: string
         '410':
           description: Identity or Account not found
-    put:
-      summary: "Assign roles on Identity"
+    patch:
+      summary: "Assign only new roles on Identity"
       operationId: assignAccountIdentityRoles
       parameters:
         - name: accountNumber
@@ -449,6 +469,32 @@ paths:
       responses:
         '202':
           description: Successfully added roles to Identity
+        '410':
+          description: Identity or Account not found
+    put:
+      summary: "Update roles on Identity"
+      operationId: updateAccountIdentityRoles
+      parameters:
+        - name: accountNumber
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string   
+        - in: body
+          name: roles
+          description: List of Roles's ID on Identity
+          schema:
+            type: array
+            items:
+              type: string  
+      responses:
+        '202':
+          description: Successfully updated roles on Identity
         '410':
           description: Identity or Account not found
     delete:

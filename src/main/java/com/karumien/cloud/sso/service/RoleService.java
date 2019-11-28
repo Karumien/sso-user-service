@@ -70,16 +70,6 @@ public interface RoleService {
     RoleInfo getClientsRoleBaseOnId(String roleId, String clientId);
 
     /**
-     * Function to assign input role to identity.
-     * 
-     * @param clientId
-     *            {@link String} ID of client that we want to assign role
-     * @param role
-     *            {@link RoleInfo} object of role we want to ussigne to identity
-     */
-    void assignRoleToIdentity(String clientId, RoleInfo role);
-
-    /**
      * Returns all roles that identity have assigned.
      * 
      * @param contactNumber
@@ -88,16 +78,6 @@ public interface RoleService {
      * @return {@link List} of {@link RoleInfo} all roles that identity have assigned
      */
     List<String> getIdentityRoles(String contactNumber);
-
-    /**
-     * Function that remove role from identity.
-     * 
-     * @param contactNumber
-     *            {@link String} ID of identity from we want to remove role
-     * @param roleId
-     *            {@link String} id of role that we want to remove
-     */
-    void unassignRoleFromIdentity(String contactNumber, String roleId);
 
     /**
      * Return Role Resource by unique ID {@code roleId}.

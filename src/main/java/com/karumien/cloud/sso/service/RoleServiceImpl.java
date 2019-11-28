@@ -13,7 +13,6 @@
  */
 package com.karumien.cloud.sso.service;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ import javax.ws.rs.NotFoundException;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,19 +123,7 @@ public class RoleServiceImpl implements RoleService {
             return Optional.empty();
         }
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void assignRoleToIdentity(String contactNumber, RoleInfo role) {
-        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        RoleRepresentation realmRole = findRoleResource(role.getRoleId()).orElseThrow(() -> new RoleNotFoundException(role.getRoleId())).toRepresentation();
-        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
-        user.roles().realmLevel().add(Arrays.asList(realmRole));
-        user.update(userRepresentation);
-    }
-
+    
     private List<String> getIdentityRoles(UserRepresentation userRepresentation) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
             .filter(r -> !r.getName().toUpperCase().endsWith("_R") && !r.getName().toUpperCase().endsWith("_W") && !r.getName().toUpperCase().endsWith("_D"))
@@ -183,20 +169,6 @@ public class RoleServiceImpl implements RoleService {
                 localizationService.translate("role" + "." + role.getName().toLowerCase(), role.getAttributes(), 
                         LocaleContextHolder.getLocale(), roleInfo.getDescription()));
         return roleInfo;
-    }
-
-    
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void unassignRoleFromIdentity(String contactNumber, String roleId) {
-        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        RoleRepresentation realmRole = findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId)).toRepresentation();
-        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
-        user.roles().realmLevel().remove(Arrays.asList(realmRole));
-        user.update(userRepresentation);
     }
 
     /**

@@ -10,9 +10,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AccountsApi;
@@ -50,7 +53,7 @@ public class AccountController implements AccountsApi {
     
     @Autowired
     private RoleService roleService;
-
+    
     /**
      * {@inheritDoc}
      */
@@ -75,13 +78,28 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<AccountInfo> getAccount(String accountNumber) {
         return new ResponseEntity<>(accountService.getAccount(accountNumber), HttpStatus.OK);
     }
+    
+    @Override
+    public ResponseEntity<Void> exists(String compRegNo, String accountNumber) {
+                 
+        if (StringUtils.hasText(accountNumber)) {
+            accountService.getAccount(accountNumber);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        if (StringUtils.hasText(compRegNo)) {
+            accountService.getAccountByCompRegNo(compRegNo);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<List<AccountInfo>> getAccounts() {
-        // Locale locale = LocaleContextHolder.getLocale();
         return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
     }
 
@@ -168,13 +186,37 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> deleteAccountIdentity(String accountNumber, String contactNumber) {
 		return new ResponseEntity<>(accountService.deleteAccountIdentity(accountNumber, contactNumber)? HttpStatus.NO_CONTENT : HttpStatus.GONE);
 	}
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
+        identityService.updateRolesOfIdentity(
+                accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+                Arrays.asList(roleId), UpdateType.ADD);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
-        identityService.assignRolesToIdentity(contactNumber, roles);
+        identityService.updateRolesOfIdentity(
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            roles, UpdateType.ADD);
+        return new ResponseEntity<>(HttpStatus.PARTIAL_CONTENT);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, @Valid List<String> roles) {
+        identityService.updateRolesOfIdentity(
+                accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+                roles, UpdateType.UPDATE);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -183,17 +225,10 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> unassignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
-        identityService.unassignRolesToIdentity(contactNumber, roles);
+        identityService.updateRolesOfIdentity(
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            roles, UpdateType.DELETE);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
-        identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId));
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
     /**
@@ -201,7 +236,9 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> unassignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
-        identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId));
+        identityService.updateRolesOfIdentity(
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            Arrays.asList(roleId), UpdateType.DELETE);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
@@ -212,23 +249,6 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> getAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         return new ResponseEntity<>(identityService.isActiveRole(roleId, contactNumber) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
     }
-    
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public ResponseEntity<Void> checkUserNameExist(String username) {    	
-//    	return new ResponseEntity<Void>(accountService.checkIfUserNameExist(username) ? HttpStatus.OK : HttpStatus.NOT_ACCEPTABLE);
-//    }
-//
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public ResponseEntity<Void> createIdentityCredentials(String accountNumber, String contactNumber, Credentials credentials) {
-//        identityService.createIdentityCredentials(contactNumber, credentials);
-//        return new ResponseEntity<>(HttpStatus.CREATED);
-//    }
     
     /**
      * {@inheritDoc}

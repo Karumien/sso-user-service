@@ -9,8 +9,10 @@ package com.karumien.cloud.sso.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
@@ -113,25 +115,15 @@ public interface IdentityService {
     boolean isIdentityExists(String username);
 
     /**
-     * Assign selected list of roles to as current Identity
+     * Add/remove roles of as current Identity.
      * 
      * @param contactNumber
      *            unique Identity CRM ID
      * @param roles
-     *            {@link List} {@link String} list of ids of roles we want to add to identity
+     *            {@link List} {@link String} list of ids of roles we want to be on identity
+     * @param updateType update type
      */
-    void assignRolesToIdentity(String contactNumber, List<String> roles);
-
-    /**
-     * Remove selected list of roles to as current Identity.
-     * 
-     * @param contactNumber
-     *            unique Identity CRM ID
-     * @param roles
-     *            {@link List} {@link String} list of ids of roles we want to remove from identity
-     */
-    void unassignRolesToIdentity(String contactNumber, List<String> roles);
-
+    void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType);
 
     /**
      * Function that save pin of Identity driver base on input.
@@ -161,6 +153,10 @@ public interface IdentityService {
 
     Optional<UserRepresentation> findIdentity(String contactNumber);
 
+    Optional<UserRepresentation> findIdentityNav4(String nav4Id);
+
+    Optional<UserRepresentation> findIdentityByUsername(String username);
+
     /**
      * Block/unblock Ientity.
      * 
@@ -181,8 +177,6 @@ public interface IdentityService {
     DriverPin getPinOfIdentityDriver(String contactNumber);
 
     boolean isActiveRole(String roleId, String contactNumber);
-
-    void refreshBinaryRoles(UserRepresentation userRepresentation);
 
     IdentityInfo mapping(UserRepresentation userRepresentation);
 
@@ -225,32 +219,10 @@ public interface IdentityService {
      */
     IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
 
-    Optional<UserRepresentation> findIdentityByUsername(String username);
-
     boolean isIdentityTemporaryLocked(String username);
-
-    /**
-     * Assign selected list of roles to as current Identity
-     * 
-     * @param nav4Id
-     *            unique Identity Navision 4 ID
-     * @param roles
-     *            {@link List} {@link String} list of ids of roles we want to add to identity
-     */
-    void assignRolesToNav4Identity(String nav4Id, List<String> roles);
-
-    /**
-     * Remove selected list of roles to as current Identity.
-     * 
-     * @param nav4Id
-     *            unique Identity Navision 4 ID
-     * @param roles
-     *            {@link List} {@link String} list of ids of roles we want to remove from identity
-     */
-    void unassignRolesToNav4Identity(String nav4Id, List<String> roles);
-
+ 
     boolean isActiveRoleNav4(String roleId, String nav4Id);
-
-    Optional<UserRepresentation> findIdentityNav4(String nav4Id);
+ 
+    void refreshBinaryRoles(UserResource userResource);
 
 }

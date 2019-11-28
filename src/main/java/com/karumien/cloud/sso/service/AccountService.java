@@ -48,11 +48,15 @@ public interface AccountService {
 
     AccountInfo getAccount(String accountNumber);
 
+    AccountInfo getAccountByCompRegNo(String compRegNo);
+
     void deleteAccount(String accountNumber);
 
     List<AccountInfo> getAccounts();
 
     Optional<GroupRepresentation> findGroup(String accountNumber);
+
+    Optional<GroupRepresentation> findGroupByCompRegNo(String compRegNo);
 
     Optional<GroupResource> findGroupResource(String accountNumber);
 
@@ -121,4 +125,6 @@ public interface AccountService {
     List<String> getAccountRightsOfIdentity(String contactNumber);
 
     List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers);
+
+
 }

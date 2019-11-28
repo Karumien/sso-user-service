@@ -53,7 +53,7 @@ paths:
           schema:
             $ref: '#/definitions/IdentityInfo'
         '409':
-          description: Duplicate Identity with same CRM ContactNumber
+          description: Duplicate Identity with same CRM Contact Number
         '410':
           description: Identity Not Found
     put:
@@ -451,6 +451,27 @@ paths:
           description: Successfully assigned Roles to Identity
         '410':
           description: Identity Not Found
+    patch:
+      summary: "Assign roles on Identity"
+      operationId: "updateIdentityRoles"
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: roles
+          description: List of Identity's ID to assign
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '206':
+          description: Successfully patched (assigned) Roles to Identity
+        '410':
+          description: Identity Not Found
     delete:
       summary: "Unassign Roles on Identity"
       operationId: "unassignIdentityRoles"
@@ -545,10 +566,10 @@ paths:
           name: username
           description: Identity existency check by username
           required: false
-          type: string 
+          type: string
         - in: query
           name: contactNumber
-          description: Identity existency check by CRM Contact ID
+          description: Identity existency check by CRM Contact Number
           required: false
           type: string 
         - in: query

@@ -9,6 +9,8 @@ package com.karumien.cloud.sso.api;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -97,34 +99,43 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRole(String contactNumber, String roleId) {
-        identityService.assignRolesToIdentity(contactNumber, Arrays.asList(roleId));
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), Arrays.asList(roleId), UpdateType.ADD);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> unassignIdentityRole(String contactNumber, String roleId) {
-        identityService.unassignRolesToIdentity(contactNumber, Arrays.asList(roleId));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<Void> assignIdentityRoles(String contactNumber, List<String> roles) {
-        identityService.assignRolesToIdentity(contactNumber, roles);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.ADD);
+        return new ResponseEntity<>(HttpStatus.PARTIAL_CONTENT);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> updateIdentityRoles(String contactNumber, @Valid List<String> roles) {
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.UPDATE);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unassignIdentityRole(String contactNumber, String roleId) {
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRoles(String contactNumber, List<String> roles) {
-        identityService.unassignRolesToIdentity(contactNumber, roles);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.DELETE);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -278,7 +289,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignNav4IdentityRole(String nav4Id, String roleId) {
-        identityService.assignRolesToNav4Identity(nav4Id, Arrays.asList(roleId));
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), Arrays.asList(roleId), UpdateType.ADD);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
@@ -287,7 +298,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignNav4IdentityRole(String nav4Id, String roleId) {
-        identityService.unassignRolesToNav4Identity(nav4Id, Arrays.asList(roleId));
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
