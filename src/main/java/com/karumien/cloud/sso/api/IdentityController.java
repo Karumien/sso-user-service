@@ -236,7 +236,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> getIdentityNav4(String nav4Id) {
+    public ResponseEntity<IdentityInfo> getNav4Identity(String nav4Id) {
     	IdentityInfo identity = identityService.getIdentityByNav4(nav4Id);
     	return new ResponseEntity<IdentityInfo>(identity, identity != null ? HttpStatus.OK : HttpStatus.GONE);
     }
@@ -255,5 +255,39 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<IdentityInfo> updateIdentity(String contactNumber, IdentityInfo identity) {
         return new ResponseEntity<>( identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> getNav4IdentityRole(String nav4Id, String roleId) {
+        return new ResponseEntity<>(identityService.isActiveRoleNav4(roleId, nav4Id) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<String>> getNav4IdentityRoleIds(String nav4Id) {
+        return new ResponseEntity<>(roleService.getIdentityRolesNav4(nav4Id), HttpStatus.OK);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignNav4IdentityRole(String nav4Id, String roleId) {
+        identityService.assignRolesToNav4Identity(nav4Id, Arrays.asList(roleId));
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> unassignNav4IdentityRole(String nav4Id, String roleId) {
+        identityService.unassignRolesToNav4Identity(nav4Id, Arrays.asList(roleId));
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

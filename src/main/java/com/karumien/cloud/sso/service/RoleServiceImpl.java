@@ -138,16 +138,27 @@ public class RoleServiceImpl implements RoleService {
         user.update(userRepresentation);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getIdentityRoles(String contactNumber) {
-        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+    private List<String> getIdentityRoles(UserRepresentation userRepresentation) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
             .filter(r -> !r.getName().toUpperCase().endsWith("_R") && !r.getName().toUpperCase().endsWith("_W") && !r.getName().toUpperCase().endsWith("_D"))
             .map(r -> r.getName())
             .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getIdentityRolesNav4(String nav4Id) {
+        return getIdentityRoles(identityService.findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("nav4Id = " + nav4Id)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getIdentityRoles(String contractNumber) {
+        return getIdentityRoles(identityService.findIdentity(contractNumber).orElseThrow(() -> new IdentityNotFoundException(contractNumber)));
     }
 
     /**

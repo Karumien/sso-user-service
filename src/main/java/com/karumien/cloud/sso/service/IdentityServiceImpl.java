@@ -301,6 +301,19 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
+    public Optional<UserRepresentation> findIdentityNav4(String nav4Id) {
+        List<String> userIds = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id);
+        if (userIds.size() > 1) {
+            throw new IdentityDuplicateException("nav4Id = " + nav4Id);            
+        }        
+        String userId = userIds.stream().findFirst().orElse(null);
+        return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IdentityInfo mapping(UserRepresentation userRepresentation) {
 
         // TODO: Orica Mapper
@@ -403,8 +416,8 @@ public class IdentityServiceImpl implements IdentityService {
     public void unassignRolesToIdentity(String contactNumber, List<String> roles) {
         UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
-        List<RoleRepresentation> list = getListOfRoleReprasentationBaseOnIds(roles);
-        user.roles().realmLevel().remove(list);
+
+        user.roles().realmLevel().remove(getListOfRoleReprasentationBaseOnIds(roles));
         refreshBinaryRoles(userRepresentation);
     }
 
@@ -512,6 +525,44 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public Optional<UserRepresentation> findIdentityByUsername(String username) {
         return keycloak.realm(realm).users().search(username).stream().findFirst();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void assignRolesToNav4Identity(String nav4Id, List<String> roles) {
+        UserRepresentation userRepresentation = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("nav4Id = " + nav4Id));
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+        
+        // remove unused roles
+        user.roles().realmLevel().remove(user.roles().realmLevel().listAll().stream()
+            .filter(actualRole -> !roles.contains(actualRole.getId())).collect(Collectors.toList()));
+
+        // add new roles
+        user.roles().realmLevel().add(getListOfRoleReprasentationBaseOnIds(roles));
+        
+        refreshBinaryRoles(userRepresentation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unassignRolesToNav4Identity(String nav4Id, List<String> roles) {
+        UserRepresentation userRepresentation = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("nav4Id = " + nav4Id));
+        UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
+
+        user.roles().realmLevel().remove(getListOfRoleReprasentationBaseOnIds(roles));
+        refreshBinaryRoles(userRepresentation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isActiveRoleNav4(String roleId, String nav4Id) {
+        return roleService.getIdentityRolesNav4(nav4Id).contains(roleId);
     }
 
 }

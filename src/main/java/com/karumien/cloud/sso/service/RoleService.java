@@ -138,4 +138,6 @@ public interface RoleService {
      */
     List<String> getIdentityRights(GroupResource groupResource, String contactNumber);
 
+    List<String> getIdentityRolesNav4(String nav4Id);
+
 }

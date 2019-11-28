@@ -229,4 +229,28 @@ public interface IdentityService {
 
     boolean isIdentityTemporaryLocked(String username);
 
+    /**
+     * Assign selected list of roles to as current Identity
+     * 
+     * @param nav4Id
+     *            unique Identity Navision 4 ID
+     * @param roles
+     *            {@link List} {@link String} list of ids of roles we want to add to identity
+     */
+    void assignRolesToNav4Identity(String nav4Id, List<String> roles);
+
+    /**
+     * Remove selected list of roles to as current Identity.
+     * 
+     * @param nav4Id
+     *            unique Identity Navision 4 ID
+     * @param roles
+     *            {@link List} {@link String} list of ids of roles we want to remove from identity
+     */
+    void unassignRolesToNav4Identity(String nav4Id, List<String> roles);
+
+    boolean isActiveRoleNav4(String roleId, String nav4Id);
+
+    Optional<UserRepresentation> findIdentityNav4(String nav4Id);
+
 }

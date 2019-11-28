@@ -376,7 +376,7 @@ paths:
             items:
               $ref: '#/definitions/IdentityRoleInfo'
         '410':
-          description: Gone  
+          description: Identity or Account not found  
   /accounts/{accountNumber}/identities/{contactNumber}/rights:
     get:
       summary: "Get Identity's Rights Ids"
@@ -400,7 +400,7 @@ paths:
             items:
               type: string
         '410':
-          description: Gone
+          description: Identity or Account not found
   /accounts/{accountNumber}/identities/{contactNumber}/roles:
     get:
       summary: "Get Identity's Roles Ids"
@@ -424,7 +424,7 @@ paths:
             items:
               type: string
         '410':
-          description: Gone
+          description: Identity or Account not found
     put:
       summary: "Assign roles on Identity"
       operationId: assignAccountIdentityRoles

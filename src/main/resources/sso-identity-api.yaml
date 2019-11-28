@@ -131,7 +131,7 @@ paths:
     get:
       summary: "Get detail of the given Identity"
       description: "Method returns detail information about Identity."
-      operationId: getIdentityNav4
+      operationId: getNav4Identity
       parameters:
         - name: nav4Id
           in: path
@@ -145,6 +145,89 @@ paths:
             $ref: '#/definitions/IdentityInfo'
         '410':
           description: Gone
+  /identities/nav4/{nav4Id}/roles:
+    get:
+      summary: "Get Identity's Roles Ids"
+      operationId: getNav4IdentityRoleIds
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              type: string
+        '410':
+          description: Identity not found
+  /identities/nav4/{nav4Id}/roles/{roleId}:
+    get:
+      summary: "Get assigned Roles on Identity"
+      operationId: "getNav4IdentityRole"
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+        - name: roleId
+          in: path
+          description: Filtering by Role ID
+          required: true
+          type: string  
+      responses:
+        '200':
+          description: Role is assigned to Identity
+        '410':
+          description: Identity not found
+        '422':
+          description: Role not assigned
+    put:
+      summary: "Assign Role to Identity"
+      operationId: "assignNav4IdentityRole"
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+        - name: roleId
+          in: path
+          description: Filtering by Role ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully assigned Role on Identity
+        '410':
+          description: Identity not found
+        '422':
+          description: Role for Identity not assigned      
+    delete:
+      summary: "Remove Role on Identity"
+      operationId: "unassignNav4IdentityRole"
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+        - name: roleId
+          in: path
+          description: Filtering by Identity ID
+          required: true
+          type: string    
+      responses:
+        '202':
+          description: Successfully unassigned Role from Identity
+        '410':
+          description: Identity not found
+        '422':
+          description: Role not unassigned
   /identities/nav4/{nav4Id}/credentials:
     post:
       summary: "Create Identity credentials"
