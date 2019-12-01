@@ -23,6 +23,7 @@ import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
+import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -80,8 +81,8 @@ public class IdentityController implements IdentitiesApi {
             return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
                 .errmsg(e.getMessage())
                 .errdata(Arrays.asList(new ErrorData()
-                    .description(messageSource.getMessage("error.credentials.invalid-password", null, LocaleContextHolder.getLocale()))
-                    .code("invalid-password"))), HttpStatus.UNPROCESSABLE_ENTITY);
+                    .description(messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
+                    .code(ErrorDataCodeCredentials.PASSWORD.toString()))), HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -264,8 +265,8 @@ public class IdentityController implements IdentitiesApi {
             return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
                 .errmsg(e.getMessage())
                 .errdata(Arrays.asList(new ErrorData()
-                    .description(messageSource.getMessage("error.credentials.invalid-password", null, LocaleContextHolder.getLocale()))
-                    .code("invalid-password"))), HttpStatus.UNPROCESSABLE_ENTITY);
+                    .description(messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
+                    .code(ErrorDataCodeCredentials.PASSWORD.toString()))), HttpStatus.UNPROCESSABLE_ENTITY);
         }        
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

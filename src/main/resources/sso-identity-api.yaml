@@ -587,12 +587,6 @@ paths:
         '410':
           description: Identity specified by filter not found
 definitions:
-  ErrorDataCodeCredentials:
-    type: string
-    description: Error codes for attributes
-    enum:
-      - invalid-username
-      - invalid-password  
   ErrorData:
     type: object
     description: EW ErrorMessage model data

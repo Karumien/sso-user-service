@@ -13,10 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.DefApi;
-import com.karumien.cloud.sso.api.model.ArrayErrorDataCodeCredentials;
-import com.karumien.cloud.sso.api.model.ArrayErrorDataCodeLogin;
 import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
+import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentialsSpecification;
 import com.karumien.cloud.sso.api.model.ErrorDataCodeLogin;
+import com.karumien.cloud.sso.api.model.ErrorDataCodeLoginSpecification;
 
 import io.swagger.annotations.Api;
 
@@ -34,19 +34,19 @@ public class DefController implements DefApi  {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<ArrayErrorDataCodeLogin> getErrorDataCodeLogin() {
-        ArrayErrorDataCodeLogin array = new ArrayErrorDataCodeLogin();
-        array.addAll(Arrays.asList(ErrorDataCodeLogin.values()));
-        return new ResponseEntity<>(array, HttpStatus.OK);
+    public ResponseEntity<ErrorDataCodeLoginSpecification> getErrorDataCodeLogin() {
+        ErrorDataCodeLoginSpecification specification = new ErrorDataCodeLoginSpecification();
+        specification.setEnum(Arrays.asList(ErrorDataCodeLogin.values()));
+        return new ResponseEntity<>(specification, HttpStatus.OK);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<ArrayErrorDataCodeCredentials> getErrorDataCodeCredentials() {
-        ArrayErrorDataCodeCredentials array = new ArrayErrorDataCodeCredentials();
-        array.addAll(Arrays.asList(ErrorDataCodeCredentials.values()));
-        return new ResponseEntity<>(array, HttpStatus.OK);
+    public ResponseEntity<ErrorDataCodeCredentialsSpecification> getErrorDataCodeCredentials() {
+        ErrorDataCodeCredentialsSpecification specification = new ErrorDataCodeCredentialsSpecification();
+        specification.setEnum(Arrays.asList(ErrorDataCodeCredentials.values()));
+        return new ResponseEntity<>(specification, HttpStatus.OK);
     }
 }
