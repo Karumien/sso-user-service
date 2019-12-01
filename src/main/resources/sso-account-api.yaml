@@ -652,17 +652,6 @@ paths:
           schema:
             $ref: '#/definitions/ErrorMessage'
 definitions:
-  ErrorCode:
-    type: string
-    description: Master Error Code
-    enum:
-      - CLIENT_ERROR
-  ErrorDataCodeCredentials:
-    type: string
-    description: Error codes for attributes
-    enum:
-      - invalid-username
-      - invalid-password  
   IdentityInfo:
     type: object
     description: "Basic information about Identity"
@@ -899,6 +888,11 @@ definitions:
         description: ie. Invalid phone number format. Valid is XXX XXX XXX
       data:
         type: object
+  ErrorCode:
+    type: string
+    description: Master Error Code
+    enum:
+      - CLIENT_ERROR
   ErrorMessage:
     type: object
     description: EW ErrorMessage model

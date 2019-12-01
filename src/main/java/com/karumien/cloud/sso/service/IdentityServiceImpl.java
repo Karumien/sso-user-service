@@ -40,7 +40,7 @@ import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
-import com.karumien.cloud.sso.exceptions.PolicyPasswordException;
+import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
 
 
@@ -272,7 +272,7 @@ public class IdentityServiceImpl implements IdentityService {
             userResource.update(user);
             
         } catch (BadRequestException e) {
-            throw new PolicyPasswordException(newCredentials.getPassword());
+            throw new PasswordPolicyException(newCredentials.getPassword());
         }
     }
 

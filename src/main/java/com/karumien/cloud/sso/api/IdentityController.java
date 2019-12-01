@@ -12,6 +12,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.karumien.cloud.sso.api.handler.IdentitiesApi;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
+import com.karumien.cloud.sso.api.model.ErrorCode;
+import com.karumien.cloud.sso.api.model.ErrorData;
+import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
+import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.RoleService;
 
@@ -42,6 +48,9 @@ public class IdentityController implements IdentitiesApi {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private MessageSource messageSource;
+    
     /**
      * {@inheritDoc}
      */
@@ -62,9 +71,18 @@ public class IdentityController implements IdentitiesApi {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ResponseEntity<Void> createIdentityCredentials(String contactNumber, Credentials credentials) {
-        identityService.createIdentityCredentials(contactNumber, credentials);
+        try {
+            identityService.createIdentityCredentials(contactNumber, credentials);
+        } catch (PasswordPolicyException e) {            
+            return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
+                .errmsg(e.getMessage())
+                .errdata(Arrays.asList(new ErrorData()
+                    .description(messageSource.getMessage("error.credentials.invalid-password", null, LocaleContextHolder.getLocale()))
+                    .code("invalid-password"))), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -237,9 +255,18 @@ public class IdentityController implements IdentitiesApi {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public ResponseEntity<Void> createIdentityNav4Credentials(String nav4Id, Credentials credentials) {
-        identityService.createIdentityCredentialsNav4(nav4Id, credentials);
+        try {
+            identityService.createIdentityCredentialsNav4(nav4Id, credentials);
+        } catch (PasswordPolicyException e) {            
+            return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
+                .errmsg(e.getMessage())
+                .errdata(Arrays.asList(new ErrorData()
+                    .description(messageSource.getMessage("error.credentials.invalid-password", null, LocaleContextHolder.getLocale()))
+                    .code("invalid-password"))), HttpStatus.UNPROCESSABLE_ENTITY);
+        }        
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

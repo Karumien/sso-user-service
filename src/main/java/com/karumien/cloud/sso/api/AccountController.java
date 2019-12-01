@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -21,10 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.Credentials;
+import com.karumien.cloud.sso.api.model.ErrorCode;
+import com.karumien.cloud.sso.api.model.ErrorData;
+import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
@@ -53,6 +59,9 @@ public class AccountController implements AccountsApi {
     
     @Autowired
     private RoleService roleService;
+    
+    @Autowired
+    private MessageSource messageSource;
     
     /**
      * {@inheritDoc}
@@ -160,7 +169,8 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> createAccountIdentity(String accountNumber, IdentityInfo identity) {
-        return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.OK);
+        //TODO: Access denied when accountNumber != identity.accountNuber
+        return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.CREATED);
     }
     
     /**
@@ -300,10 +310,19 @@ public class AccountController implements AccountsApi {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ResponseEntity<Void> createIdentityCredentials(String accountNumber, String contactNumber, Credentials credentials) {
         getAccountIdentity(accountNumber, contactNumber);
-        identityService.createIdentityCredentials(contactNumber, credentials);
+        try {
+            identityService.createIdentityCredentials(contactNumber, credentials);
+        } catch (PasswordPolicyException e) {            
+            return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
+                .errmsg(e.getMessage())
+                .errdata(Arrays.asList(new ErrorData()
+                    .description(messageSource.getMessage("error.credentials.invalid-password", null, LocaleContextHolder.getLocale()))
+                    .code("invalid-password"))), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

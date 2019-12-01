@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @since 1.0, 10. 6. 2019 13:56:31
  */
 @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-public class PolicyPasswordException extends RuntimeException {
+public class PasswordPolicyException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;
 
-    public PolicyPasswordException(String password) {
+    public PasswordPolicyException(String password) {
         super("Password Policy not accept password: " + password);
     }
     

@@ -1,0 +1,351 @@
+swagger: '2.0'
+info:
+  description: EW REST API for SSO - Authentication Service
+  version: '1.0'
+  termsOfService: 'http://www.karumien.com/terms/'
+  contact:
+    email: info@karumien.com
+  title: Definitions
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+basePath: /api/v1/iam
+schemes:
+  - http
+paths:
+  /def/ErrorDataCodeLogin:
+    get:
+      operationId: getErrorDataCodeLogin
+      responses:
+        200:
+          description: "Successful Logout"
+          schema:
+            $ref: '#/definitions/ArrayErrorDataCodeLogin'      
+  /def/ErrorDataCodeCredentials:
+    get:
+      operationId: getErrorDataCodeCredentials
+      responses:
+        200:
+          description: "Successful Logout"
+          schema:
+            $ref: '#/definitions/ArrayErrorDataCodeCredentials'      
+definitions:
+  GrantType:
+    type: string
+    description: Type of Bearer
+    enum:
+      - password
+      - client_credentials
+      - refresh_token
+      - pin
+      - impersonate
+  AuthorizationRequest:
+    type: object
+    required:
+      - grant_type
+    properties:
+      grant_type:
+        $ref: '#/definitions/GrantType'
+      username:
+        type: string
+        maxLength: 100
+        description: Identity ID of user - required for grant_type of type 'password' or 'pin' or in 'impersonate' use as requested user's userame.
+      password:
+        type: string
+        maxLength: 100
+        description: User's password - required for grant_type of type 'password'.
+      client_id:
+        type: string
+        maxLength: 250
+        description: Client Id - required for grant_type of type 'client_credentials'.
+      client_secret:
+        type: string
+        maxLength: 250
+        description: Client Secret - required for grant_type of type 'client_credentials'.
+      refresh_token:
+        type: string
+        maxLength: 4000
+        description: Refresh Token for Access Token renewal process - required for grant_type of type 'refresh_token' or 'impersonate'.
+      pin:
+        type: string
+        maxLength: 10
+        description: Driver's pin - required for grant_type of type 'pin'.
+      newPassword:
+        type: string
+        maxLength: 100
+        description: For scenario temporary password / required for grant_type of type 'password' and temporary password flow.
+    example:
+      password:
+        grant_type: password
+        identity: user@ew.com
+        secret: heslo123
+      client_credentials:
+        grant_type: client_credentials
+        client_id: admin-cli
+        client_secret: uewrutzewre
+      refresh_token:
+        grant_type: refresh_token
+        refresh_token: uyewiryerweiruew
+  AuthorizationResponse:
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - expires_in
+        - token_type
+      properties:
+        access_token:
+          type: string
+          maxLength: 4000
+          description: Access Token Representation
+        refresh_token:
+          type: string
+          maxLength: 4000
+          description: Refresh Token Representation
+        expires_in:
+          type: integer
+          format: int64
+          description: Access Token expiration in seconds
+        refresh_expires_in:
+          type: integer
+          format: int64
+          description: Refresh Token expiration in seconds
+        token_type:
+          type: string
+          description: Base type of token
+      example:
+        access_token: rewrsthhgfh
+        refresh_token: a3sdwer3twe
+        expires_in: 3600
+        token_type: Bearer
+  PasswordPolicy:
+    type: object
+    description: "Configuration object for Password Policy"
+    properties:
+      value:
+        type: string
+        description: "Full policy description"
+      minSpecialChars:
+        type: integer
+        description: "Minimum use special chars"
+        example: "1"       
+      minUpperCase: 
+        type: integer
+        description: "Minimum use upper case chars"
+        example: "1"
+      minLength:
+        type: integer
+        description: "Minimum password length"
+        example: "8"
+      notUseUsername:
+        type: boolean
+        description: "Use username in password"
+        example: "true"
+      passwordHistory:
+        type: integer
+        description: "Use same password from history"
+        example: "3"
+      minLowerCase:
+        type: integer
+        description: "Minimum use lower case chars"
+        example: "1"
+      minDigits:
+        type: integer
+        description: "Minimum use digits"
+        example: "1"
+      passwordExpireDays:
+        type: integer
+        description: "Password expire in days"
+        example: "365"
+      hashAlgorithm:
+        type: string
+        description: "Hash algorithm for password encode"
+        example: "pbkdf2-sha256"
+      hashIterations:
+        type: integer
+        description: "Hash iterations for password encode"
+        example: "27500"
+      passwordBlacklist:
+        type: boolean
+        description: "Use blacklist for passwords"
+      regexPattern:
+        type: string
+        description: "REGEX pattern for password validation"
+        example: ".*"
+      translation:
+        type: string
+        description: "Policy translation"
+        maxLength: 255
+  UsernamePolicy:
+    type: object
+    description: "Configuration object for Username Policy"
+    properties:
+      value:
+        type: string
+        description: "Full policy description"
+      specialCharsOnly:
+        type: string
+        description: "Use only specified special chars"
+        default: "-_.@"
+      canSpecialCharStart:
+        type: boolean
+        description: "Can special char starts username"
+        default: false              
+      canSpecialCharEnd:
+        type: boolean
+        description: "Can special char ends username"
+        default: false              
+      canSpecialCharRepeated:
+        type: boolean
+        description: "Can special char repeated ie. a34..3"
+        default: false              
+      useUpperCase: 
+        type: boolean
+        description: "Use upper case chars"
+        default: false        
+      useLowerCase: 
+        type: boolean
+        description: "Use lower case chars"
+        default: true
+      minLength:
+        type: integer
+        description: "Minimum username length"
+        example: "8"
+      useDigits:
+        type: boolean
+        description: "Minimum use digits"
+        default: true
+      regexPattern:
+        type: string
+        description: "REGEX pattern for username validation"
+        example: ".*"
+      translation:
+        type: string
+        description: "Policy translation"
+        maxLength: 255  
+  ErrorCode:
+    type: string
+    description: Master Error Code
+    enum:
+      - CLIENT_ERROR
+  ArrayErrorDataCodeLogin:
+    type: array
+    items:
+      $ref: "#/definitions/ErrorDataCodeLogin"
+  ErrorDataCodeLogin:
+    type: string
+    description: Error codes for attributes
+    enum:
+      - configure-totp
+      - update-password
+      - update-profile
+      - verify-email
+  ArrayErrorDataCodeCredentials:
+    type: array
+    items:
+      $ref: "#/definitions/ErrorDataCodeCredentials"
+  ErrorDataCodeCredentials:
+    type: string
+    description: Error codes for attributes
+    enum:
+      - invalid-username
+      - invalid-password  
+  ErrorData:
+    type: object
+    description: EW ErrorMessage model data
+    required:
+    - code
+    properties:
+      code:
+        type: string
+        description: ie. invalid-phone-number-format
+        maxLength: 50
+      attribute: 
+        type: string
+        maxLength: 250
+        description: ie. phoneNumberPrimary
+      description:
+        type: string
+        maxLength: 1000
+        description: ie. Invalid phone number format. Valid is XXX XXX XXX
+      data:
+        type: object
+  ErrorMessage:
+    type: object
+    description: EW ErrorMessage model
+    required:
+    - errno
+    - errcode
+    properties:
+      errno: 
+        type: integer
+        default: -1
+      errcode: 
+        $ref: "#/definitions/ErrorCode"
+      errmsg: 
+        type: string
+        maxLength: 250
+        description: Optional error message
+      errdata:
+        type: array
+        items:
+          $ref: "#/definitions/ErrorData"
+  IdentityInfo:
+    type: object
+    description: "Basic information about Identity"
+#    required:
+#     - accountNumber
+#      - contactNumber
+    properties:
+      identityId:
+        type: string
+        description: Identity's ID 
+      accountNumber:
+        type: string
+        description: Identity's CRM Account ID
+      contactNumber:
+        type: string
+        description: Identity's Unique ID 
+      nav4Id:
+        type: string
+        description: Identity's Unique NAV4 ID 
+      lastName:
+        type: string
+        description: "Last name/ surname of the Identity"
+        maxLength: 50
+      firstName:
+        type: string
+        description: "First name of the Identity"
+        maxLength: 50
+      username:
+        type: string
+        description: "Unique username"
+        maxLength: 50
+      email:
+        type: string
+        description: "Primary email used primary for password reset"
+        maxLength: 100
+      emailVerified:
+        type: boolean
+        description: "Verified status of itentity email"
+      phone:
+        type: string
+        description: "Phone used primary for OTP"
+        maxLength: 30
+      globalEmail:
+        type: string
+        description: "Contact email - can be company global"
+        maxLength: 100
+      locale:
+        type: string
+        description: "User's default Locale"
+        maxLength: 50  
+      crmAccountId:
+        type: string
+        description: Backward Compatibility
+      crmContactId:
+        type: string
+        description: Backward Compatibility
+      binaryRights:
+        type: string
+        description: "User's rights"
