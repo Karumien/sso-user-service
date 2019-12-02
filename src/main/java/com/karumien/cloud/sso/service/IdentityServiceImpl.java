@@ -257,6 +257,7 @@ public class IdentityServiceImpl implements IdentityService {
             // change when new username ready
             if (StringUtils.hasText(newCredentials.getUsername())) {
                 user.setUsername(newCredentials.getUsername());
+                userResource.update(user);          
             }
 
             // TODO: verify currentPassword
@@ -277,9 +278,8 @@ public class IdentityServiceImpl implements IdentityService {
                 }
             
                 userResource.resetPassword(credentialRepresentation);                
+                userResource.update(user);          
             }
-
-            userResource.update(user);          
 
         } catch (BadRequestException e) {
             throw new PasswordPolicyException(newCredentials.getPassword());
