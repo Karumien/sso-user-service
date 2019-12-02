@@ -844,8 +844,6 @@ definitions:
   Credentials:
     type: object
     description: "Object for setting of Identity credential"
-    required:
-      - username
     properties:
       username:
         type: string

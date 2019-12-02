@@ -247,30 +247,40 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void createCredentials(UserRepresentation user, Credentials newCredentials) {
-        
-        user.setEnabled(true);
-        user.setUsername(newCredentials.getUsername());
-        
-        // TODO: verify currentPassword
                 
         UserResource userResource = keycloak.realm(realm).users().get(user.getId());
-        
-        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
-        credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
-        credentialRepresentation.setValue(newCredentials.getPassword());
-        
-        if (Boolean.TRUE.equals(newCredentials.isTemporary())) {
-            user.getRequiredActions().add(AuthService.USER_ACTION_UPDATE_PASSWORD);
-            credentialRepresentation.setTemporary(true);
-        } else {
-            user.getRequiredActions().remove(AuthService.USER_ACTION_UPDATE_PASSWORD);
-            credentialRepresentation.setTemporary(false);
-        }
-        
         try {
-            userResource.resetPassword(credentialRepresentation);
-            userResource.update(user);
+
+            // TODO: enabled?
+            user.setEnabled(true);
+
+            // change when new username ready
+            if (StringUtils.hasText(newCredentials.getUsername())) {
+                user.setUsername(newCredentials.getUsername());
+            }
+
+            // TODO: verify currentPassword
+
+            // change when new password ready
+            if (StringUtils.hasText(newCredentials.getPassword())) {
             
+                CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+                credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+                credentialRepresentation.setValue(newCredentials.getPassword());
+                
+                if (Boolean.TRUE.equals(newCredentials.isTemporary())) {
+                    user.getRequiredActions().add(AuthService.USER_ACTION_UPDATE_PASSWORD);
+                    credentialRepresentation.setTemporary(true);
+                } else {
+                    user.getRequiredActions().remove(AuthService.USER_ACTION_UPDATE_PASSWORD);
+                    credentialRepresentation.setTemporary(false);
+                }
+            
+                userResource.resetPassword(credentialRepresentation);                
+            }
+
+            userResource.update(user);          
+
         } catch (BadRequestException e) {
             throw new PasswordPolicyException(newCredentials.getPassword());
         }
