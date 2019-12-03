@@ -16,6 +16,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.IdentitiesApi;
@@ -236,21 +237,43 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> exists(String username, String contactNumber, String nav4Id) {
         
-        if (username != null) {
+        if (StringUtils.hasText(username)) {
             return new ResponseEntity<>(identityService.isIdentityExists(username) ? HttpStatus.OK : HttpStatus.GONE);
         }
 
-        if (contactNumber != null) {
+        if (StringUtils.hasText(contactNumber)) {
             identityService.getIdentity(contactNumber);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
-        if (nav4Id != null) {
+        if (StringUtils.hasText(nav4Id)) {
             identityService.getIdentityByNav4(nav4Id);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> search(@Valid String username, @Valid String contactNumber, @Valid String nav4Id) {
+
+        if (StringUtils.hasText(username)) {
+            return new ResponseEntity<>(identityService.getIdentityByUsername(username), HttpStatus.OK);
+        }
+
+        if (StringUtils.hasText(contactNumber)) {
+            return getIdentity(contactNumber);
+        }
+
+        if (StringUtils.hasText(nav4Id)) {
+            return getNav4Identity(nav4Id);
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
+    
     }
 
     /**

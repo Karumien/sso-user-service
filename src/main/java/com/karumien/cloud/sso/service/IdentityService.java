@@ -90,6 +90,15 @@ public interface IdentityService {
     IdentityInfo getIdentity(String contactNumber);
 
     /**
+     * Return base information about Identity by {@code contactNumber}.
+     * 
+     * @param username
+     *            unique Identity username
+     * @return {@link IdentityInfo}
+     */
+    IdentityInfo getIdentityByUsername(String username);
+
+    /**
      * Impersonate Identity by specified {@code id}.
      * 
      * @param contactNumber

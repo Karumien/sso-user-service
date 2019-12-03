@@ -586,6 +586,35 @@ paths:
           description: Found Identity specified by filter
         '410':
           description: Identity specified by filter not found
+  /identities/search:
+    get:
+      summary: "Search Identity by specified attributes"
+      operationId: search
+      parameters:
+        - in: query
+          name: username
+          description: Identity existency check by username
+          required: false
+          type: string
+        - in: query
+          name: contactNumber
+          description: Identity existency check by CRM Contact Number
+          required: false
+          type: string 
+        - in: query
+          name: nav4Id
+          description: Identity existency check by NAV4 ID 
+          required: false
+          type: string 
+      responses:
+        '200':
+          description: Return Identity specified by filter
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity specified by filter not found
 definitions:
   ErrorData:
     type: object

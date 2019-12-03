@@ -383,6 +383,14 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
+    public IdentityInfo getIdentityByUsername(String username) {
+        return mapping(findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username = " + username)));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isIdentityTemporaryLocked(String username) {
         Optional<UserRepresentation> user = findIdentityByUsername(username);
         return user.isPresent() && Boolean.TRUE.equals(keycloak.realm(realm).attackDetection().bruteForceUserStatus(user.get().getId()).get("disabled"));
