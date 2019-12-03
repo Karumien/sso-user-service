@@ -256,6 +256,7 @@ public class IdentityServiceImpl implements IdentityService {
 
             // change when new username ready
             if (StringUtils.hasText(newCredentials.getUsername())) {
+                // TODO: validate username
                 user.setUsername(newCredentials.getUsername());
                 userResource.update(user);          
             }
