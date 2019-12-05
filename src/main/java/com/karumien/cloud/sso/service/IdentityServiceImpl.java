@@ -95,7 +95,7 @@ public class IdentityServiceImpl implements IdentityService {
         user.setFirstName(identityInfo.getFirstName());
         user.setLastName(identityInfo.getLastName());
         user.setEmail(identityInfo.getEmail());
-        user.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && !StringUtils.hasText(identityInfo.getEmail()));
+        user.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
         
         if (StringUtils.hasText(identityInfo.getPhone())) {
             user.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
