@@ -351,7 +351,7 @@ public class AccountController implements AccountsApi {
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
         
         if (searchFilter.isEmpty()) {
-            new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+            new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
         
         List<AccountInfo> found = accountService.search(searchFilter);

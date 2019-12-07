@@ -274,7 +274,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_PHONE, phone);
         
         if (searchFilter.isEmpty()) {
-            new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+            new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
         List<IdentityInfo> found = identityService.search(searchFilter);

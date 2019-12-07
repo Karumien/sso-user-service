@@ -584,6 +584,8 @@ paths:
       responses:
         '200':
           description: Found Identity specified by filter
+        '406':
+          description: Empty search criteria is not allowed
         '410':
           description: Identity specified by filter not found
   /identities/search:
@@ -630,10 +632,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/IdentityInfo'
+        '406':
+          description: Empty search criteria is not allowed
         '410':
           description: Identities specified by filter not found
-        '422':
-          description: Empty search criteria
 definitions:
   ErrorData:
     type: object
