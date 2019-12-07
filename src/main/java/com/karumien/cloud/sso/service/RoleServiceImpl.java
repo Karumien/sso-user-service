@@ -35,6 +35,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.ClientNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -178,7 +179,7 @@ public class RoleServiceImpl implements RoleService {
     public String getRolesBinary(UserRepresentation userRepresentation) {
 
         StringBuilder binaryRule = new StringBuilder();
-        Optional<String> accountNumber = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER);
+        Optional<String> accountNumber = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityPropertyType.ATTR_ACCOUNT_NUMBER.getValue());
 
         if (!accountNumber.isPresent()) {
             return binaryRule.toString();

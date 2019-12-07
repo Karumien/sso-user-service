@@ -7,15 +7,16 @@
 package com.karumien.cloud.sso.api;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.validation.Valid;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +28,7 @@ import com.karumien.cloud.sso.api.model.ErrorData;
 import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.IdentityService;
@@ -136,7 +138,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> updateIdentityRoles(String contactNumber, @Valid List<String> roles) {
+    public ResponseEntity<Void> updateIdentityRoles(String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.UPDATE);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -258,24 +260,27 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> search(@Valid String username, @Valid String contactNumber, @Valid String nav4Id) {
+    public ResponseEntity<List<IdentityInfo>> search(String identityId, String username, String accountNumber, String contactNumber,
+            String nav4Id, String email, String globalEmail, String phone) {
 
-        if (StringUtils.hasText(username)) {
-            return new ResponseEntity<>(identityService.getIdentityByUsername(username), HttpStatus.OK);
+        Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ID, identityId);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.USERNAME, username);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.EMAIL, email);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_NAV4ID, nav4Id);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_GLOBAL_EMAIL, globalEmail);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_PHONE, phone);
+        
+        if (searchFilter.isEmpty()) {
+            new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        if (StringUtils.hasText(contactNumber)) {
-            return getIdentity(contactNumber);
-        }
-
-        if (StringUtils.hasText(nav4Id)) {
-            return getNav4Identity(nav4Id);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
-    
+        List<IdentityInfo> found = identityService.search(searchFilter);
+        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK);
     }
-
+    
     /**
      * {@inheritDoc}
      */

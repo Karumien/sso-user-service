@@ -29,6 +29,7 @@ package com.karumien.cloud.sso.service;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
@@ -123,6 +125,18 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
+    public Optional<GroupResource> findGroupResourceById(String groupId) {
+        try {
+            return Optional.ofNullable(keycloak.realm(realm).groups().group(groupId));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return Optional.empty();
+    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<GroupResource> findGroupResource(String accountNumber) {
 
         Optional<GroupRepresentation> group = findGroup(accountNumber);
@@ -139,9 +153,10 @@ public class AccountServiceImpl implements AccountService {
     public AccountInfo createAccount(AccountInfo account) {
 
         GroupRepresentation group = new GroupRepresentation();
-        group.setName(account.getName());
+        group.setName(account.getName() + " (" + account.getAccountNumber() + ")");
         group.setPath("/" + MASTER_GROUP + "/" + group.getName());
         group.singleAttribute(ATTR_ACCOUNT_NUMBER, account.getAccountNumber());
+        group.singleAttribute(ATTR_ACCOUNT_NAME, account.getName());
 
         if (StringUtils.hasText(account.getCompRegNo())) {
             group.singleAttribute(ATTR_COMP_REG_NO, account.getCompRegNo());
@@ -153,7 +168,6 @@ public class AccountServiceImpl implements AccountService {
 
         getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup(MASTER_GROUP).getId()).subGroup(group));
 
-//        keycloak.realm(realm).clearRealmCache();
         return getAccount(account.getAccountNumber());
     }
     
@@ -212,8 +226,9 @@ public class AccountServiceImpl implements AccountService {
         accountInfo.setAccountNumber(searchService.getSimpleAttribute(group.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
         accountInfo.setCompRegNo(searchService.getSimpleAttribute(group.getAttributes(), ATTR_COMP_REG_NO).orElse(null));
         accountInfo.setContactEmail(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CONTACT_EMAIL).orElse(null));
-        accountInfo.setName(group.getName());
-        
+        accountInfo.setName(searchService.getSimpleAttribute(group.getAttributes(), ATTR_ACCOUNT_NAME).orElse(group.getName()));
+
+        // TODO: Remove deprecated compatibility
         accountInfo.setCrmAccountId(accountInfo.getAccountNumber());
         
         return accountInfo;
@@ -367,5 +382,45 @@ public class AccountServiceImpl implements AccountService {
 	    }
 	    return roles;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<AccountInfo> search(Map<AccountPropertyType, String> searchFilter) {
+	    
+        List<AccountInfo> found = new ArrayList<>();
+        
+        AccountPropertyType firstKey = searchFilter.keySet().stream().findFirst().get();
+        found = mappingIds(searchService.findGroupIdsByAttribute(firstKey.getValue(), searchFilter.remove(firstKey)));
+        
+        // filter other 
+        for (AccountPropertyType key : searchFilter.keySet()) {
+            found = found.stream().filter(i -> hasProperty(i, key, searchFilter.get(key))).collect(Collectors.toList());            
+        }
+        
+        return found;
+    }
 
+    private boolean hasProperty(AccountInfo a, AccountPropertyType key, String value) {
+        switch (key) {
+        case ATTR_ACCOUNT_NAME:
+            return value.equals(a.getName());
+        case ATTR_CONTACT_EMAIL:
+            return value.equals(a.getContactEmail());
+        case ATTR_COMP_REG_NO:
+            return value.equals(a.getCompRegNo());
+        case ATTR_ACCOUNT_NUMBER:
+            return value.equals(a.getAccountNumber());
+        default:
+            return false;
+        }
+	}
+
+	private List<AccountInfo> mappingIds(List<String> accountIds) {
+        return accountIds.stream().map(id -> findGroupResourceById(id))
+                .filter(f -> f.isPresent()).map(u -> mapping(u.get().toRepresentation()))
+                .collect(Collectors.toList());
+    }
+	
 }

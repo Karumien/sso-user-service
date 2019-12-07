@@ -651,6 +651,38 @@ paths:
           description: "Can't create Identity's credentials - Error Codes for Attributes: #/definitions/ErrorDataCodeCredentials"
           schema:
             $ref: '#/definitions/ErrorMessage'
+  /accounts/search:
+    get:
+      summary: "Search Account by specified attributes"
+      operationId: search
+      parameters:
+        - in: query
+          name: accountNumber
+          type: string
+          required: false
+        - in: query
+          name: compRegNo
+          type: string
+          required: false
+        - in: query
+          name: name
+          type: string
+          required: false
+        - in: query
+          name: contactEmail
+          type: string
+          required: false
+      responses:
+        '200':
+          description: Return Accounts specified by filter
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/AccountInfo'
+        '410':
+          description: Identities specified by filter not found
+        '422':
+          description: Empty search criteria
 definitions:
   IdentityInfo:
     type: object

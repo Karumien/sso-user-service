@@ -7,21 +7,23 @@
 package com.karumien.cloud.sso.api;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
@@ -224,7 +226,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, @Valid List<String> roles) {
+    public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
                 accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
                 roles, UpdateType.UPDATE);
@@ -335,4 +337,26 @@ public class AccountController implements AccountsApi {
         getAccountIdentity(accountNumber, contactNumber);
         return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<AccountInfo>> search(String compRegNo, String accountNumber, String name, String contactEmail) {
+
+        Map<AccountPropertyType, String> searchFilter = new HashMap<>();
+        accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_COMP_REG_NO, compRegNo);
+        accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_ACCOUNT_NAME, name);
+        accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_CONTACT_EMAIL, contactEmail);
+        accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
+        
+        if (searchFilter.isEmpty()) {
+            new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        
+        List<AccountInfo> found = accountService.search(searchFilter);
+        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK);
+    }
+
+    
 }

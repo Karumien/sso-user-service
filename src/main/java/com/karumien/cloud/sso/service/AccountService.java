@@ -7,12 +7,15 @@
 package com.karumien.cloud.sso.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
+import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
@@ -27,23 +30,20 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
 public interface AccountService {
 
     String MASTER_GROUP = "Accounts";
-
     String SELFCARE_GROUP = "SelfCare";
 
-    String ATTR_COMP_REG_NO = "compRegNo";
+    String ATTR_ACCOUNT_NUMBER = AccountPropertyType.ATTR_ACCOUNT_NUMBER.getValue();
 
-    String ATTR_ACCOUNT_NUMBER = "accountNumber";
+    String ATTR_COMP_REG_NO = AccountPropertyType.ATTR_COMP_REG_NO.getValue();
+    String ATTR_ACCOUNT_NAME = AccountPropertyType.ATTR_ACCOUNT_NAME.getValue();
+    String ATTR_CONTACT_EMAIL= AccountPropertyType.ATTR_CONTACT_EMAIL.getValue();
 
-    String ATTR_CONTACT_EMAIL = "contactEmail";
+    String ATTR_MODULE_ID = AccountPropertyType.ATTR_MODULE_ID.getValue();
+    String ATTR_RIGHT_GROUP_ID= AccountPropertyType.ATTR_RIGHT_GROUP_ID.getValue();
+    String ATTR_SERVICE_ID = AccountPropertyType.ATTR_SERVICE_ID.getValue();
 
-    String ATTR_MODULE_ID = "moduleId";
-
-    String ATTR_RIGHT_GROUP_ID = "groupId";
-
-    String ATTR_SERVICE_ID = "serviceId";
-
-    String ATTR_BUSINESS_PRIORITY = "businessPriority";
-
+    String ATTR_BUSINESS_PRIORITY = AccountPropertyType.ATTR_BUSINESS_PRIORITY.getValue();
+    
     AccountInfo createAccount(AccountInfo account);
 
     AccountInfo getAccount(String accountNumber);
@@ -126,5 +126,13 @@ public interface AccountService {
 
     List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers);
 
+    List<AccountInfo> search(Map<AccountPropertyType, String> searchFilter);
 
+    Optional<GroupResource> findGroupResourceById(String groupId);
+
+    default void putIfPresent(Map<AccountPropertyType, String> search, AccountPropertyType key, String value) {
+        if (StringUtils.hasText(value)) {
+            search.put(key, value);
+        }
+    }
 }

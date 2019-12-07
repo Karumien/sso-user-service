@@ -7,15 +7,18 @@
 package com.karumien.cloud.sso.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 
 /**
  * Service provides scenarios for Identity's management.
@@ -25,23 +28,18 @@ import com.karumien.cloud.sso.api.model.IdentityInfo;
  */
 public interface IdentityService {
 
-    String ATTR_CONTACT_NUMBER = "contactNumber";
+    String ATTR_CONTACT_NUMBER = IdentityPropertyType.ATTR_CONTACT_NUMBER.getValue();
+    String ATTR_ACCOUNT_NUMBER = IdentityPropertyType.ATTR_ACCOUNT_NUMBER.getValue();
+    String ATTR_NAV4ID = IdentityPropertyType.ATTR_NAV4ID.getValue();
 
-    String ATTR_ACCOUNT_NUMBER = "accountNumber";
+    String ATTR_GLOBAL_EMAIL = IdentityPropertyType.ATTR_GLOBAL_EMAIL.getValue();
+    String ATTR_PHONE = IdentityPropertyType.ATTR_PHONE.getValue();
+    String ATTR_LOCALE = IdentityPropertyType.ATTR_LOCALE.getValue();
+           
+    String ATTR_BINARY_RIGHTS = IdentityPropertyType.ATTR_BINARY_RIGHTS.getValue();
+    String ATTR_DRIVER_PIN = IdentityPropertyType.ATTR_DRIVER_PIN.getValue();
 
-    String ATTR_GLOBAL_EMAIL = "globalEmail";
-
-    String ATTR_DRIVER_PIN = "driverPin";
-
-    String ATTR_BINARY_RIGHTS = "binaryRights";
-
-    String ATTR_PHONE = "phone";
-
-    String ATTR_LOCALE = "locale";
-
-    String ATTR_NAV4ID = "nav4Id";
-
-    String ATTR_BUSINESS_PRIORITY = "businessPriority";
+    String ATTR_BUSINESS_PRIORITY = IdentityPropertyType.ATTR_BUSINESS_PRIORITY.getValue();
 
     /**
      * Create Identity in target SSO.
@@ -233,5 +231,17 @@ public interface IdentityService {
     boolean isActiveRoleNav4(String roleId, String nav4Id);
  
     void refreshBinaryRoles(UserResource userResource);
+
+    List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter);
+
+    Optional<UserRepresentation> findUserRepresentationById(String identityId);
+    
+    default void putIfPresent(Map<IdentityPropertyType, String> search, IdentityPropertyType key, String value) {
+        if (StringUtils.hasText(value)) {
+            search.put(key, value);
+        }
+    }
+
+    List<UserRepresentation> findIdentityByField(String field, String value);
 
 }

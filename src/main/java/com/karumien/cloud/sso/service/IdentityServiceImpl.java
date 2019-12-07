@@ -34,6 +34,7 @@ import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
@@ -64,64 +65,62 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private AccountService accountService;
-    
+
     @Autowired
     private SearchService searchService;
-    
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void deleteIdentity(String contactNumber) {
-        UserRepresentation user = findIdentity(contactNumber)
-            .orElseThrow(() -> new IdentityNotFoundException(contactNumber));        
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         keycloak.realm(realm).users().delete(user.getId());
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo) {
-        
-        UserRepresentation user = findIdentity(contactNumber)
-                .orElseThrow(() -> new IdentityNotFoundException(contactNumber));        
-        
+
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+
         if (StringUtils.hasText(identityInfo.getUsername())) {
-            user.setUsername(identityInfo.getUsername());  
+            user.setUsername(identityInfo.getUsername());
         }
-        
+
         user.setFirstName(identityInfo.getFirstName());
         user.setLastName(identityInfo.getLastName());
         user.setEmail(identityInfo.getEmail());
         user.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
-        
+
         if (StringUtils.hasText(identityInfo.getPhone())) {
             user.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         } else {
             user.getAttributes().remove(ATTR_PHONE);
-        } 
+        }
         if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
             user.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
         } else {
             user.getAttributes().remove(ATTR_GLOBAL_EMAIL);
-        } 
+        }
 
-        user.singleAttribute(ATTR_LOCALE, StringUtils.hasText(identityInfo.getLocale()) ? 
-                identityInfo.getLocale() : LocaleContextHolder.getLocale().getLanguage());
-       
+        user.singleAttribute(ATTR_LOCALE,
+                StringUtils.hasText(identityInfo.getLocale()) ? identityInfo.getLocale() : LocaleContextHolder.getLocale().getLanguage());
+
         UserResource userResource = keycloak.realm(realm).users().get(user.getId());
-        
+
         try {
             userResource.update(user);
         } catch (BadRequestException e) {
             throw new UpdateIdentityException(e.getMessage());
         }
-        
+
         return getIdentity(contactNumber);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -132,26 +131,26 @@ public class IdentityServiceImpl implements IdentityService {
 
         // TODO: Username Policy validation
         String username = identityInfo.getUsername();
-        
+
         if (!StringUtils.hasText(identityInfo.getUsername())) {
             username = "generated-" + identityInfo.getContactNumber();
             if (StringUtils.hasText(identityInfo.getNav4Id())) {
                 username += "-n4-" + identityInfo.getNav4Id();
             }
         }
-        
+
         if (isIdentityExists(username)) {
-            throw new IdentityDuplicateException("Identity with same username already exists"); 
+            throw new IdentityDuplicateException("Identity with same username already exists");
         }
-        
+
         identity.setUsername(username);
         identity.setFirstName(identityInfo.getFirstName());
         identity.setLastName(identityInfo.getLastName());
         identity.setEmail(identityInfo.getEmail());
         identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
-        
+
         identity.setEnabled(true);
-        
+
         // backward compatibility
         if (!StringUtils.hasText(identityInfo.getAccountNumber())) {
             identityInfo.setAccountNumber(identityInfo.getCrmAccountId());
@@ -160,22 +159,22 @@ public class IdentityServiceImpl implements IdentityService {
             identityInfo.setContactNumber(identityInfo.getCrmContactId());
         }
 
-        identity.singleAttribute(ATTR_CONTACT_NUMBER, 
+        identity.singleAttribute(ATTR_CONTACT_NUMBER,
                 Optional.of(identityInfo.getContactNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_CONTACT_NUMBER)));
-        identity.singleAttribute(ATTR_ACCOUNT_NUMBER, 
+        identity.singleAttribute(ATTR_ACCOUNT_NUMBER,
                 Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
-        
+
         // TODO: Persistent lock?
-		if (StringUtils.hasText(identityInfo.getNav4Id())) {
-		    if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_NAV4ID, identityInfo.getNav4Id()))) {
-		        throw new IdentityDuplicateException("Identity with same nav4Id already exists"); 
-		    }
-			identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
-		} else {		    
-		    if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, identityInfo.getContactNumber()))) {
-                throw new IdentityDuplicateException("Identity with same contactNumber already exists, use nav4Id for uniqueness"); 
+        if (StringUtils.hasText(identityInfo.getNav4Id())) {
+            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_NAV4ID, identityInfo.getNav4Id()))) {
+                throw new IdentityDuplicateException("Identity with same nav4Id already exists");
             }
-		}
+            identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
+        } else {
+            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, identityInfo.getContactNumber()))) {
+                throw new IdentityDuplicateException("Identity with same contactNumber already exists, use nav4Id for uniqueness");
+            }
+        }
 
         if (StringUtils.hasText(identityInfo.getPhone())) {
             identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
@@ -190,11 +189,11 @@ public class IdentityServiceImpl implements IdentityService {
         String groupId = accountService.findGroup(identityInfo.getAccountNumber())
                 .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber())).getId();
 
-        Response response = keycloak.realm(realm).users().create(identity);        
+        Response response = keycloak.realm(realm).users().create(identity);
         identityInfo.setIdentityId(getCreatedId(response));
-        
+
         keycloak.realm(realm).users().get(identityInfo.getIdentityId()).joinGroup(groupId);
-            
+
         return identityInfo;
     }
 
@@ -217,7 +216,7 @@ public class IdentityServiceImpl implements IdentityService {
             throw new UnsupportedOperationException("Unknown status " + response.getStatusInfo().toEnum());
         }
     }
-   
+
     /**
      * {@inheritDoc}
      */
@@ -226,28 +225,28 @@ public class IdentityServiceImpl implements IdentityService {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         createCredentials(user, newCredentials);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createIdentityCredentialsByUsername(String username, Credentials newCredentials) {        
+    public void createIdentityCredentialsByUsername(String username, Credentials newCredentials) {
         UserRepresentation user = findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException(" username = " + username));
         createCredentials(user, newCredentials);
     }
-        
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void createIdentityCredentialsNav4(String nav4Id, Credentials newCredentials) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst().orElseThrow(
-                () -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst()
+                .orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         createCredentials(keycloak.realm(realm).users().get(userId).toRepresentation(), newCredentials);
     }
 
     private void createCredentials(UserRepresentation user, Credentials newCredentials) {
-                
+
         UserResource userResource = keycloak.realm(realm).users().get(user.getId());
         try {
 
@@ -258,18 +257,18 @@ public class IdentityServiceImpl implements IdentityService {
             if (StringUtils.hasText(newCredentials.getUsername())) {
                 // TODO: validate username
                 user.setUsername(newCredentials.getUsername());
-                userResource.update(user);          
+                userResource.update(user);
             }
 
             // TODO: verify currentPassword
 
             // change when new password ready
             if (StringUtils.hasText(newCredentials.getPassword())) {
-            
+
                 CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
                 credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
                 credentialRepresentation.setValue(newCredentials.getPassword());
-                
+
                 if (Boolean.TRUE.equals(newCredentials.isTemporary())) {
                     user.getRequiredActions().add(AuthService.USER_ACTION_UPDATE_PASSWORD);
                     credentialRepresentation.setTemporary(true);
@@ -277,9 +276,9 @@ public class IdentityServiceImpl implements IdentityService {
                     user.getRequiredActions().remove(AuthService.USER_ACTION_UPDATE_PASSWORD);
                     credentialRepresentation.setTemporary(false);
                 }
-            
-                userResource.resetPassword(credentialRepresentation);                
-                userResource.update(user);          
+
+                userResource.resetPassword(credentialRepresentation);
+                userResource.update(user);
             }
 
         } catch (BadRequestException e) {
@@ -292,10 +291,9 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public IdentityInfo getIdentity(String contactNumber) {
-        return mapping(findIdentity(contactNumber)
-                .orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
+        return mapping(findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
     }
-   
+
     /**
      * {@inheritDoc}
      */
@@ -303,10 +301,23 @@ public class IdentityServiceImpl implements IdentityService {
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
         List<String> userIds = searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, contactNumber);
         if (userIds.size() > 1) {
-            throw new IdentityDuplicateException(contactNumber);            
-        }        
+            throw new IdentityDuplicateException(contactNumber);
+        }
         String userId = userIds.stream().findFirst().orElse(null);
         return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<UserRepresentation> findUserRepresentationById(String identityId) {
+        try {
+            return Optional.ofNullable(keycloak.realm(realm).users().get(identityId).toRepresentation());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -316,8 +327,8 @@ public class IdentityServiceImpl implements IdentityService {
     public Optional<UserRepresentation> findIdentityNav4(String nav4Id) {
         List<String> userIds = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id);
         if (userIds.size() > 1) {
-            throw new IdentityDuplicateException("nav4Id = " + nav4Id);            
-        }        
+            throw new IdentityDuplicateException("nav4Id = " + nav4Id);
+        }
         String userId = userIds.stream().findFirst().orElse(null);
         return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
     }
@@ -335,7 +346,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setUsername(userRepresentation.getUsername());
         identity.setEmail(userRepresentation.getEmail());
         identity.setEmailVerified(userRepresentation.isEmailVerified());
-        
+
         identity.setAccountNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
         identity.setContactNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CONTACT_NUMBER).orElse(null));
         identity.setGlobalEmail(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
@@ -343,10 +354,11 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
-        
+
+        // TODO: Remove deprecated compatibility
         identity.setCrmAccountId(identity.getAccountNumber());
         identity.setCrmContactId(identity.getContactNumber());
-        
+
         return identity;
     }
 
@@ -378,7 +390,7 @@ public class IdentityServiceImpl implements IdentityService {
     public boolean isIdentityExists(String username) {
         return findIdentityByUsername(username).isPresent();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -386,7 +398,7 @@ public class IdentityServiceImpl implements IdentityService {
     public IdentityInfo getIdentityByUsername(String username) {
         return mapping(findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username = " + username)));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -395,46 +407,46 @@ public class IdentityServiceImpl implements IdentityService {
         Optional<UserRepresentation> user = findIdentityByUsername(username);
         return user.isPresent() && Boolean.TRUE.equals(keycloak.realm(realm).attackDetection().bruteForceUserStatus(user.get().getId()).get("disabled"));
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType) {
-    	
-    	UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(identityId))
-	        .orElseThrow(() -> new IdentityNotFoundException("identityId = " + identityId));
-    	
-    	if (updateType == UpdateType.UPDATE) {
-    	    // remove unused roles
-    	    userResource.roles().realmLevel().remove(userResource.roles().realmLevel().listAll().stream()
-    	        .filter(actualRole -> !roles.contains(actualRole.getId())).collect(Collectors.toList()));
-    	}
-    	
-    	// add new roles
+
+        UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(identityId))
+                .orElseThrow(() -> new IdentityNotFoundException("identityId = " + identityId));
+
+        if (updateType == UpdateType.UPDATE) {
+            // remove unused roles
+            userResource.roles().realmLevel().remove(userResource.roles().realmLevel().listAll().stream()
+                    .filter(actualRole -> !roles.contains(actualRole.getId())).collect(Collectors.toList()));
+        }
+
+        // add new roles
         if (updateType == UpdateType.ADD || updateType == UpdateType.UPDATE) {
             userResource.roles().realmLevel().add(getListOfRoleReprasentationBaseOnIds(roles));
         }
-        
+
         // remove roles
         if (updateType == UpdateType.DELETE) {
             userResource.roles().realmLevel().remove(getListOfRoleReprasentationBaseOnIds(roles));
         }
-        
-    	refreshBinaryRoles(userResource);
+
+        refreshBinaryRoles(userResource);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void refreshBinaryRoles(UserResource userResource) {        
+    public void refreshBinaryRoles(UserResource userResource) {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         String binaryRoles = roleService.getRolesBinary(userRepresentation);
         if (!StringUtils.hasText(binaryRoles)) {
-            userRepresentation.getAttributes().remove(ATTR_BINARY_RIGHTS);
+            userRepresentation.getAttributes().remove(IdentityPropertyType.ATTR_BINARY_RIGHTS.getValue());
         } else {
-            userRepresentation.getAttributes().put(ATTR_BINARY_RIGHTS, Arrays.asList(binaryRoles));
+            userRepresentation.getAttributes().put(IdentityPropertyType.ATTR_BINARY_RIGHTS.getValue(), Arrays.asList(binaryRoles));
         }
         userResource.update(userRepresentation);
     }
@@ -445,7 +457,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void savePinOfIdentityDriver(String contactNumber, DriverPin pin) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        user.getAttributes().put(ATTR_DRIVER_PIN, Arrays.asList(pin.getPin()));
+        user.getAttributes().put(IdentityPropertyType.ATTR_DRIVER_PIN.getValue(), Arrays.asList(pin.getPin()));
         keycloak.realm(realm).users().get(user.getId()).update(user);
     }
 
@@ -488,28 +500,26 @@ public class IdentityServiceImpl implements IdentityService {
     public DriverPin getPinOfIdentityDriver(String contactNumber) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         DriverPin pin = new DriverPin();
-        pin.setPin(searchService.getSimpleAttribute(user.getAttributes(), ATTR_DRIVER_PIN)
-                .orElseThrow(() -> new AttributeNotFoundException(ATTR_DRIVER_PIN)));
-        return pin;        
+        pin.setPin(searchService.getSimpleAttribute(user.getAttributes(), ATTR_DRIVER_PIN).orElseThrow(() -> new AttributeNotFoundException(ATTR_DRIVER_PIN)));
+        return pin;
     }
 
-	private List<RoleRepresentation> getListOfRoleReprasentationBaseOnIds(List<String> roles) {
-		List<RoleRepresentation> returnList = new ArrayList<>();
-		roles.forEach(role -> {
-			RoleResource searcherRole = keycloak.realm(realm).roles().get(role);
-			try {
-				returnList.add(searcherRole.toRepresentation());
-			}
-			catch(Exception e) {
-				
-			}
-		});
-		return returnList;
-	}
+    private List<RoleRepresentation> getListOfRoleReprasentationBaseOnIds(List<String> roles) {
+        List<RoleRepresentation> returnList = new ArrayList<>();
+        roles.forEach(role -> {
+            RoleResource searcherRole = keycloak.realm(realm).roles().get(role);
+            try {
+                returnList.add(searcherRole.toRepresentation());
+            } catch (Exception e) {
 
-	/**
-	 * {@inheritDoc}
-	 */
+            }
+        });
+        return returnList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isActiveRole(String roleId, String contactNumber) {
         return roleService.getIdentityRoles(contactNumber).contains(roleId);
@@ -518,31 +528,48 @@ public class IdentityServiceImpl implements IdentityService {
     /**
      * {@inheritDoc}
      */
-	@Override
-	public IdentityInfo getIdentityByNav4(String nav4Id) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst().orElseThrow(
-                () -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+    @Override
+    public IdentityInfo getIdentityByNav4(String nav4Id) {
+        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst()
+                .orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         return mapping(keycloak.realm(realm).users().get(userId).toRepresentation());
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<String> getUserRequiredActions(String username) {
-	    if (!StringUtils.hasText(username)) {
-	        return new ArrayList<>();
-	    }
-	    List<UserRepresentation> identities = keycloak.realm(realm).users().search(username);
-	    return identities.isEmpty() ? new ArrayList<>() : identities.get(0).getRequiredActions();
-	}
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getUserRequiredActions(String username) {
+        if (!StringUtils.hasText(username)) {
+            return new ArrayList<>();
+        }
+        List<UserRepresentation> identities = keycloak.realm(realm).users().search(username);
+        return identities.isEmpty() ? new ArrayList<>() : identities.get(0).getRequiredActions();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Optional<UserRepresentation> findIdentityByUsername(String username) {
         return keycloak.realm(realm).users().search(username).stream().findFirst();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserRepresentation> findIdentityByField(String field, String value) {
+        
+        if (IdentityPropertyType.USERNAME.getValue().equals(field)) {
+            return keycloak.realm(realm).users().search(value);
+        };
+
+        if (IdentityPropertyType.EMAIL.getValue().equals(field)) {
+            return keycloak.realm(realm).users().search(null, null, null, value, 0, 50);
+        };
+        
+        return keycloak.realm(realm).users().search(field + ":" + value, 0, 50);
     }
 
     /**
@@ -553,4 +580,69 @@ public class IdentityServiceImpl implements IdentityService {
         return roleService.getIdentityRolesNav4(nav4Id).contains(roleId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter) {
+
+        List<IdentityInfo> found = new ArrayList<>();
+        
+        IdentityPropertyType firstKey = searchFilter.keySet().stream().findFirst().get();
+        
+        switch (firstKey) {
+        case USERNAME:
+        case EMAIL:
+            found = mapping(findIdentityByField(firstKey.getValue(), searchFilter.remove(firstKey)));
+            break;
+
+        case ID:
+            found = mappingIds(Arrays.asList(searchFilter.remove(firstKey)));
+            break;
+
+        default:
+            found = mappingIds(searchService.findUserIdsByAttribute(firstKey.getValue(), searchFilter.remove(firstKey)));
+            break;
+        }
+                    
+        // filter other 
+        for (IdentityPropertyType key : searchFilter.keySet()) {
+            found = found.stream().filter(i -> hasProperty(i, key, searchFilter.get(key))).collect(Collectors.toList());            
+        }
+        
+        return found;
+    }
+
+    private boolean hasProperty(IdentityInfo i, IdentityPropertyType key, String value) {
+        switch (key) {
+        case ID:
+            return value.equals(i.getIdentityId());
+        case USERNAME:
+            return value.equals(i.getUsername());
+        case EMAIL:
+            return value.equals(i.getEmail());
+        case ATTR_ACCOUNT_NUMBER:
+            return value.equals(i.getAccountNumber());
+        case ATTR_CONTACT_NUMBER:
+            return value.equals(i.getContactNumber());
+        case ATTR_GLOBAL_EMAIL:
+            return value.equals(i.getGlobalEmail());
+        case ATTR_NAV4ID:
+            return value.equals(i.getNav4Id());
+        case ATTR_PHONE:
+            return value.equals(i.getPhone());
+        default:
+            return false;
+        }
+    }
+
+    private List<IdentityInfo> mappingIds(List<String> userIds) {
+        return userIds.stream().map(id -> findUserRepresentationById(id))
+            .filter(f -> f.isPresent()).map(u -> mapping(u.get()))
+            .collect(Collectors.toList());
+    }
+
+    private List<IdentityInfo> mapping(List<UserRepresentation> users) {
+        return users.stream().map(u -> mapping(u)).collect(Collectors.toList());
+    }
 }

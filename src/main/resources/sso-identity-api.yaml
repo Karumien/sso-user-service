@@ -592,29 +592,48 @@ paths:
       operationId: search
       parameters:
         - in: query
+          name: identityId
+          required: false
+          type: string 
+        - in: query
           name: username
-          description: Identity existency check by username
           required: false
           type: string
         - in: query
+          name: accountNumber
+          required: false
+          type: string 
+        - in: query
           name: contactNumber
-          description: Identity existency check by CRM Contact Number
           required: false
           type: string 
         - in: query
           name: nav4Id
-          description: Identity existency check by NAV4 ID 
           required: false
           type: string 
+        - in: query
+          name: email
+          required: false
+          type: string 
+        - in: query
+          name: globalEmail
+          required: false
+          type: string 
+        - in: query
+          name: phone
+          required: false
+          type: string
       responses:
         '200':
-          description: Return Identity specified by filter
+          description: Return Identities specified by filter
           schema:
-            $ref: '#/definitions/IdentityInfo'
-        '409':
-          description: Duplicate Identity with same CRM Contact Number
+            type: array
+            items:
+              $ref: '#/definitions/IdentityInfo'
         '410':
-          description: Identity specified by filter not found
+          description: Identities specified by filter not found
+        '422':
+          description: Empty search criteria
 definitions:
   ErrorData:
     type: object
