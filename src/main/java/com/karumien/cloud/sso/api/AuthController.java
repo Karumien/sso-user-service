@@ -32,6 +32,7 @@ import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.PasswordPolicy;
+import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.api.model.UsernamePolicy;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AuthService;
@@ -115,7 +116,7 @@ public class AuthController implements AuthApi  {
             );        
             
             // update-password flow
-            if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && "update-password".equals(error.getErrdata().get(0).getCode())) {
+            if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && UserActionType.UPDATE_PASSWORD.getValue().equals(error.getErrdata().get(0).getCode())) {
 
                 Credentials newCredentials = new Credentials();
                 newCredentials.setTemporary(false);

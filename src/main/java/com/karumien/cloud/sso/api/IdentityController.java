@@ -174,7 +174,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> resetIdentityCredentials(String contactNumber) {
-        identityService.resetPasswordByEmail(contactNumber);
+        identityService.resetPasswordUserAction(contactNumber);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -18,8 +18,6 @@ import com.karumien.cloud.sso.api.model.UsernamePolicy;
  * @since 1.0, 10. 7. 2019 22:07:27
  */
 public interface AuthService {
-    
-    String USER_ACTION_UPDATE_PASSWORD = "UPDATE_PASSWORD";
 
     /**
      * Returns public key from realm

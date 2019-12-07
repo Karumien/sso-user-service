@@ -19,6 +19,7 @@ import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.model.UserActionType;
 
 /**
  * Service provides scenarios for Identity's management.
@@ -151,12 +152,20 @@ public interface IdentityService {
     void removePinOfIdentityDriver(String contactNumber);
 
     /**
-     * Initiate action for email change.
+     * Initiate {@link UserActionType#UPDATE_PASSWORD}.
      * 
      * @param contactNumber
      *            unique Identity CRM ID
      */
-    void resetPasswordByEmail(String contactNumber);
+    void resetPasswordUserAction(String contactNumber);
+
+    /**
+     * Initiate {@link UserActionType#VERIFY_EMAIL}.
+     * 
+     * @param contactNumber
+     *            unique Identity CRM ID
+     */
+    void changeEmailUserAction(String contactNumber);
 
     Optional<UserRepresentation> findIdentity(String contactNumber);
 

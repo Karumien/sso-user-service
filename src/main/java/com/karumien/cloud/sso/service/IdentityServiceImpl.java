@@ -35,6 +35,7 @@ import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
@@ -85,40 +86,53 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo) {
 
-        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
 
         if (StringUtils.hasText(identityInfo.getUsername())) {
-            user.setUsername(identityInfo.getUsername());
+            identity.setUsername(identityInfo.getUsername());
         }
 
-        user.setFirstName(identityInfo.getFirstName());
-        user.setLastName(identityInfo.getLastName());
-        user.setEmail(identityInfo.getEmail());
-        user.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
-
+        identity.setFirstName(patch(identityInfo.getFirstName()));
+        identity.setLastName(patch(identityInfo.getLastName()));
+        identity.setEmail(patch(identityInfo.getEmail()));
+        
+        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
+        if (!StringUtils.hasText(identity.getEmail()) || Boolean.TRUE.equals(identity.isEmailVerified())) {
+            identity.getRequiredActions().remove(UserActionType.VERIFY_EMAIL.name());
+        }
+        
+        if (StringUtils.hasText(identity.getEmail()) && !Boolean.TRUE.equals(identity.isEmailVerified())) {
+            identity.getRequiredActions().add(UserActionType.VERIFY_EMAIL.name());
+            changeEmailUserAction(identity.getId());
+        }
+        
         if (StringUtils.hasText(identityInfo.getPhone())) {
-            user.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
+            identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         } else {
-            user.getAttributes().remove(ATTR_PHONE);
+            identity.getAttributes().remove(ATTR_PHONE);
         }
         if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
-            user.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
+            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
         } else {
-            user.getAttributes().remove(ATTR_GLOBAL_EMAIL);
+            identity.getAttributes().remove(ATTR_GLOBAL_EMAIL);
         }
 
-        user.singleAttribute(ATTR_LOCALE,
+        identity.singleAttribute(ATTR_LOCALE,
                 StringUtils.hasText(identityInfo.getLocale()) ? identityInfo.getLocale() : LocaleContextHolder.getLocale().getLanguage());
 
-        UserResource userResource = keycloak.realm(realm).users().get(user.getId());
+        UserResource userResource = keycloak.realm(realm).users().get(identity.getId());
 
         try {
-            userResource.update(user);
+            userResource.update(identity);
         } catch (BadRequestException e) {
             throw new UpdateIdentityException(e.getMessage());
         }
 
         return getIdentity(contactNumber);
+    }
+
+    private String patch(String value) {
+        return StringUtils.hasText(value) ? value : "";
     }
 
     /**
@@ -148,6 +162,10 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setLastName(identityInfo.getLastName());
         identity.setEmail(identityInfo.getEmail());
         identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
+
+        if (StringUtils.hasText(identity.getEmail()) && !Boolean.TRUE.equals(identity.isEmailVerified())) {
+            identity.setRequiredActions(Arrays.asList(UserActionType.VERIFY_EMAIL.name()));    
+        }
 
         identity.setEnabled(true);
 
@@ -191,9 +209,13 @@ public class IdentityServiceImpl implements IdentityService {
 
         Response response = keycloak.realm(realm).users().create(identity);
         identityInfo.setIdentityId(getCreatedId(response));
+        identityInfo.setEmailVerified(identity.isEmailVerified());
 
         keycloak.realm(realm).users().get(identityInfo.getIdentityId()).joinGroup(groupId);
-
+        if (identity.getRequiredActions() != null && identity.getRequiredActions().contains(UserActionType.VERIFY_EMAIL.name())) {
+            changeEmailUserAction(identityInfo.getIdentityId());
+        }
+        
         return identityInfo;
     }
 
@@ -270,10 +292,10 @@ public class IdentityServiceImpl implements IdentityService {
                 credentialRepresentation.setValue(newCredentials.getPassword());
 
                 if (Boolean.TRUE.equals(newCredentials.isTemporary())) {
-                    user.getRequiredActions().add(AuthService.USER_ACTION_UPDATE_PASSWORD);
+                    user.getRequiredActions().add(UserActionType.UPDATE_PASSWORD.name());
                     credentialRepresentation.setTemporary(true);
                 } else {
-                    user.getRequiredActions().remove(AuthService.USER_ACTION_UPDATE_PASSWORD);
+                    user.getRequiredActions().remove(UserActionType.UPDATE_PASSWORD.name());
                     credentialRepresentation.setTemporary(false);
                 }
 
@@ -475,12 +497,23 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void resetPasswordByEmail(String contactNumber) {
+    public void resetPasswordUserAction(String contactNumber) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        if (StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
+        if (!StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
             throw new IdentityEmailNotExistsOrVerifiedException(contactNumber);
         }
-        keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+        keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList(UserActionType.UPDATE_PASSWORD.name()));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void changeEmailUserAction(String userId) {
+        UserResource user = keycloak.realm(realm).users().get(userId);
+        if (user != null && StringUtils.hasText(user.toRepresentation().getEmail())) {
+            user.executeActionsEmail(Arrays.asList(UserActionType.VERIFY_EMAIL.name()));
+        }
     }
 
     /**
