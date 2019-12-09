@@ -108,7 +108,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Optional<GroupRepresentation> findGroup(String accountNumber) {        
-        String groupId = searchService.findGroupIdsByAttribute(ATTR_ACCOUNT_NUMBER, accountNumber).stream().findFirst().orElse(null);
+        String groupId = searchService.findGroupIdsByAttribute(AccountPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber).stream().findFirst().orElse(null);
         return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
     }
 
@@ -117,7 +117,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public Optional<GroupRepresentation> findGroupByCompRegNo(String compRegNo) {        
-        String groupId = searchService.findGroupIdsByAttribute(ATTR_COMP_REG_NO, compRegNo).stream().findFirst().orElse(null);
+        String groupId = searchService.findGroupIdsByAttribute(AccountPropertyType.ATTR_COMP_REG_NO, compRegNo).stream().findFirst().orElse(null);
         return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
     }
 
@@ -163,7 +163,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         if (StringUtils.hasText(account.getContactEmail())) {
-            group.singleAttribute(ATTR_CONTACT_EMAIL, account.getContactEmail());
+            group.singleAttribute(ATTR_CONTACT_EMAIL, account.getContactEmail().toLowerCase());
         }
 
         getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup(MASTER_GROUP).getId()).subGroup(group));
@@ -392,7 +392,7 @@ public class AccountServiceImpl implements AccountService {
         List<AccountInfo> found = new ArrayList<>();
         
         AccountPropertyType firstKey = searchFilter.keySet().stream().findFirst().get();
-        found = mappingIds(searchService.findGroupIdsByAttribute(firstKey.getValue(), searchFilter.remove(firstKey)));
+        found = mappingIds(searchService.findGroupIdsByAttribute(firstKey, searchFilter.remove(firstKey)));
         
         // filter other 
         for (AccountPropertyType key : searchFilter.keySet()) {
@@ -407,7 +407,7 @@ public class AccountServiceImpl implements AccountService {
         case ATTR_ACCOUNT_NAME:
             return value.equals(a.getName());
         case ATTR_CONTACT_EMAIL:
-            return value.equals(a.getContactEmail());
+            return value.toLowerCase().equals(a.getContactEmail());
         case ATTR_COMP_REG_NO:
             return value.equals(a.getCompRegNo());
         case ATTR_ACCOUNT_NUMBER:

@@ -12,6 +12,9 @@ import java.util.Optional;
 
 import org.springframework.util.CollectionUtils;
 
+import com.karumien.cloud.sso.api.model.AccountPropertyType;
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+
 /**
  * Search Service for direct immutable access to KeyCloak DB for performance searching.
  * 
@@ -29,7 +32,7 @@ public interface SearchService {
      *            specific value of attribute
      * @return {@link List} of User's IDs
      */
-    List<String> findUserIdsByAttribute(String attribute, String value);
+    List<String> findUserIdsByAttribute(IdentityPropertyType attribute, String value);
 
     /**
      * Search Groups by UserAttribute name and value.
@@ -40,7 +43,7 @@ public interface SearchService {
      *            specific value of attribute
      * @return {@link List} of User's IDs
      */
-    List<String> findGroupIdsByAttribute(String attribute, String value);
+    List<String> findGroupIdsByAttribute(AccountPropertyType attribute, String value);
     
     default Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
         if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {

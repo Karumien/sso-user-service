@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+
 /**
  * Tests Service {@link SearchService}.
  *
@@ -35,7 +37,7 @@ public class SearchServiceTest {
     @Ignore
     public void findUserIdsByAttribute() {
         
-        List<String> usersIds = searchService.findUserIdsByAttribute(IdentityService.ATTR_CONTACT_NUMBER, "11714");
+        List<String> usersIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, "11714");
         assertNotNull(usersIds);
         assertEquals(2, usersIds.size());
         

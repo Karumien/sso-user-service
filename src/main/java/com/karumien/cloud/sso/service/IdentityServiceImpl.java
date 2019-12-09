@@ -184,12 +184,12 @@ public class IdentityServiceImpl implements IdentityService {
 
         // TODO: Persistent lock?
         if (StringUtils.hasText(identityInfo.getNav4Id())) {
-            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_NAV4ID, identityInfo.getNav4Id()))) {
+            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, identityInfo.getNav4Id()))) {
                 throw new IdentityDuplicateException("Identity with same nav4Id already exists");
             }
             identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
         } else {
-            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, identityInfo.getContactNumber()))) {
+            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, identityInfo.getContactNumber()))) {
                 throw new IdentityDuplicateException("Identity with same contactNumber already exists, use nav4Id for uniqueness");
             }
         }
@@ -198,7 +198,7 @@ public class IdentityServiceImpl implements IdentityService {
             identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         }
         if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
-            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
+            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail().toLowerCase());
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
             identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
@@ -262,7 +262,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public void createIdentityCredentialsNav4(String nav4Id, Credentials newCredentials) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst()
+        String userId = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, nav4Id).stream().findFirst()
                 .orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         createCredentials(keycloak.realm(realm).users().get(userId).toRepresentation(), newCredentials);
     }
@@ -321,7 +321,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
-        List<String> userIds = searchService.findUserIdsByAttribute(ATTR_CONTACT_NUMBER, contactNumber);
+        List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
         if (userIds.size() > 1) {
             throw new IdentityDuplicateException(contactNumber);
         }
@@ -347,7 +347,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentityNav4(String nav4Id) {
-        List<String> userIds = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id);
+        List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, nav4Id);
         if (userIds.size() > 1) {
             throw new IdentityDuplicateException("nav4Id = " + nav4Id);
         }
@@ -563,7 +563,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public IdentityInfo getIdentityByNav4(String nav4Id) {
-        String userId = searchService.findUserIdsByAttribute(ATTR_NAV4ID, nav4Id).stream().findFirst()
+        String userId = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, nav4Id).stream().findFirst()
                 .orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         return mapping(keycloak.realm(realm).users().get(userId).toRepresentation());
     }
@@ -595,11 +595,12 @@ public class IdentityServiceImpl implements IdentityService {
     public List<UserRepresentation> findIdentityByField(String field, String value) {
         
         if (IdentityPropertyType.USERNAME.getValue().equals(field)) {
-            return keycloak.realm(realm).users().search(value);
+            return keycloak.realm(realm).users().search(value.toLowerCase(), null, null, value, 0, 50);
+            //return keycloak.realm(realm).users().search(value);
         };
 
         if (IdentityPropertyType.EMAIL.getValue().equals(field)) {
-            return keycloak.realm(realm).users().search(null, null, null, value, 0, 50);
+            return keycloak.realm(realm).users().search(null, null, null, value.toLowerCase(), 0, 50);
         };
         
         return keycloak.realm(realm).users().search(field + ":" + value, 0, 50);
@@ -622,21 +623,7 @@ public class IdentityServiceImpl implements IdentityService {
         List<IdentityInfo> found = new ArrayList<>();
         
         IdentityPropertyType firstKey = searchFilter.keySet().stream().findFirst().get();
-        
-        switch (firstKey) {
-        case USERNAME:
-        case EMAIL:
-            found = mapping(findIdentityByField(firstKey.getValue(), searchFilter.remove(firstKey)));
-            break;
-
-        case ID:
-            found = mappingIds(Arrays.asList(searchFilter.remove(firstKey)));
-            break;
-
-        default:
-            found = mappingIds(searchService.findUserIdsByAttribute(firstKey.getValue(), searchFilter.remove(firstKey)));
-            break;
-        }
+        found = mappingIds(searchService.findUserIdsByAttribute(firstKey, searchFilter.remove(firstKey)));
                     
         // filter other 
         for (IdentityPropertyType key : searchFilter.keySet()) {
@@ -651,15 +638,15 @@ public class IdentityServiceImpl implements IdentityService {
         case ID:
             return value.equals(i.getIdentityId());
         case USERNAME:
-            return value.equals(i.getUsername());
+            return value.toLowerCase().equals(i.getUsername());
         case EMAIL:
-            return value.equals(i.getEmail());
+            return value.toLowerCase().equals(i.getEmail());
         case ATTR_ACCOUNT_NUMBER:
             return value.equals(i.getAccountNumber());
         case ATTR_CONTACT_NUMBER:
             return value.equals(i.getContactNumber());
         case ATTR_GLOBAL_EMAIL:
-            return value.equals(i.getGlobalEmail());
+            return value.toLowerCase().equals(i.getGlobalEmail());
         case ATTR_NAV4ID:
             return value.equals(i.getNav4Id());
         case ATTR_PHONE:
@@ -675,7 +662,7 @@ public class IdentityServiceImpl implements IdentityService {
             .collect(Collectors.toList());
     }
 
-    private List<IdentityInfo> mapping(List<UserRepresentation> users) {
-        return users.stream().map(u -> mapping(u)).collect(Collectors.toList());
-    }
+//    private List<IdentityInfo> mapping(List<UserRepresentation> users) {
+//        return users.stream().map(u -> mapping(u)).collect(Collectors.toList());
+//    }
 }
