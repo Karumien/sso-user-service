@@ -110,7 +110,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleInfo getRoleBaseOnId(String roleId) {
         RoleResource role = findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId));
-        return transformRoleToBaseRole(role.toRepresentation(), role.getRealmRoleComposites());
+        return transformRoleToBaseRole(role.toRepresentation(), role.getRoleComposites()); //RealmRoleComposites());
     }
 
     /**
@@ -230,7 +230,7 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleInfo> getAccountRoles(GroupResource groupResource, boolean effective) {
         List<RoleRepresentation> roles = effective ? groupResource.roles().realmLevel().listEffective() : groupResource.roles().realmLevel().listAll();
         return roles.stream()
-            .map(role -> transformRoleToBaseRole(role, findRoleResource(role.getName()).get().getRoleComposites()))
+            .map(role -> getRoleBaseOnId(role.getName()))
             .collect(Collectors.toList());
     }
 
