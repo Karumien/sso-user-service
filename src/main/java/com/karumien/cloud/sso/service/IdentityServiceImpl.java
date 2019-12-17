@@ -282,8 +282,6 @@ public class IdentityServiceImpl implements IdentityService {
                 userResource.update(user);
             }
 
-            // TODO: verify currentPassword
-
             // change when new password ready
             if (StringUtils.hasText(newCredentials.getPassword())) {
 

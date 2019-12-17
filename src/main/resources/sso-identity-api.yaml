@@ -759,9 +759,6 @@ definitions:
       password:
         type: string
         maxLength: 50
-      currentPassword:
-        type: string
-        maxLength: 50
       temporary:
         type: boolean
         description: "Temporary - need reset after first login"
@@ -769,9 +766,6 @@ definitions:
       - username: "midie"
         password: "#123456."
       - password: "#123456."
-        temporary: true      
-      - password: "#123456."
-        currentPassword: "oldPassword"
         temporary: true      
   DriverPin:
     type: object
