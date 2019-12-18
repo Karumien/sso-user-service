@@ -169,14 +169,6 @@ public class IdentityServiceImpl implements IdentityService {
 
         identity.setEnabled(true);
 
-        // backward compatibility
-        if (!StringUtils.hasText(identityInfo.getAccountNumber())) {
-            identityInfo.setAccountNumber(identityInfo.getCrmAccountId());
-        }
-        if (!StringUtils.hasText(identityInfo.getContactNumber())) {
-            identityInfo.setContactNumber(identityInfo.getCrmContactId());
-        }
-
         identity.singleAttribute(ATTR_CONTACT_NUMBER,
                 Optional.of(identityInfo.getContactNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_CONTACT_NUMBER)));
         identity.singleAttribute(ATTR_ACCOUNT_NUMBER,
@@ -374,10 +366,6 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
-
-        // TODO: Remove deprecated compatibility
-        identity.setCrmAccountId(identity.getAccountNumber());
-        identity.setCrmContactId(identity.getContactNumber());
 
         return identity;
     }

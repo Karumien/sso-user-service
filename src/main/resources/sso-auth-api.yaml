@@ -394,12 +394,6 @@ definitions:
         type: string
         description: "User's default Locale"
         maxLength: 50  
-      crmAccountId:
-        type: string
-        description: Backward Compatibility
-      crmContactId:
-        type: string
-        description: Backward Compatibility
       binaryRights:
         type: string
         description: "User's rights"

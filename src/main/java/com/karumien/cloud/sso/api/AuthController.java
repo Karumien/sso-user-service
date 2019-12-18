@@ -173,15 +173,16 @@ public class AuthController implements AuthApi  {
     }
 
     private ResponseEntity<AuthorizationResponse> changePasswordAndLogin(AuthorizationRequest user) {
+
         Credentials newCredentials = new Credentials();
         newCredentials.setTemporary(false);
         newCredentials.setPassword(user.getNewPassword());
         newCredentials.setUsername(user.getUsername());
-        newCredentials.setCurrentPassword(user.getPassword());
         
         identityService.createIdentityCredentialsByUsername(user.getUsername(), newCredentials);
         user.setPassword(user.getNewPassword());
         user.setNewPassword(null);
+        
         return login(user);
     }
 

@@ -228,9 +228,6 @@ public class AccountServiceImpl implements AccountService {
         accountInfo.setContactEmail(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CONTACT_EMAIL).orElse(null));
         accountInfo.setName(searchService.getSimpleAttribute(group.getAttributes(), ATTR_ACCOUNT_NAME).orElse(group.getName()));
 
-        // TODO: Remove deprecated compatibility
-        accountInfo.setCrmAccountId(accountInfo.getAccountNumber());
-        
         return accountInfo;
     }
     
