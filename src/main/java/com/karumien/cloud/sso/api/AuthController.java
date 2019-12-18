@@ -87,6 +87,9 @@ public class AuthController implements AuthApi  {
                 break;
             case PASSWORD:
                 response = authService.loginByUsernamePassword(user.getClientId(), user.getClientSecret(), user.getUsername(), user.getPassword());
+                if (StringUtils.hasText(user.getNewPassword())) {
+                    return changePasswordAndLogin(user);
+                }                
                 break;
             case CLIENT_CREDENTIALS:
                 response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
@@ -108,26 +111,16 @@ public class AuthController implements AuthApi  {
         } catch (javax.ws.rs.BadRequestException e) {
             // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
             ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
-                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class))
-                    .errdata(identityService.getUserRequiredActions(
-                            user.getUsername()).stream().map(a -> new ErrorData()
-                                    .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
-                                    .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
+                .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class))
+                .errdata(identityService.getUserRequiredActions(
+                    user.getUsername()).stream().map(a -> new ErrorData()
+                        .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
+                        .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
             );        
             
             // update-password flow
             if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && UserActionType.UPDATE_PASSWORD.getValue().equals(error.getErrdata().get(0).getCode())) {
-
-                Credentials newCredentials = new Credentials();
-                newCredentials.setTemporary(false);
-                newCredentials.setPassword(user.getNewPassword());
-                newCredentials.setUsername(user.getUsername());
-                newCredentials.setCurrentPassword(user.getPassword());
-                
-                identityService.createIdentityCredentialsByUsername(user.getUsername(), newCredentials);
-                user.setPassword(user.getNewPassword());
-                user.setNewPassword(null);
-                return login(user);
+                return changePasswordAndLogin(user);
             }
             
             return new ResponseEntity(error, user.getGrantType() == GrantType.PASSWORD ? HttpStatus.UNPROCESSABLE_ENTITY : HttpStatus.UNAUTHORIZED);
@@ -177,6 +170,19 @@ public class AuthController implements AuthApi  {
         }
         
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private ResponseEntity<AuthorizationResponse> changePasswordAndLogin(AuthorizationRequest user) {
+        Credentials newCredentials = new Credentials();
+        newCredentials.setTemporary(false);
+        newCredentials.setPassword(user.getNewPassword());
+        newCredentials.setUsername(user.getUsername());
+        newCredentials.setCurrentPassword(user.getPassword());
+        
+        identityService.createIdentityCredentialsByUsername(user.getUsername(), newCredentials);
+        user.setPassword(user.getNewPassword());
+        user.setNewPassword(null);
+        return login(user);
     }
 
     @Override
