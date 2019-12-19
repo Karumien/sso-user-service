@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.api;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.NotAuthorizedException;
@@ -28,12 +29,14 @@ import com.karumien.cloud.sso.api.model.AuthorizationResponse;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
+import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.GrantType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.PasswordPolicy;
 import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.api.model.UsernamePolicy;
+import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
@@ -81,89 +84,100 @@ public class AuthController implements AuthApi  {
         AuthorizationResponse response = null;
 
         try {
-            switch (user.getGrantType()) {
-            case REFRESH_TOKEN:
-                response = authService.loginByToken(user.getClientId(), user.getRefreshToken());
-                break;
-            case PASSWORD:
-                response = authService.loginByUsernamePassword(user.getClientId(), user.getClientSecret(), user.getUsername(), user.getPassword());
-                if (StringUtils.hasText(user.getNewPassword())) {
-                    return changePasswordAndLogin(user);
-                }                
-                break;
-            case CLIENT_CREDENTIALS:
-                response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
-                break;
-            case IMPERSONATE:
-                response = authService.loginByImpersonator(user.getClientId(), user.getRefreshToken(), user.getUsername());
-                break;            
-            case PIN:
-                IdentityInfo identity = authService.loginByPin(user.getClientId(), user.getUsername(), user.getPin());
-                if (identity == null) {
-                    throw new NotAuthorizedException(user.getUsername());
-                } else {
-                    return new ResponseEntity(identity, HttpStatus.ACCEPTED);
+        
+            try {
+                switch (user.getGrantType()) {
+                case REFRESH_TOKEN:
+                    response = authService.loginByToken(user.getClientId(), user.getRefreshToken());
+                    break;
+                case PASSWORD:
+                    response = authService.loginByUsernamePassword(user.getClientId(), user.getClientSecret(), user.getUsername(), user.getPassword());
+                    if (StringUtils.hasText(user.getNewPassword())) {
+                        return changePasswordAndLogin(user);
+                    }                
+                    break;
+                case CLIENT_CREDENTIALS:
+                    response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
+                    break;
+                case IMPERSONATE:
+                    response = authService.loginByImpersonator(user.getClientId(), user.getRefreshToken(), user.getUsername());
+                    break;            
+                case PIN:
+                    IdentityInfo identity = authService.loginByPin(user.getClientId(), user.getUsername(), user.getPin());
+                    if (identity == null) {
+                        throw new NotAuthorizedException(user.getUsername());
+                    } else {
+                        return new ResponseEntity(identity, HttpStatus.ACCEPTED);
+                    }
+                default:
+                    throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());
                 }
-            default:
-                throw new UnsupportedApiOperationException("Unknown grant_type " + user.getGrantType());
+            
+            } catch (javax.ws.rs.BadRequestException e) {
+                // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
+                ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
+                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class))
+                    .errdata(identityService.getUserRequiredActions(
+                        user.getUsername()).stream().map(a -> new ErrorData()
+                            .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
+                            .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
+                );        
+                
+                // update-password flow
+                if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && UserActionType.UPDATE_PASSWORD.getValue().equals(error.getErrdata().get(0).getCode())) {
+                    return changePasswordAndLogin(user);
+                }
+                
+                return new ResponseEntity(error, user.getGrantType() == GrantType.PASSWORD ? HttpStatus.UNPROCESSABLE_ENTITY : HttpStatus.UNAUTHORIZED);
+            } catch (javax.ws.rs.NotAuthorizedException e) {
+                
+                int errorNo = 0;
+                String errorMsg = null;
+    
+                ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(errorNo).errmsg(errorMsg);
+                
+                switch (user.getGrantType()) {
+                case CLIENT_CREDENTIALS:
+                    errorNo = 402;
+                    break;
+                case PIN:
+                    errorNo = 403;
+                    errorMsg = messageSource.getMessage("user.invalid.pin", null, LocaleContextHolder.getLocale());
+                    break;
+                case PASSWORD:
+                    errorNo = 404;
+    
+                    // account is temporarily locked
+                    if (identityService.isIdentityTemporaryLocked(user.getUsername())) {
+                        errorMsg = messageSource.getMessage("user.temporary.locked", null, LocaleContextHolder.getLocale());
+                        error.addErrdataItem(
+                            new ErrorData()
+                                .description(messageSource.getMessage("user.temporary.locked", null, LocaleContextHolder.getLocale()))
+                                .code("temporary-locked"));
+                    }                
+                    break;
+                default:
+                    errorNo = 400;
+                    break;
+                }
+    
+                if (StringUtils.hasText(errorMsg)) {
+                    errorMsg = JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class);
+                }
+                error.errno(errorNo).errmsg(errorMsg);
+                
+                return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
             }
-        
-        } catch (javax.ws.rs.BadRequestException e) {
-            // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
-            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
-                .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class))
-                .errdata(identityService.getUserRequiredActions(
-                    user.getUsername()).stream().map(a -> new ErrorData()
-                        .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
-                        .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
-            );        
-            
-            // update-password flow
-            if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && UserActionType.UPDATE_PASSWORD.getValue().equals(error.getErrdata().get(0).getCode())) {
-                return changePasswordAndLogin(user);
-            }
-            
-            return new ResponseEntity(error, user.getGrantType() == GrantType.PASSWORD ? HttpStatus.UNPROCESSABLE_ENTITY : HttpStatus.UNAUTHORIZED);
-        } catch (javax.ws.rs.NotAuthorizedException e) {
-            
-            int errorNo = 0;
-            String errorMsg = null;
 
-            ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(errorNo).errmsg(errorMsg);
+        } catch (PasswordPolicyException e) {            
+            return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
+                .errmsg("Password is not accepted by Password Policy")
+                .errdata(Arrays.asList(new ErrorData()
+                    .description(authService.getPasswordPolicy().getTranslation())
+                    //messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
+                    .code(ErrorDataCodeCredentials.PASSWORD.toString()))), HttpStatus.UNPROCESSABLE_ENTITY);
+        }    
             
-            switch (user.getGrantType()) {
-            case CLIENT_CREDENTIALS:
-                errorNo = 402;
-                break;
-            case PIN:
-                errorNo = 403;
-                errorMsg = messageSource.getMessage("user.invalid.pin", null, LocaleContextHolder.getLocale());
-                break;
-            case PASSWORD:
-                errorNo = 404;
-
-                // account is temporarily locked
-                if (identityService.isIdentityTemporaryLocked(user.getUsername())) {
-                    errorMsg = messageSource.getMessage("user.temporary.locked", null, LocaleContextHolder.getLocale());
-                    error.addErrdataItem(
-                        new ErrorData()
-                            .description(messageSource.getMessage("user.temporary.locked", null, LocaleContextHolder.getLocale()))
-                            .code("temporary-locked"));
-                }                
-                break;
-            default:
-                errorNo = 400;
-                break;
-            }
-
-            if (StringUtils.hasText(errorMsg)) {
-                errorMsg = JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class);
-            }
-            error.errno(errorNo).errmsg(errorMsg);
-            
-            return new ResponseEntity(error, HttpStatus.UNAUTHORIZED);
-        }
-        
         if (response.getAccessToken() != null) {
             MDC.put("access_token", decodeJWT(response.getAccessToken()));
             System.out.println(decodeJWT(response.getAccessToken()));

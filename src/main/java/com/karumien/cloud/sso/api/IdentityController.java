@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +29,7 @@ import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
+import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.RoleService;
 
@@ -51,9 +50,9 @@ public class IdentityController implements IdentitiesApi {
 
     @Autowired
     private RoleService roleService;
-
+    
     @Autowired
-    private MessageSource messageSource;
+    private AuthService authService;
     
     /**
      * {@inheritDoc}
@@ -82,9 +81,10 @@ public class IdentityController implements IdentitiesApi {
             identityService.createIdentityCredentials(contactNumber, credentials);
         } catch (PasswordPolicyException e) {            
             return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
-                .errmsg(e.getMessage())
+                .errmsg("Password is not accepted by Password Policy")
                 .errdata(Arrays.asList(new ErrorData()
-                    .description(messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
+                    .description(authService.getPasswordPolicy().getTranslation())
+                    //.description(messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
                     .code(ErrorDataCodeCredentials.PASSWORD.toString()))), HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -291,9 +291,10 @@ public class IdentityController implements IdentitiesApi {
             identityService.createIdentityCredentialsNav4(nav4Id, credentials);
         } catch (PasswordPolicyException e) {            
             return new ResponseEntity(new ErrorMessage().errcode(ErrorCode.ERROR).errno(300)
-                .errmsg(e.getMessage())
+                .errmsg("Password is not accepted by Password Policy")
                 .errdata(Arrays.asList(new ErrorData()
-                    .description(messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
+                    .description(authService.getPasswordPolicy().getTranslation())
+//                    .description(messageSource.getMessage("error.credentials." + ErrorDataCodeCredentials.PASSWORD.toString(), null, LocaleContextHolder.getLocale()))
                     .code(ErrorDataCodeCredentials.PASSWORD.toString()))), HttpStatus.UNPROCESSABLE_ENTITY);
         }        
         return new ResponseEntity<>(HttpStatus.CREATED);
