@@ -21,7 +21,7 @@ public class PasswordPolicyException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public PasswordPolicyException(String password) {
-        super("Password Policy not accept password: " + password);
+        super("Entered password is not accepted by Password Policy: " + password);
     }
     
 }
