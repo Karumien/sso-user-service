@@ -205,8 +205,8 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         identityService.updateRolesOfIdentity(
-                accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-                Arrays.asList(roleId), UpdateType.ADD, null);
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            Arrays.asList(roleId), UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -227,8 +227,8 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
-                accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-                roles, UpdateType.UPDATE, accountService.getAccountRolesRepresentation(accountNumber));
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            roles, UpdateType.UPDATE, accountService.getAccountRolesRepresentation(accountNumber));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
