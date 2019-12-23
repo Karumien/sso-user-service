@@ -420,14 +420,15 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType) {
+    public void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType, List<RoleRepresentation> scope) {
 
         UserResource userResource = Optional.ofNullable(keycloak.realm(realm).users().get(identityId))
                 .orElseThrow(() -> new IdentityNotFoundException("identityId = " + identityId));
 
         if (updateType == UpdateType.UPDATE) {
             // remove unused roles
-            userResource.roles().realmLevel().remove(userResource.roles().realmLevel().listAll().stream()
+            userResource.roles().realmLevel().remove(
+                (scope == null ? userResource.roles().realmLevel().listAll() : scope).stream()
                     .filter(actualRole -> !roles.contains(actualRole.getId())).collect(Collectors.toList()));
         }
 

@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.admin.client.resource.RoleResource;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import com.karumien.cloud.sso.api.model.RoleInfo;
@@ -108,6 +109,7 @@ public interface RoleService {
      * @return {@link List} of {@link RoleInfo} all roles that account have assigned
      */
     List<RoleInfo> getAccountRoles(GroupResource groupResource, boolean effective);
+    List<RoleRepresentation> getAccountRolesRepresentation(GroupResource group, boolean effective);
 
     /**
      * Returns all rights that identity have assigned.
@@ -119,5 +121,6 @@ public interface RoleService {
     List<String> getIdentityRights(GroupResource groupResource, String contactNumber);
 
     List<String> getIdentityRolesNav4(String nav4Id);
+
 
 }

@@ -206,7 +206,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         identityService.updateRolesOfIdentity(
                 accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-                Arrays.asList(roleId), UpdateType.ADD);
+                Arrays.asList(roleId), UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -217,7 +217,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
             accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-            roles, UpdateType.ADD);
+            roles, UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.PARTIAL_CONTENT);
     }
 
@@ -228,7 +228,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
                 accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-                roles, UpdateType.UPDATE);
+                roles, UpdateType.UPDATE, accountService.getAccountRolesRepresentation(accountNumber));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -239,7 +239,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> unassignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
             accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-            roles, UpdateType.DELETE);
+            roles, UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
@@ -250,7 +250,7 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<Void> unassignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         identityService.updateRolesOfIdentity(
             accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-            Arrays.asList(roleId), UpdateType.DELETE);
+            Arrays.asList(roleId), UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     

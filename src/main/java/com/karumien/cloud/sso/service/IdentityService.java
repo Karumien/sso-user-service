@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.util.StringUtils;
 
@@ -130,8 +131,9 @@ public interface IdentityService {
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to be on identity
      * @param updateType update type
+     * @param scope selected roles for apply, empty means all
      */
-    void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType);
+    void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType, List<RoleRepresentation> scope);
 
     /**
      * Function that save pin of Identity driver base on input.

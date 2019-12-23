@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
@@ -135,4 +136,6 @@ public interface AccountService {
             search.put(key, value);
         }
     }
+
+    List<RoleRepresentation> getAccountRolesRepresentation(String accountNumber);
 }
