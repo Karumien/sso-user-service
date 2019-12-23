@@ -228,12 +228,20 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public List<RoleInfo> getAccountRoles(GroupResource groupResource, boolean effective) {
-        List<RoleRepresentation> roles = effective ? groupResource.roles().realmLevel().listEffective() : groupResource.roles().realmLevel().listAll();
+        List<RoleRepresentation> roles = getAccountRolesRepresentation(groupResource, effective);
         return roles.stream()
             .map(role -> getRoleBaseOnId(role.getName()))
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<RoleRepresentation> getAccountRolesRepresentation(GroupResource groupResource, boolean effective) {
+        return effective ? groupResource.roles().realmLevel().listEffective() : groupResource.roles().realmLevel().listAll();
+    }
+    
     /**
      * {@inheritDoc}
      */

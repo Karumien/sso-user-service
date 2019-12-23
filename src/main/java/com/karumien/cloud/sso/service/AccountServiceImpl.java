@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.GroupResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -348,6 +349,14 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	public List<RoleInfo> getAccountRoles(String accountNumber) {
 	    return roleService.getAccountRoles(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), false);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<RoleRepresentation> getAccountRolesRepresentation(String accountNumber) {
+        return roleService.getAccountRolesRepresentation(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), false);
 	}
 	
     /**
