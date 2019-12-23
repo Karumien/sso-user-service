@@ -325,9 +325,9 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public Optional<UserRepresentation> findUserRepresentationById(String identityId) {
         try {
-            return Optional.ofNullable(keycloak.realm(realm).users().get(identityId).toRepresentation());
+            return StringUtils.hasText(identityId) ? 
+                Optional.ofNullable(keycloak.realm(realm).users().get(identityId).toRepresentation()) : Optional.empty();
         } catch (Exception e) {
-            System.out.println(e);
         }
         return Optional.empty();
     }
@@ -559,11 +559,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public List<String> getUserRequiredActions(String username) {
-        if (!StringUtils.hasText(username)) {
-            return new ArrayList<>();
-        }
-        List<UserRepresentation> identities = keycloak.realm(realm).users().search(username);
-        return identities.isEmpty() ? new ArrayList<>() : identities.get(0).getRequiredActions();
+        return findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username)).getRequiredActions();
     }
 
     /**
@@ -571,25 +567,8 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentityByUsername(String username) {
-        return keycloak.realm(realm).users().search(username).stream().findFirst();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserRepresentation> findIdentityByField(String field, String value) {
-        
-        if (IdentityPropertyType.USERNAME.getValue().equals(field)) {
-            return keycloak.realm(realm).users().search(value.toLowerCase(), null, null, value, 0, 50);
-            //return keycloak.realm(realm).users().search(value);
-        };
-
-        if (IdentityPropertyType.EMAIL.getValue().equals(field)) {
-            return keycloak.realm(realm).users().search(null, null, null, value.toLowerCase(), 0, 50);
-        };
-        
-        return keycloak.realm(realm).users().search(field + ":" + value, 0, 50);
+        return findUserRepresentationById(searchService.findUserIdsByAttribute(IdentityPropertyType.USERNAME, username)
+                .stream().findFirst().orElse(null));
     }
 
     /**

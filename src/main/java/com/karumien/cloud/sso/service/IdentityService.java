@@ -251,6 +251,4 @@ public interface IdentityService {
         }
     }
 
-    List<UserRepresentation> findIdentityByField(String field, String value);
-
 }
