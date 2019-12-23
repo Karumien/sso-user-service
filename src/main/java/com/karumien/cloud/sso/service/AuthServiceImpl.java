@@ -13,7 +13,6 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -71,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private RoleService roleService;
-
+   
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
 
@@ -321,7 +320,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         
-        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.username", null, locale) + " " : ", ");
+        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.username", null, locale) + "" : ", ");
 
         sb.append(messageSource.getMessage(Boolean.TRUE.equals(useIt) ? "policy.can" : "policy.cannot", null, locale));
         sb.append(" " + messageSource.getMessage(key, null, locale));
@@ -335,7 +334,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
 
-        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.password", null, locale) + " " : ", ");
+        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.password", null, locale) + "" : ", ");
         sb.append(messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
         return true;
     }
@@ -364,14 +363,10 @@ public class AuthServiceImpl implements AuthService {
     public AuthorizationResponse loginByImpersonator(String clientId, String refreshToken, String username) {
 
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
-
-        List<UserRepresentation> users = keycloak.realm(realm).users().search(username);
-        if (users.isEmpty()) {
-            throw new IdentityNotFoundException("username = " + username);
-        }
+        identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
 
         AdvancedTokenManager tokenManager = new AdvancedTokenManager(
-                new AdvancedTokenConfig(this.adminServerUrl, realm, users.get(0).getId(), null, 
+                new AdvancedTokenConfig(this.adminServerUrl, realm, username, null, 
                         StringUtils.hasText(clientId) ? clientId : this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
                 clientBuilder.build(), refreshToken);
 

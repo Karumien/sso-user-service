@@ -52,6 +52,7 @@ import org.springframework.util.StringUtils;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
@@ -338,7 +339,7 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public boolean checkIfUserNameExist(String username) {
-		return keycloak.realm(realm).users().search(username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
+		return searchService.findUserIdsByAttribute(IdentityPropertyType.USERNAME, username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
 	}
 
 	/**
