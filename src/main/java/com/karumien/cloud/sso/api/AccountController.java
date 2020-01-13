@@ -377,7 +377,8 @@ public class AccountController implements AccountsApi {
             info.setIdentity(identity);
             if (StringUtils.hasText(identity.getAccountNumber())) {
                 try {
-                    info.setRoles(getAccountIdentityRoleIds(identity.getAccountNumber(), identity.getContactNumber()).getBody());
+                    // TODO: assigned not effective
+                    info.setRoles(roleService.getIdentityRoles(identity.getContactNumber()));
                     info.setAccount(accountService.getAccount(identity.getAccountNumber()));
                 } catch (AccountNotFoundException e) {
                 }
