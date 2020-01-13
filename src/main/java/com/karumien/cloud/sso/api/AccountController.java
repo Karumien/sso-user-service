@@ -399,52 +399,65 @@ public class AccountController implements AccountsApi {
         
         for (OnBoardingInfo onBoardingInfo : onBoardingInfos) {
         
-            // account
-            if (onBoardingInfo.getAccount() != null) {
-                if (accountService.findGroup(onBoardingInfo.getAccount().getAccountNumber()).isPresent() && onBoardingInfo.isOverwriteAccount()) {
-                    // TODO: accountService.update
-                } else {
-                    accountService.createAccount(onBoardingInfo.getAccount());
-                }
-            }
-            
-            // identity
-            if (onBoardingInfo.getIdentity() != null) {
-
-                Optional<UserRepresentation> identity = Optional.empty();
-                
-                if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
-                    identity = identityService.findIdentityNav4(onBoardingInfo.getIdentity().getNav4Id());
-                } else {
-                    identity = identityService.findIdentity(onBoardingInfo.getIdentity().getContactNumber());
-                }
-                
-                IdentityInfo identityInfo = null;
-                
-                if (identity.isPresent() && onBoardingInfo.isOverwriteIdentity()) {
-                    identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());
-                    if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles())) {
-                        identityService.updateRolesOfIdentity(
-                            identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.UPDATE, null);
-                    }
-                } else {
-                    identityInfo = identityService.createIdentity(onBoardingInfo.getIdentity());
-                    if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles())) {
-                        identityService.updateRolesOfIdentity(
-                            identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.ADD, null);
-                    }
-                }   
-                
-                if (identityInfo != null && onBoardingInfo.getCredentials() != null) {
-                    if (identityInfo.getNav4Id() != null) {
-                        identityService.createIdentityCredentialsNav4(identityInfo.getNav4Id(), onBoardingInfo.getCredentials());
+            try {
+                // account
+                if (onBoardingInfo.getAccount() != null) {
+                    if (accountService.findGroup(onBoardingInfo.getAccount().getAccountNumber()).isPresent()) {                        
+                        // TODO: accountService.update
+                        if (onBoardingInfo.isOverwriteAccount()) {
+                        }
                     } else {
-                        identityService.createIdentityCredentials(identityInfo.getContactNumber(), onBoardingInfo.getCredentials());
+                        accountService.createAccount(onBoardingInfo.getAccount());
                     }
                 }
-                                
+                
+                // identity
+                if (onBoardingInfo.getIdentity() != null) {
+    
+                    Optional<UserRepresentation> identity = Optional.empty();
+                    
+                    if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
+                        identity = identityService.findIdentityNav4(onBoardingInfo.getIdentity().getNav4Id());
+                    } else {
+                        identity = identityService.findIdentity(onBoardingInfo.getIdentity().getContactNumber());
+                    }
+                    
+                    IdentityInfo identityInfo = null;
+                    
+                    if (identity.isPresent()) {
+                        
+                        if (onBoardingInfo.isOverwriteIdentity()) {
+                            identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());
+                        }
+                        
+                        if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles()) && onBoardingInfo.isOverwriteRoles()) {
+                            identityService.updateRolesOfIdentity(
+                                identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.UPDATE, null);
+                        }
+                        
+                    } else {
+                        identityInfo = identityService.createIdentity(onBoardingInfo.getIdentity());
+                        if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles())) {
+                            identityService.updateRolesOfIdentity(
+                                identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.ADD, null);
+                        }
+                    }   
+                    
+                    if (identityInfo != null && onBoardingInfo.getCredentials() != null) {
+                        if (identityInfo.getNav4Id() != null) {
+                            identityService.createIdentityCredentialsNav4(identityInfo.getNav4Id(), onBoardingInfo.getCredentials());
+                        } else {
+                            identityService.createIdentityCredentials(identityInfo.getContactNumber(), onBoardingInfo.getCredentials());
+                        }
+                    }
+                    
+                    found.add(identityService.getIdentity(onBoardingInfo.getIdentity().getContactNumber()));
+                                    
+                }
+                
+            } catch (Exception e) {
+                log.warn("Error import " + onBoardingInfo, e);
             }
-            
         }
         
         return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
