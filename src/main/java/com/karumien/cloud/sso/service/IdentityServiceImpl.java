@@ -310,6 +310,22 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
+    public List<IdentityInfo> getIdentities(List<String> contactNumbers) {
+        
+        List<IdentityInfo> data = new ArrayList<>();
+        
+        for (String contactNumber : contactNumbers) {
+            searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber)
+                .forEach(userId -> data.add(mapping(keycloak.realm(realm).users().get(userId).toRepresentation())));
+        }
+        
+        return data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
         List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
         if (userIds.size() > 1) {

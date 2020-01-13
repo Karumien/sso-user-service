@@ -253,4 +253,6 @@ public interface IdentityService {
         }
     }
 
+    List<IdentityInfo> getIdentities(List<String> contactNumbers);
+
 }

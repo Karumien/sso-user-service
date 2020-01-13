@@ -6,12 +6,17 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +35,9 @@ import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
+import com.karumien.cloud.sso.api.model.OnBoardingInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.AuthService;
@@ -205,8 +212,8 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         identityService.updateRolesOfIdentity(
-                accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-                Arrays.asList(roleId), UpdateType.ADD, null);
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            Arrays.asList(roleId), UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -227,8 +234,8 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
-                accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
-                roles, UpdateType.UPDATE, accountService.getAccountRolesRepresentation(accountNumber));
+            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            roles, UpdateType.UPDATE, accountService.getAccountRolesRepresentation(accountNumber));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -356,7 +363,90 @@ public class AccountController implements AccountsApi {
         
         List<AccountInfo> found = accountService.search(searchFilter);
         return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK);
-    }
+    }    
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<OnBoardingInfo>> getOnboardingExport(@Valid List<String> contactNumbers) {
+        
+        List<OnBoardingInfo> found = new ArrayList<>();        
+        for (IdentityInfo identity : identityService.getIdentities(contactNumbers)) {
+            OnBoardingInfo info = new OnBoardingInfo();
+            info.setIdentity(identity);
+            if (StringUtils.hasText(identity.getAccountNumber())) {
+                try {
+                    info.setRoles(getAccountIdentityRoleIds(identity.getAccountNumber(), identity.getContactNumber()).getBody());
+                    info.setAccount(accountService.getAccount(identity.getAccountNumber()));
+                } catch (AccountNotFoundException e) {
+                }
+            }
+            found.add(info);
+        }
 
+        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<IdentityInfo>> onboarding(@Valid List<OnBoardingInfo> onBoardingInfos) {
+
+        List<IdentityInfo> found = new ArrayList<>();
+        
+        for (OnBoardingInfo onBoardingInfo : onBoardingInfos) {
+        
+            // account
+            if (onBoardingInfo.getAccount() != null) {
+                if (accountService.findGroup(onBoardingInfo.getAccount().getAccountNumber()).isPresent() && onBoardingInfo.isOverwriteAccount()) {
+                    // TODO: accountService.update
+                } else {
+                    accountService.createAccount(onBoardingInfo.getAccount());
+                }
+            }
+            
+            // identity
+            if (onBoardingInfo.getIdentity() != null) {
+
+                Optional<UserRepresentation> identity = Optional.empty();
+                
+                if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
+                    identity = identityService.findIdentityNav4(onBoardingInfo.getIdentity().getNav4Id());
+                } else {
+                    identity = identityService.findIdentity(onBoardingInfo.getIdentity().getContactNumber());
+                }
+                
+                IdentityInfo identityInfo = null;
+                
+                if (! identity.isEmpty() && onBoardingInfo.isOverwriteIdentity()) {
+                    identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());
+                    if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles())) {
+                        identityService.updateRolesOfIdentity(
+                            identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.UPDATE, null);
+                    }
+                } else {
+                    identityInfo = identityService.createIdentity(onBoardingInfo.getIdentity());
+                    if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles())) {
+                        identityService.updateRolesOfIdentity(
+                            identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.ADD, null);
+                    }
+                }   
+                
+                if (identityInfo != null && onBoardingInfo.getCredentials() != null) {
+                    if (identityInfo.getNav4Id() != null) {
+                        identityService.createIdentityCredentialsNav4(identityInfo.getNav4Id(), onBoardingInfo.getCredentials());
+                    } else {
+                        identityService.createIdentityCredentials(identityInfo.getContactNumber(), onBoardingInfo.getCredentials());
+                    }
+                }
+                                
+            }
+            
+        }
+        
+        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
+    }
     
 }
