@@ -360,15 +360,15 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponse loginByImpersonator(String clientId, String refreshToken, String username) {
+    public AuthorizationResponse loginByImpersonator(String clientId, String clientSecret, String refreshToken, String username) {
 
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
         identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
 
         AdvancedTokenManager tokenManager = new AdvancedTokenManager(
                 new AdvancedTokenConfig(this.adminServerUrl, realm, username, null, 
-                        StringUtils.hasText(clientId) ? clientId : this.clientId, null, OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE),
-                clientBuilder.build(), refreshToken);
+                        StringUtils.hasText(clientId) ? clientId : this.clientId, StringUtils.hasText(clientId) ? clientSecret : null, 
+                                OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE), clientBuilder.build(), refreshToken);
 
         return mapping(tokenManager.getAccessToken());            
     }
