@@ -153,15 +153,23 @@ definitions:
     example:
       password:
         grant_type: password
-        identity: user@ew.com
-        secret: heslo123
+        client_id: some-client
+        username: user@ew.com
+        password: heslo123
       client_credentials:
         grant_type: client_credentials
-        client_id: admin-cli
-        client_secret: uewrutzewre
+        client_id: some-client
+        client_secret: uewrutze wre
       refresh_token:
         grant_type: refresh_token
         refresh_token: uyewiryerweiruew
+      impersonate:
+        grant_type: impersonate
+        refresh_token: accessTokenOfImpersonator
+        username: impersonatedUsername
+      pin:  
+        grant_type: pin
+        username: user@ew.com        
   AuthorizationResponse:
       type: object
       required:

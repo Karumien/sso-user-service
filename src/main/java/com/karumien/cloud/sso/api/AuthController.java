@@ -100,7 +100,7 @@ public class AuthController implements AuthApi  {
                     response = authService.loginByClientCredentials(user.getClientId(), user.getClientSecret());
                     break;
                 case IMPERSONATE:
-                    response = authService.loginByImpersonator(user.getClientId(), user.getRefreshToken(), user.getUsername());
+                    response = authService.loginByImpersonator(user.getClientId(), user.getClientSecret(), user.getRefreshToken(), user.getUsername());
                     break;            
                 case PIN:
                     IdentityInfo identity = authService.loginByPin(user.getClientId(), user.getUsername(), user.getPin());

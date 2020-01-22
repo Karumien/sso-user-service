@@ -47,7 +47,7 @@ public interface AuthService {
 
     AuthorizationResponse loginByToken(String clientId, String refreshToken);
 
-    AuthorizationResponse loginByImpersonator(String clienId, String refreshToken, String username);
+    AuthorizationResponse loginByImpersonator(String clienId, String clientSecret, String refreshToken, String username);
 
     IdentityInfo loginByPin(String clientId, String username, String pin);
 
