@@ -253,6 +253,11 @@ public class AuthServiceImpl implements AuthService {
         policy.setRegexPattern(extract("regexPattern", policyDescription, String.class));
         policy.setPasswordExpireDays(extract("forceExpiredPasswordChange", policyDescription, Integer.class));
         policy.setMinLength(extract("length", policyDescription, Integer.class));
+        
+        if (policy.getMinLength() == null || policy.getMinLength() == 0) {
+            policy.setMinLength(1);
+        }
+        
         policy.setTranslation(getPolicyTranslation(LocaleContextHolder.getLocale(), policy));
 
         return policy;
@@ -261,9 +266,8 @@ public class AuthServiceImpl implements AuthService {
     private String getPolicyTranslation(Locale locale, PasswordPolicy policy) {
 
         boolean finalAnd = false;
-        int minimalLength = policy.getMinLength() != null && policy.getMinLength() > 0 ? policy.getMinLength() : 1;
-
         StringBuilder sb = new StringBuilder();
+
         finalAnd = policyRule(sb, locale, "policy.password.lower", "s", policy.getMinLowerCase()) || finalAnd;
         finalAnd = policyRule(sb, locale, "policy.password.upper", "s", policy.getMinUpperCase()) || finalAnd;
         finalAnd = policyRule(sb, locale, "policy.password.number", "s", policy.getMinDigits()) || finalAnd;
@@ -274,17 +278,15 @@ public class AuthServiceImpl implements AuthService {
             sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
         }
 
-        policyRule(sb, locale, "policy.length", "s", minimalLength);
+        policyRule(sb, locale, "policy.length", "s", policy.getMinLength());
         sb.append(".");
 
-        return sb.toString();
+        return messageSource.getMessage("policy.password", null, locale) + " " + sb.toString();
     }
 
     private String getPolicyTranslation(Locale locale, UsernamePolicy policy) {
 
         boolean finalAnd = false;
-        int minimalLength = policy.getMinLength() != null && policy.getMinLength() > 0 ? policy.getMinLength() : 8;
-
         StringBuilder sb = new StringBuilder();
 
         finalAnd = policyRule(sb, locale, "policy.username.digits", policy.isUseDigits()) || finalAnd;
@@ -299,9 +301,9 @@ public class AuthServiceImpl implements AuthService {
             sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
         }
         
-        sb.append(messageSource.getMessage("policy.length", new Object[] { minimalLength }, locale)).append(".");
+        sb.append(messageSource.getMessage("policy.length", new Object[] { policy.getMinLength() }, locale)).append(".");
 
-        return sb.toString();
+        return messageSource.getMessage("policy.username", null, locale) + " " + sb.toString();
     }
 
     
@@ -321,7 +323,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         
-        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.username", null, locale) + " " : ", ");
+        sb.append(sb.length() == 0 ? "" : ", ");
 
         sb.append(messageSource.getMessage(Boolean.TRUE.equals(useIt) ? "policy.can" : "policy.cannot", null, locale));
         sb.append(" " + messageSource.getMessage(key, null, locale));
@@ -335,7 +337,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
 
-        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.password", null, locale) + " " : ", ");
+        sb.append(sb.length() == 0 ? "" : ", ");
         sb.append(messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
         return true;
     }
