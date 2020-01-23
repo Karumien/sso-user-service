@@ -12,7 +12,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -265,82 +267,86 @@ public class AuthServiceImpl implements AuthService {
 
     private String getPolicyTranslation(Locale locale, PasswordPolicy policy) {
 
-        boolean finalAnd = false;
-        StringBuilder sb = new StringBuilder();
+        List<String> texts = new ArrayList<>();
+        
+        policyRule(texts, locale, "policy.password.lower", "s", policy.getMinLowerCase());
+        policyRule(texts, locale, "policy.password.upper", "s", policy.getMinUpperCase());
+        policyRule(texts, locale, "policy.password.number", "s", policy.getMinDigits());
+        policyRule(texts, locale, "policy.password.special", "s", policy.getMinSpecialChars());
+        policyRule(texts, locale, "policy.length", "s", policy.getMinLength());
+        policyRule(texts, locale, "policy.password.history", "", policy.getPasswordHistory());
 
-        finalAnd = policyRule(sb, locale, "policy.password.lower", "s", policy.getMinLowerCase()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.password.upper", "s", policy.getMinUpperCase()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.password.number", "s", policy.getMinDigits()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.password.special", "s", policy.getMinSpecialChars()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.password.history", "", policy.getPasswordHistory()) || finalAnd;
-
-        if (finalAnd) {
-            sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
-        }
-
-        policyRule(sb, locale, "policy.length", "s", policy.getMinLength());
-        sb.append(".");
-
-        return messageSource.getMessage("policy.password", null, locale) + " " + sb.toString();
+        return messageSource.getMessage("policy.password", null, locale) 
+            + join(texts, messageSource.getMessage("policy.and", null, locale) + " ") 
+            + ".";
     }
 
+   
     private String getPolicyTranslation(Locale locale, UsernamePolicy policy) {
 
-        boolean finalAnd = false;
-        StringBuilder sb = new StringBuilder();
+        List<String> texts = new ArrayList<>();
 
-        finalAnd = policyRule(sb, locale, "policy.username.digits", policy.isUseDigits()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.username.uppers", policy.isUseUpperCase()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.username.lowers", policy.isUseLowerCase()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.username.specials", policy.getSpecialCharsOnly()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.username.starts", policy.isCanSpecialCharStart()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.username.ends", policy.isCanSpecialCharRepeated()) || finalAnd;
-        finalAnd = policyRule(sb, locale, "policy.username.repeated", policy.isCanSpecialCharRepeated()) || finalAnd;
+        policyRule(texts, locale, "policy.username.digits", policy.isUseDigits());
+        policyRule(texts, locale, "policy.username.uppers", policy.isUseUpperCase());
+        policyRule(texts, locale, "policy.username.lowers", policy.isUseLowerCase());
+        policyRule(texts, locale, "policy.username.specials", policy.getSpecialCharsOnly());
+        policyRule(texts, locale, "policy.username.starts", policy.isCanSpecialCharStart());
+        policyRule(texts, locale, "policy.username.ends", policy.isCanSpecialCharRepeated());
+        policyRule(texts, locale, "policy.username.repeated", policy.isCanSpecialCharRepeated());
+        policyRule(texts, locale, "policy.length", "s", policy.getMinLength());
         
-        if (finalAnd) {
-            sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
-        }
-        
-        sb.append(messageSource.getMessage("policy.length", new Object[] { policy.getMinLength() }, locale)).append(".");
-
-        return messageSource.getMessage("policy.username", null, locale) + " " + sb.toString();
+        return messageSource.getMessage("policy.username", null, locale) 
+                + join(texts, messageSource.getMessage("policy.and", null, locale) + " ") 
+                + ".";
     }
 
     
-    private boolean policyRule(StringBuilder sb, Locale locale, String key, String specialCharsOnly) {
+    private void policyRule(List<String> texts, Locale locale, String key, String specialCharsOnly) {
       
         if (specialCharsOnly == null) {
-            return false;
+            return;
         }
         
-        sb.append(", ").append(messageSource.getMessage(key, new Object[] { specialCharsOnly }, locale));
-        return true;
+        texts.add(messageSource.getMessage(key, new Object[] { specialCharsOnly }, locale));
     }
 
-    private boolean policyRule(StringBuilder sb, Locale locale, String key, Boolean useIt) {
+    private void policyRule(List<String> texts, Locale locale, String key, Boolean useIt) {
 
         if (useIt == null) {
-            return false;
+            return;
         }
         
-        sb.append(sb.length() == 0 ? "" : ", ");
-
-        sb.append(messageSource.getMessage(Boolean.TRUE.equals(useIt) ? "policy.can" : "policy.cannot", null, locale));
-        sb.append(" " + messageSource.getMessage(key, null, locale));
-
-        return true;
+        texts.add(messageSource.getMessage(Boolean.TRUE.equals(useIt) ? "policy.can" : "policy.cannot", null, locale)
+            + " " + messageSource.getMessage(key, null, locale));
     }
 
-    private boolean policyRule(StringBuilder sb, Locale locale, String key, String keyAdvances, Integer count) {
-
+    private void policyRule(List<String> texts, Locale locale, String key, String keyAdvances, Integer count) {
+        
         if (count == null || count <= 0) {
-            return false;
+            return;
         }
-
-        sb.append(sb.length() == 0 ? "" : ", ");
-        sb.append(messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
-        return true;
+        
+        texts.add((key.equals("policy.length") ? messageSource.getMessage("policy.contain", null, locale) : "")
+             + messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
     }
+    
+    private StringBuilder join(List<String> texts, String last) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < texts.size(); i++) {
+            if (i == 0) {
+                sb.append(" ");
+            } else {
+                if (i == texts.size() - 1) {
+                    sb.append(last);
+                } else {
+                    sb.append(", ");
+                }
+            }
+            sb.append(texts);
+        }
+        return sb;
+    }
+
 
     @SuppressWarnings("unchecked")
     private <T> T extract(String code, String policyDescription, Class<T> clazz) {
