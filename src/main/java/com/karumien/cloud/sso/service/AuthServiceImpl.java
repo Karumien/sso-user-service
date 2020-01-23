@@ -274,7 +274,7 @@ public class AuthServiceImpl implements AuthService {
             sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
         }
 
-        policyRule(sb, locale, "policy.length", "", minimalLength);
+        policyRule(sb, locale, "policy.length", "s", minimalLength);
         sb.append(".");
 
         return sb.toString();
