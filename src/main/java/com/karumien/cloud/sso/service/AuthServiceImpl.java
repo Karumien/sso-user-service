@@ -261,7 +261,7 @@ public class AuthServiceImpl implements AuthService {
     private String getPolicyTranslation(Locale locale, PasswordPolicy policy) {
 
         boolean finalAnd = false;
-        int minimalLength = policy.getMinLength() != null && policy.getMinLength() > 0 ? policy.getMinLength() : 8;
+        int minimalLength = policy.getMinLength() != null && policy.getMinLength() > 0 ? policy.getMinLength() : 1;
 
         StringBuilder sb = new StringBuilder();
         finalAnd = policyRule(sb, locale, "policy.password.lower", "s", policy.getMinLowerCase()) || finalAnd;
@@ -271,10 +271,11 @@ public class AuthServiceImpl implements AuthService {
         finalAnd = policyRule(sb, locale, "policy.password.history", "", policy.getPasswordHistory()) || finalAnd;
 
         if (finalAnd) {
-            sb.append(" ").append(messageSource.getMessage("policy.and", null, locale)).append(" ");
+            sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
         }
 
-        sb.append(messageSource.getMessage("policy.length", new Object[] { minimalLength }, locale)).append(".");
+        policyRule(sb, locale, "policy.length", "", minimalLength);
+        sb.append(".");
 
         return sb.toString();
     }
@@ -295,7 +296,7 @@ public class AuthServiceImpl implements AuthService {
         finalAnd = policyRule(sb, locale, "policy.username.repeated", policy.isCanSpecialCharRepeated()) || finalAnd;
         
         if (finalAnd) {
-            sb.append(" ").append(messageSource.getMessage("policy.and", null, locale)).append(" ");
+            sb.append(messageSource.getMessage("policy.and", null, locale)).append(" ");
         }
         
         sb.append(messageSource.getMessage("policy.length", new Object[] { minimalLength }, locale)).append(".");
@@ -320,7 +321,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
         
-        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.username", null, locale) + "" : ", ");
+        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.username", null, locale) + " " : ", ");
 
         sb.append(messageSource.getMessage(Boolean.TRUE.equals(useIt) ? "policy.can" : "policy.cannot", null, locale));
         sb.append(" " + messageSource.getMessage(key, null, locale));
@@ -334,7 +335,7 @@ public class AuthServiceImpl implements AuthService {
             return false;
         }
 
-        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.password", null, locale) + "" : ", ");
+        sb.append(sb.length() == 0 ? messageSource.getMessage("policy.password", null, locale) + " " : ", ");
         sb.append(messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
         return true;
     }
