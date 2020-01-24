@@ -277,7 +277,7 @@ public class AuthServiceImpl implements AuthService {
         policyRule(texts, locale, "policy.password.history", "", policy.getPasswordHistory());
 
         return messageSource.getMessage("policy.password", null, locale) 
-            + join(texts, messageSource.getMessage("policy.and", null, locale) + " ") 
+            + join(texts, messageSource.getMessage("policy.and", null, locale)) 
             + ".";
     }
 
@@ -296,7 +296,7 @@ public class AuthServiceImpl implements AuthService {
         policyRule(texts, locale, "policy.length", "s", policy.getMinLength());
         
         return messageSource.getMessage("policy.username", null, locale) 
-                + join(texts, messageSource.getMessage("policy.and", null, locale) + " ") 
+                + join(texts, messageSource.getMessage("policy.and", null, locale)) 
                 + ".";
     }
 
@@ -337,12 +337,12 @@ public class AuthServiceImpl implements AuthService {
                 sb.append(" ");
             } else {
                 if (i == texts.size() - 1) {
-                    sb.append(last);
+                    sb.append(" " + last + " ");
                 } else {
                     sb.append(", ");
                 }
             }
-            sb.append(texts);
+            sb.append(texts.get(i));
         }
         return sb;
     }
