@@ -276,7 +276,7 @@ public class AuthServiceImpl implements AuthService {
         policyRule(texts, locale, "policy.password.special", "s", policy.getMinSpecialChars());
         policyRule(texts, locale, "policy.password.history", "", policy.getPasswordHistory());
 
-        return messageSource.getMessage("policy.password", null, locale) + " "
+        return messageSource.getMessage("policy.password", null, locale)
             + join(texts, messageSource.getMessage("policy.and", null, locale)) 
             + ".";
     }
@@ -295,7 +295,7 @@ public class AuthServiceImpl implements AuthService {
         policyRule(texts, locale, "policy.username.repeated", policy.isCanSpecialCharRepeated());
         policyRule(texts, locale, "policy.length", "s", policy.getMinLength());
         
-        return messageSource.getMessage("policy.username", null, locale) + " "
+        return messageSource.getMessage("policy.username", null, locale)
                 + join(texts, messageSource.getMessage("policy.and", null, locale)) 
                 + ".";
     }
