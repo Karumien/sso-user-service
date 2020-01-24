@@ -327,7 +327,7 @@ public class AuthServiceImpl implements AuthService {
         }
         
         texts.add((key.equals("policy.length") ? messageSource.getMessage("policy.contain", null, locale) : "")
-             + messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
+             + " " + messageSource.getMessage(count == 1 ? key : key + keyAdvances, new Object[] { count }, locale));
     }
     
     private StringBuilder join(List<String> texts, String last) {
