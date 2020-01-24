@@ -269,11 +269,11 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> texts = new ArrayList<>();
         
+        policyRule(texts, locale, "policy.length", "s", policy.getMinLength());
         policyRule(texts, locale, "policy.password.lower", "s", policy.getMinLowerCase());
         policyRule(texts, locale, "policy.password.upper", "s", policy.getMinUpperCase());
         policyRule(texts, locale, "policy.password.number", "s", policy.getMinDigits());
         policyRule(texts, locale, "policy.password.special", "s", policy.getMinSpecialChars());
-        policyRule(texts, locale, "policy.length", "s", policy.getMinLength());
         policyRule(texts, locale, "policy.password.history", "", policy.getPasswordHistory());
 
         return messageSource.getMessage("policy.password", null, locale) 
