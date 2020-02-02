@@ -736,8 +736,9 @@ definitions:
         type: string
         description: "User's rights"
     example:
+      identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034
-      contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      contactNumber: c31034
       lastName: Novak
       firstName: Karel
       email: KajaN@eurowag.com
