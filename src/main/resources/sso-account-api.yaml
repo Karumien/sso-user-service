@@ -804,8 +804,9 @@ definitions:
         type: string
         description: "User's rights"
     example:
+      identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034
-      contactNumber: fe29248c-f3aa-4310-8fcf-91eacdd324xx
+      contactNumber: c31034
       lastName: Novak
       firstName: Karel
       email: KajaN@eurowag.com
@@ -853,7 +854,7 @@ definitions:
         description: "Contact Email"
         maxLength: 200
     example:
-      id: 31034
+      accountNumber: 31034
       name: Some AUTODOPRAVA, s.r.o.
       compRegNo: 6484605
       contactEmail: info@doprava.cz
