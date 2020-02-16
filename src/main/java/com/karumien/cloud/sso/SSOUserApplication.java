@@ -12,6 +12,10 @@
  */
 package com.karumien.cloud.sso;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.jboss.logging.MDC;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -37,9 +41,18 @@ import lombok.extern.slf4j.Slf4j;
 public class SSOUserApplication {
 
     public static void main(String[] args) {
+
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+
         SpringApplication.run(SSOUserApplication.class, args);
+        
         MDC.put("group", "EW SSO API");
         log.info("EW SSO API started");
+
     }
     
 }
