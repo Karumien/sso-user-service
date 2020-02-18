@@ -12,7 +12,7 @@ public enum IdentityPropertyType {
     EMAIL("email"),
     ATTR_CONTACT_NUMBER("contactNumber"),
     ATTR_ACCOUNT_NUMBER("accountNumber"),
-    ATTR_GLOBAL_EMAIL("globalEmail"),
+    ATTR_NOTE("note"),
     ATTR_DRIVER_PIN("driverPin"),
     ATTR_BINARY_RIGHTS("binaryRights"),
     ATTR_PHONE("phone"),

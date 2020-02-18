@@ -419,6 +419,8 @@ public class AccountServiceImpl implements AccountService {
             return value.equals(a.getCompRegNo());
         case ATTR_ACCOUNT_NUMBER:
             return value.equals(a.getAccountNumber());
+        case ATTR_NOTE:
+            return value.equals(a.getNote());
         default:
             return false;
         }
