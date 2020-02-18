@@ -349,13 +349,14 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<AccountInfo>> search(String compRegNo, String accountNumber, String name, String contactEmail) {
+    public ResponseEntity<List<AccountInfo>> search(String compRegNo, String accountNumber, String name, String contactEmail, String note) {
 
         Map<AccountPropertyType, String> searchFilter = new HashMap<>();
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_COMP_REG_NO, compRegNo);
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_ACCOUNT_NAME, name);
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_CONTACT_EMAIL, contactEmail);
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
+        accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_NOTE, note);
         
         if (searchFilter.isEmpty()) {
             new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -402,6 +403,12 @@ public class AccountController implements AccountsApi {
             try {
                 // account
                 if (onBoardingInfo.getAccount() != null) {
+
+                    // notes
+                    if (StringUtils.isEmpty(onBoardingInfo.getAccount().getNote())) {
+                        onBoardingInfo.getAccount().setNote(onBoardingInfo.getNote());
+                    }
+                    
                     if (accountService.findGroup(onBoardingInfo.getAccount().getAccountNumber()).isPresent()) {                        
                         // TODO: accountService.update
                         if (onBoardingInfo.isOverwriteAccount()) {
@@ -413,7 +420,12 @@ public class AccountController implements AccountsApi {
                 
                 // identity
                 if (onBoardingInfo.getIdentity() != null) {
-    
+
+                    // notes
+                    if (StringUtils.isEmpty(onBoardingInfo.getAccount().getNote())) {
+                        onBoardingInfo.getIdentity().setNote(onBoardingInfo.getNote());
+                    }
+
                     Optional<UserRepresentation> identity = Optional.empty();
                     
                     if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
@@ -443,16 +455,19 @@ public class AccountController implements AccountsApi {
                         }
                     }   
                     
-                    if (identityInfo != null && onBoardingInfo.getCredentials() != null) {
-                        if (identityInfo.getNav4Id() != null) {
-                            identityService.createIdentityCredentialsNav4(identityInfo.getNav4Id(), onBoardingInfo.getCredentials());
-                        } else {
-                            identityService.createIdentityCredentials(identityInfo.getContactNumber(), onBoardingInfo.getCredentials());
+                    try {
+                        if (identity.isPresent() && onBoardingInfo.getCredentials() != null) {
+                            if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
+                                identityService.createIdentityCredentialsNav4(onBoardingInfo.getIdentity().getNav4Id(), onBoardingInfo.getCredentials());
+                            } else {
+                                identityService.createIdentityCredentials(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getCredentials());
+                            }
                         }
+                    } catch (PasswordPolicyException e) {
+                        throw e;
+                    } finally {
+                        found.add(identityService.getIdentity(onBoardingInfo.getIdentity().getContactNumber()));
                     }
-                    
-                    found.add(identityService.getIdentity(onBoardingInfo.getIdentity().getContactNumber()));
-                                    
                 }
                 
             } catch (Exception e) {

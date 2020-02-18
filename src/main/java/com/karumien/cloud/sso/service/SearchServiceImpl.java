@@ -55,7 +55,7 @@ public class SearchServiceImpl implements SearchService {
             return user != null ? Arrays.asList(user.getUserId()) : new ArrayList<>();
         }
 
-        if (attribute == IdentityPropertyType.ATTR_GLOBAL_EMAIL) {
+        if (attribute == IdentityPropertyType.ATTR_NOTE) {
             value = value.toLowerCase();
         }
         

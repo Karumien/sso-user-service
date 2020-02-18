@@ -618,13 +618,13 @@ paths:
           required: false
           type: string 
         - in: query
-          name: globalEmail
-          required: false
-          type: string 
-        - in: query
           name: phone
           required: false
           type: string
+        - in: query
+          name: note
+          required: false
+          type: string 
       responses:
         '200':
           description: Return Identities specified by filter
@@ -724,10 +724,10 @@ definitions:
         type: string
         description: "Phone used primary for OTP"
         maxLength: 30
-      globalEmail:
+      note:
         type: string
-        description: "Contact email - can be company global"
-        maxLength: 100
+        description: "Notes"
+        maxLength: 200
       locale:
         type: string
         description: "User's default Locale"

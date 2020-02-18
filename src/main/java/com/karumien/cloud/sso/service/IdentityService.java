@@ -34,7 +34,7 @@ public interface IdentityService {
     String ATTR_ACCOUNT_NUMBER = IdentityPropertyType.ATTR_ACCOUNT_NUMBER.getValue();
     String ATTR_NAV4ID = IdentityPropertyType.ATTR_NAV4ID.getValue();
 
-    String ATTR_GLOBAL_EMAIL = IdentityPropertyType.ATTR_GLOBAL_EMAIL.getValue();
+    String ATTR_NOTE = IdentityPropertyType.ATTR_NOTE.getValue();
     String ATTR_PHONE = IdentityPropertyType.ATTR_PHONE.getValue();
     String ATTR_LOCALE = IdentityPropertyType.ATTR_LOCALE.getValue();
            

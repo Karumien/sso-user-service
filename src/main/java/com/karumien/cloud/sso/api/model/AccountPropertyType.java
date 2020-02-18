@@ -16,6 +16,7 @@ public enum AccountPropertyType {
     ATTR_MODULE_ID("moduleId"),
     ATTR_RIGHT_GROUP_ID("groupId"),
     ATTR_SERVICE_ID("serviceId"),
+    ATTR_NOTE("note"),
     ATTR_BUSINESS_PRIORITY("businessPriority");
 
     private String value;

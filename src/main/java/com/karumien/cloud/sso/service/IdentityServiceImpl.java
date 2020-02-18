@@ -111,10 +111,9 @@ public class IdentityServiceImpl implements IdentityService {
         } else {
             identity.getAttributes().remove(ATTR_PHONE);
         }
-        if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
-            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail());
-        } else {
-            identity.getAttributes().remove(ATTR_GLOBAL_EMAIL);
+
+        if (StringUtils.hasText(identityInfo.getNote())) {
+            identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
 
         identity.singleAttribute(ATTR_LOCALE,
@@ -189,8 +188,8 @@ public class IdentityServiceImpl implements IdentityService {
         if (StringUtils.hasText(identityInfo.getPhone())) {
             identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
         }
-        if (StringUtils.hasText(identityInfo.getGlobalEmail())) {
-            identity.singleAttribute(ATTR_GLOBAL_EMAIL, identityInfo.getGlobalEmail().toLowerCase());
+        if (StringUtils.hasText(identityInfo.getNote())) {
+            identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
             identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
@@ -377,7 +376,7 @@ public class IdentityServiceImpl implements IdentityService {
 
         identity.setAccountNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
         identity.setContactNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_CONTACT_NUMBER).orElse(null));
-        identity.setGlobalEmail(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_GLOBAL_EMAIL).orElse(null));
+        identity.setNote(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NOTE).orElse(null));
         identity.setPhone(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_PHONE).orElse(null));
         identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
@@ -627,8 +626,8 @@ public class IdentityServiceImpl implements IdentityService {
             return value.equals(i.getAccountNumber());
         case ATTR_CONTACT_NUMBER:
             return value.equals(i.getContactNumber());
-        case ATTR_GLOBAL_EMAIL:
-            return value.toLowerCase().equals(i.getGlobalEmail());
+        case ATTR_NOTE:
+            return value.equals(i.getNote());
         case ATTR_NAV4ID:
             return value.equals(i.getNav4Id());
         case ATTR_PHONE:

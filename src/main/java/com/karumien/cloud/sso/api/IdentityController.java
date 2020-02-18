@@ -261,7 +261,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<IdentityInfo>> search(String identityId, String username, String accountNumber, String contactNumber,
-            String nav4Id, String email, String globalEmail, String phone) {
+            String nav4Id, String email, String phone, String note) {
 
         Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ID, identityId);
@@ -270,7 +270,7 @@ public class IdentityController implements IdentitiesApi {
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_NAV4ID, nav4Id);
-        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_GLOBAL_EMAIL, globalEmail);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_NOTE, note);
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_PHONE, phone);
         
         if (searchFilter.isEmpty()) {

@@ -674,6 +674,10 @@ paths:
           name: contactEmail
           type: string
           required: false
+        - in: query
+          name: note
+          required: false
+          type: string 
       responses:
         '200':
           description: Return Accounts specified by filter
@@ -737,6 +741,10 @@ definitions:
         $ref: '#/definitions/IdentityInfo'
       credentials:
         $ref: '#/definitions/Credentials'
+      note:
+        type: string
+        description: "Notes"
+        maxLength: 200
       roles:
         type: array
         items: 
@@ -792,10 +800,10 @@ definitions:
         type: string
         description: "Phone used primary for OTP"
         maxLength: 30
-      globalEmail:
+      note:
         type: string
-        description: "Contact email - can be company global"
-        maxLength: 100
+        description: "Notes"
+        maxLength: 200
       locale:
         type: string
         description: "User's default Locale"
@@ -852,6 +860,10 @@ definitions:
       contactEmail:
         type: string
         description: "Contact Email"
+        maxLength: 200
+      note:
+        type: string
+        description: "Notes"
         maxLength: 200
     example:
       accountNumber: 31034
