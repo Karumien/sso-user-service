@@ -168,8 +168,14 @@ public class IdentityServiceImpl implements IdentityService {
 
         identity.setEnabled(true);
 
-        identity.singleAttribute(ATTR_CONTACT_NUMBER,
-                Optional.of(identityInfo.getContactNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_CONTACT_NUMBER)));
+        if (!StringUtils.hasText(identityInfo.getContactNumber()) && !StringUtils.hasText(identityInfo.getNav4Id())) {
+            throw new IdNotFoundException(ATTR_CONTACT_NUMBER);
+        }
+        
+        if (StringUtils.hasText(identityInfo.getContactNumber())) {
+            identity.singleAttribute(ATTR_CONTACT_NUMBER, identityInfo.getContactNumber());
+        }
+        
         identity.singleAttribute(ATTR_ACCOUNT_NUMBER,
                 Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
 
