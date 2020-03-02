@@ -55,6 +55,7 @@ import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
+import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.api.model.RoleInfo;
@@ -431,5 +432,14 @@ public class AccountServiceImpl implements AccountService {
                 .filter(f -> f.isPresent()).map(u -> mapping(u.get().toRepresentation()))
                 .collect(Collectors.toList());
     }
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IdentityState getIdentityState(String accountNumber, String contactNumber) {
+	    getAccount(accountNumber);
+	    return identityService.getIdentityState(contactNumber);
+	}
 	
 }

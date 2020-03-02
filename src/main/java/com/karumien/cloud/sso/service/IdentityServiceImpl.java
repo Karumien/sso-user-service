@@ -35,6 +35,7 @@ import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
@@ -388,7 +389,29 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
 
+        identity.setState(mapIdentityState(userRepresentation));
         return identity;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IdentityState getIdentityState(String contactNumber) {
+        return mapIdentityState(findIdentity(contactNumber).orElse(null));
+    }
+    
+    private IdentityState mapIdentityState(UserRepresentation userRepresentation) {
+        
+        if (userRepresentation == null) {
+            return IdentityState.NOT_EXISTS;
+        }
+        
+        if (searchService.hasCredentials(userRepresentation.getId())) {
+            return IdentityState.CREDENTIALS_CREATED;            
+        } else {
+            return IdentityState.CREATED;            
+        }
     }
 
     /**

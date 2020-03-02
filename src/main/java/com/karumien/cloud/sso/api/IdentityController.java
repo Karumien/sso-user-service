@@ -27,6 +27,7 @@ import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.AuthService;
@@ -357,5 +358,13 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> unassignNav4IdentityRole(String nav4Id, String roleId) {
         identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityState> getIdentityState(String contactNumber) {
+        return new ResponseEntity<>(identityService.getIdentityState(contactNumber), HttpStatus.OK);
     }
 }

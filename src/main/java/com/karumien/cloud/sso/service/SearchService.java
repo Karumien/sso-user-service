@@ -58,4 +58,6 @@ public interface SearchService {
         }
         return attributes.get(attrName).contains(value);
     }
+
+    boolean hasCredentials(String identityId);
 }

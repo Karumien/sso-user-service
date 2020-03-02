@@ -34,6 +34,7 @@ import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
+import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.OnBoardingInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
@@ -388,6 +389,14 @@ public class AccountController implements AccountsApi {
         }
 
         return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityState> getIdentityState(String accountNumber, String contactNumber) {
+        return new ResponseEntity<>(accountService.getIdentityState(accountNumber, contactNumber), HttpStatus.OK);
     }
     
     /**
