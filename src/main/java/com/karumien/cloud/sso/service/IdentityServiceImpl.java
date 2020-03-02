@@ -388,8 +388,12 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_NAV4ID).orElse(null));
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
-
-        identity.setState(mapIdentityState(userRepresentation));
+        
+        if (!userRepresentation.isEnabled()) {
+            identity.setLocked(true);     
+        }
+        identity.setState(mappingIdentityState(userRepresentation));
+        
         return identity;
     }
 
@@ -398,16 +402,25 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public IdentityState getIdentityState(String contactNumber) {
-        return mapIdentityState(findIdentity(contactNumber).orElse(null));
+        return mappingIdentityState(findIdentity(contactNumber).orElse(null));
     }
     
-    private IdentityState mapIdentityState(UserRepresentation userRepresentation) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IdentityState mappingIdentityState(UserRepresentation userRepresentation) {
         
         if (userRepresentation == null) {
             return IdentityState.NOT_EXISTS;
         }
         
         if (searchService.hasCredentials(userRepresentation.getId())) {
+         
+            if (searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).isPresent()) {
+                return IdentityState.ACTIVE;
+            }
+                        
             return IdentityState.CREDENTIALS_CREATED;            
         } else {
             return IdentityState.CREATED;            

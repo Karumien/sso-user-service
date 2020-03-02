@@ -386,7 +386,15 @@ public class AccountServiceImpl implements AccountService {
 	        role.setNav4Id(info.getNav4Id());
 	        role.setRoles(roleService.getIdentityRoles(info.getContactNumber()).stream()
 	                .filter(k -> accountRoles.contains(k)).collect(Collectors.toList()));
-	        roles.add(role);
+	        
+	        Optional<UserRepresentation> userRepresentation = identityService.findIdentity(info.getContactNumber());
+	        if (userRepresentation.isPresent()) {
+    	        role.setState(identityService.mappingIdentityState(userRepresentation.get()));
+    	        if (!userRepresentation.get().isEnabled()) {
+    	            role.setLocked(true);
+    	        }
+    	        roles.add(role);
+	        }
 	    }
 	    return roles;
 	}

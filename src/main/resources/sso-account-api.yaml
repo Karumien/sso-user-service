@@ -771,7 +771,7 @@ paths:
 definitions:
   IdentityState:
     type: string
-    enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, AFTER_FIRST_LOGIN, FULL_ACTIVE]
+    enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, ACTIVE]
   OnBoardingInfo:
     type: object
     description: "Basic information about Identity"
@@ -854,6 +854,9 @@ definitions:
       binaryRights:
         type: string
         description: "User's rights"
+      locked:
+        type: boolean
+        description: "Locked status"
     example:
       identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034
@@ -882,6 +885,11 @@ definitions:
         type: array
         items:
           type: string
+      state:
+        $ref: "#/definitions/IdentityState"
+      locked:
+        type: boolean
+        description: "Locked status"
   AccountInfo:
     type: object
     description: "Basic information about Account"

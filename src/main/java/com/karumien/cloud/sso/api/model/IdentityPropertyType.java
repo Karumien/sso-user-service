@@ -18,7 +18,8 @@ public enum IdentityPropertyType {
     ATTR_PHONE("phone"),
     ATTR_LOCALE("locale"),
     ATTR_NAV4ID("nav4Id"),
-    ATTR_BUSINESS_PRIORITY("businessPriority");
+    ATTR_BUSINESS_PRIORITY("businessPriority"),
+    ATTR_LAST_LOGIN("lastLogin");
 
     private String value;
 

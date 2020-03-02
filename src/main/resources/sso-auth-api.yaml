@@ -108,7 +108,7 @@ paths:
 definitions:
   IdentityState:
     type: string
-    enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, AFTER_FIRST_LOGIN, FULL_ACTIVE]
+    enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, ACTIVE]
   GrantType:
     type: string
     description: Type of Bearer
@@ -410,3 +410,6 @@ definitions:
       binaryRights:
         type: string
         description: "User's rights"
+      locked:
+        type: boolean
+        description: "Locked status"
