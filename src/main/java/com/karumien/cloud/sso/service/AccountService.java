@@ -19,6 +19,7 @@ import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
+import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 
@@ -138,4 +139,6 @@ public interface AccountService {
     }
 
     List<RoleRepresentation> getAccountRolesRepresentation(String accountNumber);
+
+    IdentityState getIdentityState(String accountNumber, String contactNumber);
 }

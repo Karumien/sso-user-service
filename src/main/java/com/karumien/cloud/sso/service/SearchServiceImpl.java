@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.karumien.cloud.sso.api.entity.UserEntity;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.repository.CredentialRepository;
 import com.karumien.cloud.sso.api.repository.GroupAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserEntityRepository;
@@ -36,6 +37,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private UserEntityRepository userEntityRepository;
+    
+    @Autowired
+    private CredentialRepository credentialRepository;
 
     @Autowired
     private GroupAttributeRepository groupAttributeRepository;
@@ -82,5 +86,13 @@ public class SearchServiceImpl implements SearchService {
         }
 
         return groupAttributeRepository.findGroupIdsByAttribute(attribute.getValue(), value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasCredentials(String identityId) {
+        return !credentialRepository.findCredentialsByUserIdAndType(identityId, "password").isEmpty();
     }
 }

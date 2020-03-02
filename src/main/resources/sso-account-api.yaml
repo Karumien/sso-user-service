@@ -350,6 +350,28 @@ paths:
           description: Duplicate Identity with same CRM ContactNumber
         '410':
           description: Identity or Account not found
+  /accounts/{accountNumber}/identities/{contactNumber}/state:
+    get:
+      summary: "Get state of the given Identity"
+      operationId: getIdentityState
+      parameters:
+        - name: accountNumber
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string    
+      responses:
+        '200':
+          description: Successfully returned Identity's info
+          schema:
+            $ref: '#/definitions/IdentityState'
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
   /accounts/{accountNumber}/identities/roles:
     get:
       summary: "Get detail of the given Identity"
@@ -602,6 +624,22 @@ paths:
         '410':
           description: Account not found  
   /accounts/{accountNumber}/identities/{contactNumber}/credentials:
+    get:
+      summary: "Check if credentials exists"
+      operationId: hasIdentityCredentials
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Identity has credentials
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity or Credentials Not Found
     post:
       summary: "Add Account Identity credentials"
       description: "Method to create Identity credentials for given customer"
@@ -731,6 +769,9 @@ paths:
             items:
               $ref: '#/definitions/IdentityInfo'       
 definitions:
+  IdentityState:
+    type: string
+    enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, AFTER_FIRST_LOGIN, FULL_ACTIVE]
   OnBoardingInfo:
     type: object
     description: "Basic information about Identity"
@@ -804,6 +845,8 @@ definitions:
         type: string
         description: "Notes"
         maxLength: 200
+      state:
+        $ref: "#/definitions/IdentityState"
       locale:
         type: string
         description: "User's default Locale"

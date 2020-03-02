@@ -20,6 +20,7 @@ import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.UserActionType;
 
 /**
@@ -254,5 +255,7 @@ public interface IdentityService {
     }
 
     List<IdentityInfo> getIdentities(List<String> contactNumbers);
+
+    IdentityState getIdentityState(String contactNumber);
 
 }

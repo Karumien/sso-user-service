@@ -100,7 +100,40 @@ paths:
           description: Duplicate Identity with same CRM Contact Number
         '410':
           description: Identity Not Found
+  /identities/{contactNumber}/state:
+    get:
+      summary: "Get state of the given Identity"
+      operationId: getIdentityState
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's info
+          schema:
+            $ref: '#/definitions/IdentityState'
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
   /identities/{contactNumber}/credentials:
+    get:
+      summary: "Check if credentials exists"
+      operationId: hasIdentityCredentials
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Identity has credentials
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity or Credentials Not Found
     post:
       summary: "Create Identity credentials"
       description: "Method to create Identity credentials for given customer"
@@ -637,6 +670,9 @@ paths:
         '410':
           description: Identities specified by filter not found
 definitions:
+  IdentityState:
+    type: string
+    enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, AFTER_FIRST_LOGIN, FULL_ACTIVE]
   ErrorData:
     type: object
     description: EW ErrorMessage model data
@@ -732,6 +768,8 @@ definitions:
         type: string
         description: "User's default Locale"
         maxLength: 50  
+      state:
+        $ref: "#/definitions/IdentityState"
       binaryRights:
         type: string
         description: "User's rights"
