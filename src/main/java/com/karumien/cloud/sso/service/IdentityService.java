@@ -43,6 +43,7 @@ public interface IdentityService {
     String ATTR_DRIVER_PIN = IdentityPropertyType.ATTR_DRIVER_PIN.getValue();
 
     String ATTR_BUSINESS_PRIORITY = IdentityPropertyType.ATTR_BUSINESS_PRIORITY.getValue();
+    String ATTR_LAST_LOGIN = IdentityPropertyType.ATTR_LAST_LOGIN.getValue();
 
     /**
      * Create Identity in target SSO.
@@ -257,5 +258,7 @@ public interface IdentityService {
     List<IdentityInfo> getIdentities(List<String> contactNumbers);
 
     IdentityState getIdentityState(String contactNumber);
+
+    IdentityState mappingIdentityState(UserRepresentation userRepresentation);
 
 }
