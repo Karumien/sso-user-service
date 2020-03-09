@@ -431,7 +431,7 @@ public class AccountController implements AccountsApi {
                 if (onBoardingInfo.getIdentity() != null) {
 
                     // notes
-                    if (StringUtils.isEmpty(onBoardingInfo.getNote())) {
+                    if (StringUtils.isEmpty(onBoardingInfo.getIdentity().getNote())) {
                         onBoardingInfo.getIdentity().setNote(onBoardingInfo.getNote());
                     }
 
@@ -475,7 +475,7 @@ public class AccountController implements AccountsApi {
                     } catch (PasswordPolicyException e) {
                         throw e;
                     } finally {
-                        found.add(identityService.getIdentity(onBoardingInfo.getIdentity().getContactNumber()));
+                        found.add(identityInfo);
                     }
                 }
                 
