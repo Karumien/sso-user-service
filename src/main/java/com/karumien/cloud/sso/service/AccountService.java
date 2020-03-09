@@ -45,6 +45,7 @@ public interface AccountService {
     String ATTR_SERVICE_ID = AccountPropertyType.ATTR_SERVICE_ID.getValue();
 
     String ATTR_BUSINESS_PRIORITY = AccountPropertyType.ATTR_BUSINESS_PRIORITY.getValue();
+    String ATTR_NOTE = AccountPropertyType.ATTR_NOTE.getValue();
     
     AccountInfo createAccount(AccountInfo account);
 
