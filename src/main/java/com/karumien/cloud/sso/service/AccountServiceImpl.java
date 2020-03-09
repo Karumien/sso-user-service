@@ -169,6 +169,10 @@ public class AccountServiceImpl implements AccountService {
             group.singleAttribute(ATTR_CONTACT_EMAIL, account.getContactEmail().toLowerCase());
         }
 
+        if (StringUtils.hasText(account.getNote())) {
+            group.singleAttribute(ATTR_NOTE, account.getNote());
+        }
+
         getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup(MASTER_GROUP).getId()).subGroup(group));
 
         return getAccount(account.getAccountNumber());

@@ -431,7 +431,7 @@ public class AccountController implements AccountsApi {
                 if (onBoardingInfo.getIdentity() != null) {
 
                     // notes
-                    if (StringUtils.isEmpty(onBoardingInfo.getAccount().getNote())) {
+                    if (StringUtils.isEmpty(onBoardingInfo.getNote())) {
                         onBoardingInfo.getIdentity().setNote(onBoardingInfo.getNote());
                     }
 
