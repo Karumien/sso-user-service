@@ -467,7 +467,8 @@ public class AccountController implements AccountsApi {
                     }   
                     
                     try {
-                        if (identityInfo != null && onBoardingInfo.getCredentials() != null) {
+                        if ((identity.isEmpty() || identity.isPresent() && onBoardingInfo.isOverwriteIdentity()) 
+                                && identityInfo != null && onBoardingInfo.getCredentials() != null) {
                             if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
                                 identityService.createIdentityCredentialsNav4(onBoardingInfo.getIdentity().getNav4Id(), onBoardingInfo.getCredentials());
                             } else {
