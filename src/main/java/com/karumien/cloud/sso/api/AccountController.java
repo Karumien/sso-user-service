@@ -449,6 +449,8 @@ public class AccountController implements AccountsApi {
                         
                         if (onBoardingInfo.isOverwriteIdentity()) {
                             identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());
+                        } else {
+                            identityInfo = identityService.mapping(identity.get());
                         }
                         
                         if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles()) && onBoardingInfo.isOverwriteRoles()) {
@@ -465,7 +467,8 @@ public class AccountController implements AccountsApi {
                     }   
                     
                     try {
-                        if ((identityInfo != null || identity.isPresent()) && onBoardingInfo.getCredentials() != null) {
+                        if ((identity.isEmpty() || identity.isPresent() && onBoardingInfo.isOverwriteIdentity()) 
+                                && identityInfo != null && onBoardingInfo.getCredentials() != null) {
                             if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
                                 identityService.createIdentityCredentialsNav4(onBoardingInfo.getIdentity().getNav4Id(), onBoardingInfo.getCredentials());
                             } else {
