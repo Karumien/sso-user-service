@@ -34,7 +34,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import org.keycloak.admin.client.Keycloak;
@@ -90,22 +89,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private LocalizationService localizationService;
-
-
-    private GroupRepresentation getMasterGroup(String groupKey) {
-
-        // TODO viliam.litavec: Optimize performance - use stored group id for MASTER_GROUP
-        try {
-            return keycloak.realm(realm).getGroupByPath("/" + groupKey);
-        } catch (NotFoundException e) {
-            // autocreate
-            GroupRepresentation newMasterGroup = new GroupRepresentation();
-            newMasterGroup.setName(groupKey);
-            keycloak.realm(realm).groups().add(newMasterGroup);
-            return newMasterGroup;
-        }
-    }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -173,7 +157,8 @@ public class AccountServiceImpl implements AccountService {
             group.singleAttribute(ATTR_NOTE, account.getNote());
         }
 
-        getCreatedId(keycloak.realm(realm).groups().group(getMasterGroup(MASTER_GROUP).getId()).subGroup(group));
+        String masterGroupId = searchService.getMasterGroupId(MASTER_GROUP); 
+        getCreatedId(keycloak.realm(realm).groups().group(masterGroupId).subGroup(group));
 
         return getAccount(account.getAccountNumber());
     }
@@ -185,7 +170,8 @@ public class AccountServiceImpl implements AccountService {
     public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
         getAccount(accountNumber);
         //TODO: apply buyed services
-        return getMasterGroup(SELFCARE_GROUP).getSubGroups().stream()
+        return keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)).toRepresentation()
+            .getSubGroups().stream()
            .map(g -> mappingModule(g))
            .collect(Collectors.toList());               
     }
@@ -288,8 +274,9 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
-    public List<AccountInfo> getAccounts() {
-        return getMasterGroup(MASTER_GROUP).getSubGroups().stream()
+    public List<AccountInfo> getAccounts() {        
+        return keycloak.realm(realm).groups().group(searchService.getMasterGroupId(MASTER_GROUP)).toRepresentation()
+                .getSubGroups().stream()
                 .filter(g -> g.getAttributes().containsKey(ATTR_ACCOUNT_NUMBER))
                 .map(g -> mapping(g))
                 .collect(Collectors.toList());
@@ -353,7 +340,7 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public List<RoleInfo> getAccountRoles(String accountNumber) {
-	    return roleService.getAccountRoles(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), false);
+	    return roleService.getAccountRoles(keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), false);
 	}
 
 	/**
@@ -361,7 +348,7 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	public List<RoleRepresentation> getAccountRolesRepresentation(String accountNumber) {
-        return roleService.getAccountRolesRepresentation(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), false);
+        return roleService.getAccountRolesRepresentation(keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), false);
 	}
 	
     /**
@@ -369,7 +356,7 @@ public class AccountServiceImpl implements AccountService {
      */
 	@Override
 	public List<String> getAccountRightsOfIdentity(String contactNumber) {
-        return roleService.getIdentityRights(keycloak.realm(realm).groups().group(getMasterGroup(SELFCARE_GROUP).getId()), contactNumber);
+        return roleService.getIdentityRights(keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), contactNumber);
 	}
 	
 	/**

@@ -20,8 +20,10 @@ import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.repository.CredentialRepository;
 import com.karumien.cloud.sso.api.repository.GroupAttributeRepository;
+import com.karumien.cloud.sso.api.repository.GroupEntityRepository;
 import com.karumien.cloud.sso.api.repository.UserAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserEntityRepository;
+import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 
 /**
  * Implementation of {@link SearchService}.
@@ -43,6 +45,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Autowired
     private GroupAttributeRepository groupAttributeRepository;
+
+    @Autowired
+    private GroupEntityRepository groupEntityRepository;
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -92,7 +97,18 @@ public class SearchServiceImpl implements SearchService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public boolean hasCredentials(String identityId) {
         return !credentialRepository.findCredentialsByUserIdAndType(identityId, "password").isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public String getMasterGroupId(String masterGroup) {
+        return groupEntityRepository.findGroupIdsByName(masterGroup, realm).stream()
+            .findFirst().orElseThrow(() -> new AccountNotFoundException("NAME: " + masterGroup));
     }
 }

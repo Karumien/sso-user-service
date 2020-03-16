@@ -60,4 +60,12 @@ public interface SearchService {
     }
 
     boolean hasCredentials(String identityId);
+
+    /**
+     * Search root group by name
+     * 
+     * @param masterGroup master/root group name
+     * @return {@link String} group ID
+     */
+    String getMasterGroupId(String masterGroup);
 }
