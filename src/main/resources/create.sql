@@ -25,20 +25,20 @@ select count(u.id), ua.value as account_id, ul.value as locale from user_entity 
 left join user_attribute ua on (ua.user_id = u.id and ua.name = 'accountNumber')
 left join user_attribute ul on (ul.user_id = u.id and ul.name = 'locale')
 where ul.value is not null and ul.value != 'en'
-group by ua.value, ul.value
+group by ua.value, ul.value;
 
 create view view_account_locales_max as
 select ls.account_id, max(ls.locale) as locale 
 from view_account_locales ls
 group by ls.account_id 
-having ls.account_id is not null
+having ls.account_id is not null;
 
 create view view_account_identities_locales as
 select count(u.id), ua.value as account_id, ul.value as locale from user_entity u 
 left join user_attribute ua on (ua.user_id = u.id and ua.name = 'accountNumber')
 left join user_attribute ul on (ul.user_id = u.id and ul.name = 'locale')
 where ul.value is not null
-group by ua.value, ul.value
+group by ua.value, ul.value;
 
 
 insert into PLUGIN_ACCOUNT 
@@ -90,3 +90,29 @@ where note like '20200218-Migration2PROD-%');
 
 left join group_attribute a3 on (a3.group_id = g.id and a3.name = 'note')
 where a3.value like '20200218-Migration2PROD-%');
+
+
+
+select count(u.id) as cnt, a.id from plugin_account a
+left join user_attribute u on (u.name = 'accountNumber' and u.value = a.id)
+group by a.id
+having count(u.id) = 0;
+
+
+select ue.*, u.value, a.id from user_entity ue
+left join user_attribute u on (u.name = 'accountNumber' and u.user_id = ue.id)
+left join plugin_account a on (a.id = u.value)
+where a is null;
+
+
+
+
+select ue.id, c.value, u.value, n.value, a.id, ue.enabled from user_entity ue
+left join user_attribute u on (u.name = 'accountNumber' and u.user_id = ue.id)
+left join user_attribute c on (c.name = 'contactNumber' and c.user_id = ue.id)
+left join user_attribute n on (n.name = 'contactNumber' and n.user_id = ue.id)
+left join plugin_account a on (a.id = u.value)
+where u.value = '73699' 
+
+select r.name, u.* from user_role_mapping u right join keycloak_role r on (r.id = u.role_id)
+where u.user_id = 'f91ebe0e-4bec-4aae-b9fd-21a9da2f2aeb'

@@ -391,7 +391,7 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setLocale(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LOCALE).orElse(null));
         identity.setIdentityId(userRepresentation.getId());
         
-        if (!userRepresentation.isEnabled()) {
+        if (! Boolean.TRUE.equals(userRepresentation.isEnabled())) {
             identity.setLocked(true);     
         }
         identity.setState(mappingIdentityState(userRepresentation));
