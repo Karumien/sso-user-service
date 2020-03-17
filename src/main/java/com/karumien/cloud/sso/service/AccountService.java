@@ -113,4 +113,6 @@ public interface AccountService {
     Optional<AccountEntity> findAccount(String accountNumber);
 
     List<String> getAccountIdentitiesLocales(String accountNumber);
+
+    List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers);
 }

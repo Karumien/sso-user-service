@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -178,13 +179,13 @@ public class AccountServiceImpl implements AccountService {
         }
         throw new IdentityNotFoundException(contactNumber);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
     @Transactional(readOnly = true)
-    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
+    public List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers) {
 
         List<String> userIds = null;
         
@@ -197,8 +198,20 @@ public class AccountServiceImpl implements AccountService {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         }
-                
-        List<IdentityInfo> identities = userIds.stream()
+        
+        return userIds;
+        
+    }
+    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
+
+        List<IdentityInfo> identities = getAccountIdentitiesIds(accountNumber, contactNumbers).stream()
             .map(identityId -> identityService.findUserRepresentationById(identityId))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -258,21 +271,36 @@ public class AccountServiceImpl implements AccountService {
 	public List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
 	    
         // TODO: https://jira.eurowag.com/browse/P572-313
-	    Set<String> accountRoles = getAccountRoles(accountNumber).stream().map(r -> r.getRoleId()).collect(Collectors.toSet());
+	    Set<String> accountRoles = getAccountRoles(accountNumber).stream()
+            .map(r -> r.getRoleId())
+            .collect(Collectors.toSet());
 	        
-        // TODO: performance - optimize by DB?
 	    List<IdentityRoleInfo> roles = new ArrayList<>();
-	    for (IdentityInfo info : getAccountIdentities(accountNumber, null, contactNumbers)) {
+	    
+	    List<UserRepresentation> identities = getAccountIdentitiesIds(accountNumber, contactNumbers).stream()
+	        .map(identityId -> identityService.findUserRepresentationById(identityId))
+	        .filter(Optional::isPresent)
+	        .map(Optional::get)
+	        .filter(u -> searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).isPresent()
+	                 && searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).get().equals(accountNumber))
+	        .collect(Collectors.toList());
+	        
+	    for (UserRepresentation userRepresentation : identities) {
+
 	        IdentityRoleInfo role = new IdentityRoleInfo();
-	        role.setAccountNumber(info.getAccountNumber());
-	        role.setContactNumber(info.getContactNumber());
-	        role.setNav4Id(info.getNav4Id());
-	        role.setRoles(roleService.getIdentityRoles(info.getContactNumber()).stream()
-	                .filter(k -> accountRoles.contains(k)).collect(Collectors.toList()));
-	        if (info.isLocked()) {
-	            role.setLocked(true);
-	        }
-            roles.add(role);
+            role.setAccountNumber(accountNumber);
+            role.setContactNumber(searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).orElse(null));
+            role.setNav4Id(searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityService.ATTR_NAV4ID).orElse(null));
+
+            if (!Boolean.TRUE.equals(userRepresentation.isEnabled())) {
+                role.setLocked(true);
+            }
+            	        
+	        role.setRoles(roleService.getIdentityRoles(userRepresentation).stream()
+                .filter(k -> accountRoles.contains(k))
+                .collect(Collectors.toList()));
+
+	        roles.add(role);
 	    }
 	    return roles;
 	}
