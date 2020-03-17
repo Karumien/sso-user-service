@@ -26,7 +26,6 @@
  */
 package com.karumien.cloud.sso.service;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,21 +33,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Response;
-
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.GroupResource;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
+import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
@@ -56,12 +49,12 @@ import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
-import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.api.repository.AccountEntityRepository;
+import com.karumien.cloud.sso.exceptions.AccountDeleteException;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
-
 
 /**
  * Implementation {@link AccountService} for Account Management.
@@ -71,12 +64,6 @@ import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
  */
 @Service
 public class AccountServiceImpl implements AccountService {
-
-    @Value("${keycloak.realm}")
-    private String realm;
-
-    @Autowired
-    private Keycloak keycloak;
 
     @Autowired
     private IdentityService identityService;
@@ -88,204 +75,101 @@ public class AccountServiceImpl implements AccountService {
     private RoleService roleService;
 
     @Autowired
-    private LocalizationService localizationService;
+    private GroupService groupService;
+    
+    @Autowired
+    private AccountEntityRepository accountEntityRepository;
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<GroupRepresentation> findGroup(String accountNumber) {        
-        String groupId = searchService.findGroupIdsByAttribute(AccountPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber).stream().findFirst().orElse(null);
-        return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<GroupRepresentation> findGroupByCompRegNo(String compRegNo) {        
-        String groupId = searchService.findGroupIdsByAttribute(AccountPropertyType.ATTR_COMP_REG_NO, compRegNo).stream().findFirst().orElse(null);
-        return Optional.ofNullable(groupId == null ? null : keycloak.realm(realm).groups().group(groupId).toRepresentation());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<GroupResource> findGroupResourceById(String groupId) {
-        try {
-            return Optional.ofNullable(keycloak.realm(realm).groups().group(groupId));
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-        return Optional.empty();
-    }
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<GroupResource> findGroupResource(String accountNumber) {
-
-        Optional<GroupRepresentation> group = findGroup(accountNumber);
-        if (!group.isPresent()) {
-            return Optional.empty();
-        }
-        return Optional.of(keycloak.realm(realm).groups().group(group.get().getId()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    @Transactional
     public AccountInfo createAccount(AccountInfo account) {
-
-        GroupRepresentation group = new GroupRepresentation();
-        group.setName(account.getName() + " (" + account.getAccountNumber() + ")");
-        group.setPath("/" + MASTER_GROUP + "/" + group.getName());
-        group.singleAttribute(ATTR_ACCOUNT_NUMBER, account.getAccountNumber());
-        group.singleAttribute(ATTR_ACCOUNT_NAME, account.getName());
-
-        if (StringUtils.hasText(account.getCompRegNo())) {
-            group.singleAttribute(ATTR_COMP_REG_NO, account.getCompRegNo());
+        
+        try {
+            
+            AccountEntity accountEntity = new AccountEntity();
+            accountEntity.setAccountNumber(account.getAccountNumber());
+            accountEntity.setName(account.getName());
+            accountEntity.setCompRegNo(account.getCompRegNo());
+            accountEntity.setNote(account.getNote());
+            accountEntity.setContactEmail(account.getContactEmail());
+            
+            return mapping(accountEntityRepository.save(accountEntity));
+        } catch (DuplicateKeyException e) {
+            throw new AccountDuplicateException(account.getAccountNumber());
         }
-
-        if (StringUtils.hasText(account.getContactEmail())) {
-            group.singleAttribute(ATTR_CONTACT_EMAIL, account.getContactEmail().toLowerCase());
-        }
-
-        if (StringUtils.hasText(account.getNote())) {
-            group.singleAttribute(ATTR_NOTE, account.getNote());
-        }
-
-        String masterGroupId = searchService.getMasterGroupId(MASTER_GROUP); 
-        getCreatedId(keycloak.realm(realm).groups().group(masterGroupId).subGroup(group));
-
-        return getAccount(account.getAccountNumber());
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-        getAccount(accountNumber);
-        //TODO: apply buyed services
-        return keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)).toRepresentation()
-            .getSubGroups().stream()
-           .map(g -> mappingModule(g))
-           .collect(Collectors.toList());               
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getCreatedId(Response response) {
-        URI location = response.getLocation();
-
-        switch (response.getStatusInfo().toEnum()) {
-        case CREATED:
-            if (location == null) {
-                return null;
-            }
-            String path = location.getPath();
-            return path.substring(path.lastIndexOf('/') + 1);
-        case CONFLICT:
-            throw new AccountDuplicateException("Account already exists");
-        default:
-            throw new UnsupportedOperationException("Unknown status " + response.getStatusInfo().toEnum());
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    @Transactional(readOnly = true)
     public AccountInfo getAccount(String accountNumber) {
-        return mapping(findGroup(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber)));
+        return mapping(findAccount(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber)));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AccountEntity> findAccount(String accountNumber) {
+        return accountEntityRepository.findById(accountNumber);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public AccountInfo getAccountByCompRegNo(String compRegNo) {
-        return mapping(findGroupByCompRegNo(compRegNo).orElseThrow(() -> new AccountNotFoundException("compReqgNo = " + compRegNo)));
+        return mapping(accountEntityRepository.findByCompRegNo(compRegNo).orElseThrow(() -> new AccountNotFoundException("compReqgNo = " + compRegNo)));
     }
 
-    private AccountInfo mapping(GroupRepresentation group) {
+    private AccountInfo mapping(AccountEntity accountEntity) {
 
-        // TODO viliam: Orica
-        AccountInfo accountInfo = new AccountInfo();
-        accountInfo.setAccountNumber(searchService.getSimpleAttribute(group.getAttributes(), ATTR_ACCOUNT_NUMBER).orElse(null));
-        accountInfo.setCompRegNo(searchService.getSimpleAttribute(group.getAttributes(), ATTR_COMP_REG_NO).orElse(null));
-        accountInfo.setContactEmail(searchService.getSimpleAttribute(group.getAttributes(), ATTR_CONTACT_EMAIL).orElse(null));
-        accountInfo.setName(searchService.getSimpleAttribute(group.getAttributes(), ATTR_ACCOUNT_NAME).orElse(group.getName()));
-
+        // TODO viliam: Orica        
+        AccountInfo accountInfo = new AccountInfo ();
+        accountInfo.setAccountNumber(accountEntity.getAccountNumber());
+        accountInfo.setName(accountEntity.getName());
+        accountInfo.setCompRegNo(accountEntity.getCompRegNo());
+        accountInfo.setNote(accountEntity.getNote());
+        accountInfo.setContactEmail(accountEntity.getContactEmail());
+        accountInfo.setLocale(StringUtils.isEmpty(accountEntity.getLocale()) ? "en" : accountEntity.getLocale());
         return accountInfo;
     }
     
-    private ModuleInfo mappingModule(GroupRepresentation group) {
-
-        // TODO viliam: Orica
-        ModuleInfo moduleInfo = new ModuleInfo();
-        moduleInfo.setName(group.getName());
-        moduleInfo.setModuleId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_MODULE_ID).orElse(null));
-        String businessPriority = searchService.getSimpleAttribute(group.getAttributes(), ATTR_BUSINESS_PRIORITY).orElse(null);
-        if (businessPriority != null) {
-            moduleInfo.setBusinessPriority(NumberUtils.parseNumber(businessPriority, Integer.class));
-        }
-        moduleInfo.setTranslation(localizationService.translate(
-                moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(), 
-                        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
-        
-        moduleInfo.setGroups(group.getSubGroups().stream()
-            .map(rg -> mappingRightGroup(rg))
-            .collect(Collectors.toList()));
-        return moduleInfo;
-    }
-    
-    private RightGroup mappingRightGroup(GroupRepresentation group) {
-
-        // TODO viliam: Orica
-        RightGroup rightGroup = new RightGroup();
-        rightGroup.setName(group.getName());
-        rightGroup.setGroupId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_RIGHT_GROUP_ID).orElse(null));
-        rightGroup.setServiceId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_SERVICE_ID).orElse(null));
-        String businessPriority = searchService.getSimpleAttribute(group.getAttributes(), ATTR_BUSINESS_PRIORITY).orElse(null);
-        if (businessPriority != null) {
-            rightGroup.setBusinessPriority(NumberUtils.parseNumber(businessPriority, Integer.class));
-        }
-        rightGroup.setTranslation(localizationService.translate(
-                rightGroup.getGroupId() == null ? null : "group" + "." + rightGroup.getGroupId().toLowerCase(), 
-                        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
-        
-        return rightGroup;
-    }
-    
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deleteAccount(String accountNumber) {
-        keycloak.realm(realm).groups().group(findGroup(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber)).getId()).remove();
+        if (!searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber).isEmpty()) {
+            throw new AccountDeleteException(accountNumber);
+        }        
+        accountEntityRepository.deleteById(accountNumber);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public List<AccountInfo> getAccounts() {        
-        return keycloak.realm(realm).groups().group(searchService.getMasterGroupId(MASTER_GROUP)).toRepresentation()
-                .getSubGroups().stream()
-                .filter(g -> g.getAttributes().containsKey(ATTR_ACCOUNT_NUMBER))
-                .map(g -> mapping(g))
-                .collect(Collectors.toList());
+        return accountEntityRepository.findAll().stream()
+            .map(g -> mapping(g))
+            .collect(Collectors.toList());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public IdentityInfo getAccountIdentity(String accountNumber, String contactNumber) {
         getAccount(accountNumber);
         IdentityInfo identity = identityService.getIdentity(contactNumber);
@@ -299,28 +183,39 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
+
+        List<String> userIds = null;
         
-        // TODO: performance - search over DB (searchService)
-        List<UserRepresentation> users = findGroupResource(accountNumber)
-            .orElseThrow(() -> new AccountNotFoundException(accountNumber)).members();
-        
-        List<IdentityInfo> identities = users.stream()
-                .filter(u -> CollectionUtils.isEmpty(contactNumbers) 
-                    || searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).isPresent()
-                      && contactNumbers.contains(searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_CONTACT_NUMBER).get()))
-                .map(user -> identityService.mapping(user))
+        // add all identities from account when no filter specified
+        if (CollectionUtils.isEmpty(contactNumbers)) {
+            userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
+        } else { 
+            userIds = contactNumbers.stream()
+                .map(contactNumber -> searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber))
+                .flatMap(List::stream)
                 .collect(Collectors.toList());
+        }
+                
+        List<IdentityInfo> identities = userIds.stream()
+            .map(identityId -> identityService.findUserRepresentationById(identityId))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .filter(u -> searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).isPresent()
+                 && searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).get().equals(accountNumber))
+            .filter(u -> !StringUtils.hasText(roleId) || roleService.getIdentityRoles(u).contains(roleId))
+            .map(user -> identityService.mapping(user))
+            .collect(Collectors.toList());
         
-        return StringUtils.hasText(roleId) ? identities.stream()
-                .filter(i -> roleService.getIdentityRoles(i.getContactNumber()).contains(roleId))
-                .collect(Collectors.toList()) : identities;
+        return identities;
     }
     
     /**
      * {@inheritDoc}
      */
 	@Override
+	@Transactional(readOnly = true)	
 	public boolean deleteAccountIdentity(String accountNumber, String contactNumber) {
 	    getAccountIdentity(accountNumber, contactNumber);	    
 		identityService.deleteIdentity(contactNumber);
@@ -331,24 +226,20 @@ public class AccountServiceImpl implements AccountService {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean checkIfUserNameExist(String username) {
-		return searchService.findUserIdsByAttribute(IdentityPropertyType.USERNAME, username).isEmpty() ? Boolean.FALSE : Boolean.TRUE;		
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
+	@Transactional(readOnly = true)    
 	public List<RoleInfo> getAccountRoles(String accountNumber) {
-	    return roleService.getAccountRoles(keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), false);
+	    getAccount(accountNumber);
+	    return groupService.getAccountRoles(accountNumber);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Transactional(readOnly = true)    
 	public List<RoleRepresentation> getAccountRolesRepresentation(String accountNumber) {
-        return roleService.getAccountRolesRepresentation(keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), false);
+	    getAccount(accountNumber);
+        return groupService.getAccountRolesRepresentation(accountNumber);
 	}
 	
     /**
@@ -356,19 +247,20 @@ public class AccountServiceImpl implements AccountService {
      */
 	@Override
 	public List<String> getAccountRightsOfIdentity(String contactNumber) {
-        return roleService.getIdentityRights(keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), contactNumber);
+        return groupService.getAccountRightsOfIdentity(contactNumber);
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Transactional(readOnly = true)    
 	public List<IdentityRoleInfo> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
 	    
         // TODO: https://jira.eurowag.com/browse/P572-313
 	    Set<String> accountRoles = getAccountRoles(accountNumber).stream().map(r -> r.getRoleId()).collect(Collectors.toSet());
 	        
-        // TODO: performance?
+        // TODO: performance - optimize by DB?
 	    List<IdentityRoleInfo> roles = new ArrayList<>();
 	    for (IdentityInfo info : getAccountIdentities(accountNumber, null, contactNumbers)) {
 	        IdentityRoleInfo role = new IdentityRoleInfo();
@@ -377,15 +269,10 @@ public class AccountServiceImpl implements AccountService {
 	        role.setNav4Id(info.getNav4Id());
 	        role.setRoles(roleService.getIdentityRoles(info.getContactNumber()).stream()
 	                .filter(k -> accountRoles.contains(k)).collect(Collectors.toList()));
-	        
-	        Optional<UserRepresentation> userRepresentation = identityService.findIdentity(info.getContactNumber());
-	        if (userRepresentation.isPresent()) {
-    	        role.setState(identityService.mappingIdentityState(userRepresentation.get()));
-    	        if (!userRepresentation.get().isEnabled()) {
-    	            role.setLocked(true);
-    	        }
-    	        roles.add(role);
+	        if (info.isLocked()) {
+	            role.setLocked(true);
 	        }
+            roles.add(role);
 	    }
 	    return roles;
 	}
@@ -399,7 +286,7 @@ public class AccountServiceImpl implements AccountService {
         List<AccountInfo> found = new ArrayList<>();
         
         AccountPropertyType firstKey = searchFilter.keySet().stream().findFirst().get();
-        found = mappingIds(searchService.findGroupIdsByAttribute(firstKey, searchFilter.remove(firstKey)));
+        found = mappingIds(searchService.findAccountIdsByAttribute(firstKey, searchFilter.remove(firstKey)));
         
         // filter other 
         for (AccountPropertyType key : searchFilter.keySet()) {
@@ -427,18 +314,39 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	private List<AccountInfo> mappingIds(List<String> accountIds) {
-        return accountIds.stream().map(id -> findGroupResourceById(id))
-                .filter(f -> f.isPresent()).map(u -> mapping(u.get().toRepresentation()))
-                .collect(Collectors.toList());
+        return accountIds.stream()
+            .map(accountNumber -> findAccount(accountNumber))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(accountEntity -> mapping(accountEntity))
+            .collect(Collectors.toList());
     }
 	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Transactional(readOnly = true)    
 	public IdentityState getIdentityState(String accountNumber, String contactNumber) {
 	    getAccount(accountNumber);
 	    return identityService.getIdentityState(contactNumber);
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+    @Override
+    public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
+        return groupService.getAccountHierarchy(accountNumber);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true) 
+    public List<String> getAccountIdentitiesLocales(String accountNumber) {
+        return accountEntityRepository.getLocales(accountNumber);
+    }
 	
 }

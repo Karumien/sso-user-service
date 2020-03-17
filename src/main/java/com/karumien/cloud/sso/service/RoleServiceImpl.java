@@ -125,7 +125,11 @@ public class RoleServiceImpl implements RoleService {
         }
     }
     
-    private List<String> getIdentityRoles(UserRepresentation userRepresentation) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getIdentityRoles(UserRepresentation userRepresentation) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
             .filter(r -> !r.getName().toUpperCase().endsWith("_R") && !r.getName().toUpperCase().endsWith("_W") && !r.getName().toUpperCase().endsWith("_D"))
             .map(r -> r.getName())

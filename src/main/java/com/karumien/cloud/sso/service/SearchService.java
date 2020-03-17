@@ -43,7 +43,7 @@ public interface SearchService {
      *            specific value of attribute
      * @return {@link List} of User's IDs
      */
-    List<String> findGroupIdsByAttribute(AccountPropertyType attribute, String value);
+    List<String> findAccountIdsByAttribute(AccountPropertyType attribute, String value);
     
     default Optional<String> getSimpleAttribute(Map<String, List<String>> attributes, String attrName) {
         if (CollectionUtils.isEmpty(attributes) || CollectionUtils.isEmpty(attributes.get(attrName))) {
