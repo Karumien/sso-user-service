@@ -25,9 +25,13 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.karumien.cloud.sso.api.entity.AccountModule;
+import com.karumien.cloud.sso.api.entity.AccountModuleID;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.api.repository.AccountModuleRepository;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.ModuleNotFoundException;
 import com.karumien.cloud.sso.exceptions.RoleNotFoundException;
@@ -55,6 +59,10 @@ public class ModuleServiceImpl implements ModuleService {
     
     @Autowired 
     private AccountService accountService;
+    
+    @Autowired 
+    private AccountModuleRepository accountModuleRepository;
+    
 
     /**
      * {@inheritDoc}
@@ -122,67 +130,91 @@ public class ModuleServiceImpl implements ModuleService {
     }
 
     private String getRoleName(String moduleId) {
-        return ROLE_PREFIX + moduleId;
+        return moduleId.startsWith(ROLE_PREFIX) ? moduleId : ROLE_PREFIX + moduleId;
+    }
+
+    private AccountModule activateModule(String accountNumber, String moduleId) {
+        AccountModule accountModule = new AccountModule();
+        accountModule.setModuleId(moduleId);
+        accountModule.setAccountNumber(accountService.findAccount(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber)).getAccountNumber());
+        return accountModuleRepository.save(accountModule);
+    }
+
+    private void deactivateModule(String accountNumber, String moduleId) {
+        AccountModuleID accountModule = new AccountModuleID();
+        accountModule.setModuleId(moduleId);
+        accountModule.setAccountNumber(accountNumber);
+        accountModuleRepository.deleteById(accountModule);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void activateModules(List<String> modules, List<String> accountNumbers) {
         
         // TODO: transactional?
-        List<RoleRepresentation> rolesToAdd = modules.stream().map(moduleId -> findModule(moduleId))
+        List<String> modulesToAdd = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
-            .map(module -> module.get().toRepresentation())
+            .map(module -> module.get().toRepresentation().getName())
             .collect(Collectors.toList());
         
-        accountNumbers.stream().map(accountNumber ->  accountService.findGroupResource(accountNumber))
-            .filter(accountResource -> accountResource.isPresent())
-            .forEach(accountResource -> accountResource.get().roles().realmLevel().add(rolesToAdd));
-
-        accountNumbers.stream().forEach(accountNumber -> 
-            accountService.getAccountIdentities(accountNumber, null, null).forEach(identity -> identityService.refreshBinaryRoles(
-                keycloak.realm(realm).users().get(identity.getIdentityId()))));
-
+        for (String accountNumber : accountNumbers) {
+            
+            accountModuleRepository.findIdsByAccount(accountNumber).stream()
+                .filter(m -> !modulesToAdd.contains(m))
+                .forEach(m -> activateModule(accountNumber, m));
+            
+            accountService.getAccountIdentities(accountNumber, null, null)
+                .forEach(identity -> identityService.refreshBinaryRoles(keycloak.realm(realm).users().get(identity.getIdentityId())));
+        }
+        
     }
-
+   
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void deactivateModules(List<String> modules, List<String> accountNumbers) {
         
-        // TODO: transactional?
-        List<RoleRepresentation> rolesToRemove = modules.stream().map(moduleId -> findModule(moduleId))
+        List<String> modulesToDel = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
-            .map(module -> module.get().toRepresentation())
+            .map(module -> module.get().toRepresentation().getName())
             .collect(Collectors.toList());
         
-        accountNumbers.stream().map(accountNumber ->  accountService.findGroupResource(accountNumber))
-            .filter(accountResource -> accountResource.isPresent())
-            .forEach(accountResource -> accountResource.get().roles().realmLevel().remove(rolesToRemove));
-        
-        accountNumbers.stream().forEach(accountNumber -> 
-            accountService.getAccountIdentities(accountNumber, null, null).forEach(identity -> identityService.refreshBinaryRoles(
-                keycloak.realm(realm).users().get(identity.getIdentityId()))));
+        for (String accountNumber : accountNumbers) {
+            
+            accountModuleRepository.findIdsByAccount(accountNumber).stream()
+                .filter(m -> modulesToDel.contains(m))
+                .forEach(m -> deactivateModule(accountNumber, m));
+            
+            accountService.getAccountIdentities(accountNumber, null, null)
+                .forEach(identity -> identityService.refreshBinaryRoles(keycloak.realm(realm).users().get(identity.getIdentityId())));
+        }
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public List<ModuleInfo> getAccountModules(String accountNumber) {
-        return accountService.findGroupResource(accountNumber)
-            .orElseThrow(() -> new AccountNotFoundException(accountNumber)).roles().realmLevel()
-            .listAll().stream().filter(role -> role.getName().startsWith(ROLE_PREFIX))
-            .map(role -> mapping(role)).collect(Collectors.toList());                
+        return accountModuleRepository.findIdsByAccount(accountNumber).stream()
+            .map(m -> findModule(m))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(role -> mapping(role.toRepresentation()))
+            .collect(Collectors.toList());                
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public List<String> getAccountModulesSimple(String accountNumber) {
         List<ModuleInfo> info = getAccountModules(accountNumber);
         return info.stream().map(module -> module.getModuleId()).collect(Collectors.toList());                
@@ -192,9 +224,9 @@ public class ModuleServiceImpl implements ModuleService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public boolean isActiveModule(String moduleId, String accountNumber) {
-        //FIXME: performance
-        return getAccountModules(accountNumber).stream().filter(module -> module.getModuleId().equals(moduleId)).findAny().isPresent();
+        return accountModuleRepository.findById(new AccountModuleID(moduleId, accountNumber)).isPresent();
     }
 
 }

@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.keycloak.admin.client.resource.GroupResource;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.util.StringUtils;
 
+import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
@@ -31,22 +30,6 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  */
 public interface AccountService {
 
-    String MASTER_GROUP = "Accounts";
-    String SELFCARE_GROUP = "SelfCare";
-
-    String ATTR_ACCOUNT_NUMBER = AccountPropertyType.ATTR_ACCOUNT_NUMBER.getValue();
-
-    String ATTR_COMP_REG_NO = AccountPropertyType.ATTR_COMP_REG_NO.getValue();
-    String ATTR_ACCOUNT_NAME = AccountPropertyType.ATTR_ACCOUNT_NAME.getValue();
-    String ATTR_CONTACT_EMAIL= AccountPropertyType.ATTR_CONTACT_EMAIL.getValue();
-
-    String ATTR_MODULE_ID = AccountPropertyType.ATTR_MODULE_ID.getValue();
-    String ATTR_RIGHT_GROUP_ID= AccountPropertyType.ATTR_RIGHT_GROUP_ID.getValue();
-    String ATTR_SERVICE_ID = AccountPropertyType.ATTR_SERVICE_ID.getValue();
-
-    String ATTR_BUSINESS_PRIORITY = AccountPropertyType.ATTR_BUSINESS_PRIORITY.getValue();
-    String ATTR_NOTE = AccountPropertyType.ATTR_NOTE.getValue();
-    
     AccountInfo createAccount(AccountInfo account);
 
     AccountInfo getAccount(String accountNumber);
@@ -57,11 +40,6 @@ public interface AccountService {
 
     List<AccountInfo> getAccounts();
 
-    Optional<GroupRepresentation> findGroup(String accountNumber);
-
-    Optional<GroupRepresentation> findGroupByCompRegNo(String compRegNo);
-
-    Optional<GroupResource> findGroupResource(String accountNumber);
 
     /**
      * Return all identidities that are under this account
@@ -99,15 +77,6 @@ public interface AccountService {
     boolean deleteAccountIdentity(String accountNumber, String contactNumber);
 
     /**
-     * Check if this username is already used for some user
-     * 
-     * @param username
-     *            username to check
-     * @return {@link Boolean} return true if user name was already used and false if not
-     */
-    boolean checkIfUserNameExist(String username);
-
-    /**
      * Returns hierarchy information filtered by buyed services.
      * 
      * @param accountNumber
@@ -131,8 +100,6 @@ public interface AccountService {
 
     List<AccountInfo> search(Map<AccountPropertyType, String> searchFilter);
 
-    Optional<GroupResource> findGroupResourceById(String groupId);
-
     default void putIfPresent(Map<AccountPropertyType, String> search, AccountPropertyType key, String value) {
         if (StringUtils.hasText(value)) {
             search.put(key, value);
@@ -142,4 +109,8 @@ public interface AccountService {
     List<RoleRepresentation> getAccountRolesRepresentation(String accountNumber);
 
     IdentityState getIdentityState(String accountNumber, String contactNumber);
+
+    Optional<AccountEntity> findAccount(String accountNumber);
+
+    List<String> getAccountIdentitiesLocales(String accountNumber);
 }

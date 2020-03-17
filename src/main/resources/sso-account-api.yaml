@@ -73,6 +73,8 @@ paths:
           description: Successfully removed existing Account
         '410':
           description: Account not found
+        '422':
+          description: Can't delete account because contains identities
   /accounts/{accountNumber}/modules:
     get:
       summary: "Get Active Modules on Account"
@@ -269,6 +271,25 @@ paths:
             type: array            
             items:
               $ref: '#/definitions/IdentityInfo'
+        '410':
+          description: Account not found
+  /accounts/{accountNumber}/identities/locales:
+   get: 
+      summary: Return all used Locales in account
+      operationId: getAccountIdentityLocales
+      parameters:
+        - in: path
+          name: accountNumber
+          description: Filtering by Account CRM ID
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully returned Identities Locales
+          schema:
+            type: array            
+            items: 
+              type: string
         '410':
           description: Account not found
   /accounts/{accountNumber}/identities/{contactNumber}:
@@ -916,6 +937,10 @@ definitions:
         type: string
         description: "Notes"
         maxLength: 200
+      locale:
+        type: string
+        description: "Account default Locale"
+        maxLength: 50  
     example:
       accountNumber: 31034
       name: Some AUTODOPRAVA, s.r.o.

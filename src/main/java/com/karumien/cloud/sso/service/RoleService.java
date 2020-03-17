@@ -122,5 +122,7 @@ public interface RoleService {
 
     List<String> getIdentityRolesNav4(String nav4Id);
 
+    List<String> getIdentityRoles(UserRepresentation userRepresentation);
+
 
 }

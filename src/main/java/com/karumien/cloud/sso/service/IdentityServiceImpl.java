@@ -25,12 +25,12 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.UpdateType;
+import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
@@ -117,8 +117,9 @@ public class IdentityServiceImpl implements IdentityService {
             identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
 
-        identity.singleAttribute(ATTR_LOCALE,
-                StringUtils.hasText(identityInfo.getLocale()) ? identityInfo.getLocale() : LocaleContextHolder.getLocale().getLanguage());
+        if (StringUtils.hasText(identityInfo.getLocale())) {
+            identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
+        }
 
         UserResource userResource = keycloak.realm(realm).users().get(identity.getId());
 
@@ -178,7 +179,10 @@ public class IdentityServiceImpl implements IdentityService {
         }
         
         identity.singleAttribute(ATTR_ACCOUNT_NUMBER,
-                Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
+            Optional.of(identityInfo.getAccountNumber()).orElseThrow(() -> new IdNotFoundException(ATTR_ACCOUNT_NUMBER)));
+        
+        AccountEntity account = accountService.findAccount(identityInfo.getAccountNumber())
+            .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber()));
 
         // TODO: Persistent lock?
         if (StringUtils.hasText(identityInfo.getNav4Id())) {
@@ -199,21 +203,19 @@ public class IdentityServiceImpl implements IdentityService {
             identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
-            identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
+            identity.singleAttribute(ATTR_LOCALE, 
+                StringUtils.isEmpty(identityInfo.getLocale()) ? account.getLocale() : identityInfo.getLocale());
         }
-
-        String groupId = accountService.findGroup(identityInfo.getAccountNumber())
-                .orElseThrow(() -> new AccountNotFoundException(identityInfo.getAccountNumber())).getId();
 
         Response response = keycloak.realm(realm).users().create(identity);
         identityInfo.setIdentityId(getCreatedId(response));
         identityInfo.setEmailVerified(identity.isEmailVerified());
 
-        keycloak.realm(realm).users().get(identityInfo.getIdentityId()).joinGroup(groupId);
         if (identity.getRequiredActions() != null && identity.getRequiredActions().contains(UserActionType.VERIFY_EMAIL.name())) {
             changeEmailUserAction(identityInfo.getIdentityId());
         }
         
+        identityInfo.setState(IdentityState.CREATED);
         return identityInfo;
     }
 

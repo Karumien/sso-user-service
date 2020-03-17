@@ -9,17 +9,20 @@ package com.karumien.cloud.sso.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.entity.UserEntity;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
+import com.karumien.cloud.sso.api.repository.AccountEntityRepository;
 import com.karumien.cloud.sso.api.repository.CredentialRepository;
-import com.karumien.cloud.sso.api.repository.GroupAttributeRepository;
 import com.karumien.cloud.sso.api.repository.GroupEntityRepository;
 import com.karumien.cloud.sso.api.repository.UserAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserEntityRepository;
@@ -44,10 +47,10 @@ public class SearchServiceImpl implements SearchService {
     private CredentialRepository credentialRepository;
 
     @Autowired
-    private GroupAttributeRepository groupAttributeRepository;
+    private GroupEntityRepository groupEntityRepository;
 
     @Autowired
-    private GroupEntityRepository groupEntityRepository;
+    private AccountEntityRepository accountEntityRepository;
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -84,13 +87,28 @@ public class SearchServiceImpl implements SearchService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<String> findGroupIdsByAttribute(AccountPropertyType attribute, String value) {
-
-        if (attribute == AccountPropertyType.ATTR_CONTACT_EMAIL) {
-            value = value.toLowerCase();
+    public List<String> findAccountIdsByAttribute(AccountPropertyType attribute, String value) {
+        
+        if (StringUtils.hasText(value)) {
+            
+            switch (attribute) {
+            case ATTR_ACCOUNT_NAME:
+                return accountEntityRepository.findIdsByName(value);
+            case ATTR_COMP_REG_NO:
+                return accountEntityRepository.findIdsByCompRegNo(value);
+            case ATTR_CONTACT_EMAIL:
+                return accountEntityRepository.findIdsByContactEmail(value.toLowerCase());
+            case ATTR_ACCOUNT_NUMBER:
+                Optional<AccountEntity> account = accountEntityRepository.findById(value);
+                if (account.isPresent()) {
+                    return Arrays.asList(value);
+                }
+            default:
+                break;
+            }
         }
-
-        return groupAttributeRepository.findGroupIdsByAttribute(attribute.getValue(), value);
+        
+        return new ArrayList<>();
     }
 
     /**

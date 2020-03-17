@@ -222,6 +222,14 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
+    public ResponseEntity<List<String>> getAccountIdentityLocales(String accountNumber) {
+        return new ResponseEntity<>(accountService.getAccountIdentitiesLocales(accountNumber), HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
             accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
@@ -418,7 +426,7 @@ public class AccountController implements AccountsApi {
                         onBoardingInfo.getAccount().setNote(onBoardingInfo.getNote());
                     }
                     
-                    if (accountService.findGroup(onBoardingInfo.getAccount().getAccountNumber()).isPresent()) {                        
+                    if (accountService.findAccount(onBoardingInfo.getAccount().getAccountNumber()).isPresent()) {                        
                         // TODO: accountService.update
                         if (onBoardingInfo.isOverwriteAccount()) {
                         }
@@ -474,6 +482,7 @@ public class AccountController implements AccountsApi {
                             } else {
                                 identityService.createIdentityCredentials(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getCredentials());
                             }
+                            identityInfo.setState(IdentityState.CREDENTIALS_CREATED);
                         }
                     } catch (PasswordPolicyException e) {
                         throw e;
