@@ -54,7 +54,7 @@ public class LoggingMDCAspect {
       for (int i = 0; i < codeSignature.getParameterNames().length; i++) {
           String name = codeSignature.getParameterNames()[i];
           if (MDC_CONTEXT.contains(name) && joinPoint.getArgs()[i] != null) {
-              MDC.put("name", ""+joinPoint.getArgs()[i]);
+              MDC.put(name, ""+joinPoint.getArgs()[i]);
           }
       }
 

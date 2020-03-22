@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -418,8 +419,15 @@ public class AccountController implements AccountsApi {
         for (OnBoardingInfo onBoardingInfo : onBoardingInfos) {
         
             try {
+                // note
+                if (!StringUtils.isEmpty(onBoardingInfo.getNote())) {
+                    MDC.put("note_full", onBoardingInfo.getNote());
+                }
+                
                 // account
                 if (onBoardingInfo.getAccount() != null) {
+
+                    MDC.put("accountNumber", onBoardingInfo.getAccount().getAccountNumber());
 
                     // notes
                     if (StringUtils.isEmpty(onBoardingInfo.getAccount().getNote())) {
@@ -437,6 +445,13 @@ public class AccountController implements AccountsApi {
                 
                 // identity
                 if (onBoardingInfo.getIdentity() != null) {
+                    
+                    if (onBoardingInfo.getIdentity().getAccountNumber() == null && onBoardingInfo.getAccount() != null) {
+                        onBoardingInfo.getIdentity().setAccountNumber(onBoardingInfo.getAccount().getAccountNumber());
+                    }
+                    
+                    MDC.put("accountNumber", onBoardingInfo.getIdentity().getAccountNumber());
+                    MDC.put("contactNumber", onBoardingInfo.getIdentity().getContactNumber());
 
                     // notes
                     if (StringUtils.isEmpty(onBoardingInfo.getIdentity().getNote())) {
@@ -446,6 +461,7 @@ public class AccountController implements AccountsApi {
                     Optional<UserRepresentation> identity = Optional.empty();
                     
                     if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
+                        MDC.put("nav4Id", onBoardingInfo.getIdentity().getNav4Id());                        
                         identity = identityService.findIdentityNav4(onBoardingInfo.getIdentity().getNav4Id());
                     } else {
                         identity = identityService.findIdentity(onBoardingInfo.getIdentity().getContactNumber());
@@ -454,7 +470,7 @@ public class AccountController implements AccountsApi {
                     IdentityInfo identityInfo = null;
                     
                     if (identity.isPresent()) {
-                        
+
                         if (onBoardingInfo.isOverwriteIdentity()) {
                             identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());
                         } else {
