@@ -9,7 +9,6 @@ package com.karumien.cloud.sso;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -114,12 +113,11 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
             } else {
                 sb.append(", ");
             }
-            sb.append("\"").append(key).append("\" : [ ");
+            sb.append("\"").append(key).append("\" : ");
             
-            sb.append(headers.get(key).stream()
-                .map( v -> "\"" + v.toString() + "\"")
-                .collect( Collectors.joining( ", " ) ));
-            sb.append(" ]");
+            sb.append(headers.get(key).stream().findFirst()
+                .map( v -> "\"" + v.toString() + "\""));
+            sb.append("");
         }
         
         return sb.append(" }").toString();

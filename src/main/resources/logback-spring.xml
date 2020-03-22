@@ -2,6 +2,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org" level="WARN"/>
+    <logger name="springfox" level="WARN"/>
     <logger name="com.karumien" level="INFO"/>
     <!-- logger name="org.zalando.logbook" level="TRACE"/ -->
     <!-- logger name="com.karumien.cloud.sso.LoggingRequestInterceptor" level="DEBUG"/-->
@@ -42,7 +43,7 @@
                                 "parent_span_id": "%mdc{X-B3-ParentSpanId}",
                                 "exportable": "%mdc{X-Span-Export}"
                             },
-                            "service_name": "ciam-service",
+                            "service_name": "sso-service",
                             "context": {
                                 "account_number": "%mdc{accountNumber}",
                                 "contact_number": "%mdc{contactNumber}",
@@ -51,7 +52,7 @@
                                 "identity_id": "%mdc{identityId}"                                
                             },
                             "jwt": "#tryJson{%mdc{access_token}}",
-                            "headers": "%mdc{headers_all}",
+                            "headers": "#tryJson{%mdc{headers_all}}",
                             "duration": "#asLong{%mdc{duration_ms}}"
                         }
                     </pattern>
