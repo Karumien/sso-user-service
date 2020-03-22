@@ -3,6 +3,7 @@
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="org" level="WARN"/>
     <logger name="springfox" level="WARN"/>
+    <logger name="com" level="WARN"/>    
     <logger name="com.karumien" level="INFO"/>
     <!-- logger name="org.zalando.logbook" level="TRACE"/ -->
     <!-- logger name="com.karumien.cloud.sso.LoggingRequestInterceptor" level="DEBUG"/-->
