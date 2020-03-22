@@ -42,7 +42,7 @@
                                 "parent_span_id": "%mdc{X-B3-ParentSpanId}",
                                 "exportable": "%mdc{X-Span-Export}"
                             },
-                            "service_name": "sso-user-service",
+                            "service_name": "ciam-service",
                             "context": {
                                 "account_number": "%mdc{accountNumber}",
                                 "contact_number": "%mdc{contactNumber}",
