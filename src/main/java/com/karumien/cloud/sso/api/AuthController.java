@@ -145,7 +145,7 @@ public class AuthController implements AuthApi  {
                     errorMsg = messageSource.getMessage("user.invalid.pin", null, LocaleContextHolder.getLocale());
                     break;
                 case PASSWORD:
-                    errorNo = 404;
+                    errorNo = 401;
     
                     // account is temporarily locked
                     if (identityService.isIdentityTemporaryLocked(user.getUsername())) {

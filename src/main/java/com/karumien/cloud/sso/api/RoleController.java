@@ -6,6 +6,8 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,5 +56,12 @@ public class RoleController implements RolesApi {
     public ResponseEntity<RoleInfo> getRole(String id) {
     	return new ResponseEntity<>(roleService.getRoleBaseOnId(id), HttpStatus.OK);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<RoleInfo>> getRoles() {
+        return new ResponseEntity<>(roleService.getRoles(), HttpStatus.OK);
+    }
 }

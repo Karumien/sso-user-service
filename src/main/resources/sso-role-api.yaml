@@ -14,6 +14,16 @@ schemes:
   - http
 paths:
   /roles:
+    get:
+      summary: "Get known Roles"
+      operationId: getRoles
+      responses:
+        '200':
+          description: Successfully found Roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RoleInfo'
     post:
       summary: Create role
       description: Create role in target SSO

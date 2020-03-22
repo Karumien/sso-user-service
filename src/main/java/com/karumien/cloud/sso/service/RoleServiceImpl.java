@@ -118,6 +118,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Optional<RoleResource> findRoleResource(String roleName) {
+        //TODO: optimize in DB
         try {
             return Optional.of(keycloak.realm(realm).roles().get(roleName));
         } catch (NotFoundException e) {
@@ -164,11 +165,14 @@ public class RoleServiceImpl implements RoleService {
         roleInfo.setRoleId(role.getName());
         roleInfo.setDescription(role.getDescription());
         
-        List<String> rightKeys = rights.stream()
+        if (!CollectionUtils.isEmpty(rights)) {
+            List<String> rightKeys = rights.stream()
                 .filter(r -> r.getName().toUpperCase().endsWith("_R") || r.getName().toUpperCase().endsWith("_W") || r.getName().toUpperCase().endsWith("_D"))
                 .map(r -> r.getName()).collect(Collectors.toList());
         
-        roleInfo.setRights(CollectionUtils.isEmpty(rightKeys) ? null : rightKeys);
+            roleInfo.setRights(CollectionUtils.isEmpty(rightKeys) ? null : rightKeys);
+        }
+        
         // role.setId(userClientRole.getId());
         roleInfo.setTranslation(
                 localizationService.translate("role" + "." + role.getName().toLowerCase(), role.getAttributes(), 
@@ -237,7 +241,17 @@ public class RoleServiceImpl implements RoleService {
             .map(role -> getRoleBaseOnId(role.getName()))
             .collect(Collectors.toList());
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<RoleInfo> getRoles() {
+        return keycloak.realm(realm).roles().list().stream()
+            .map(role -> transformRoleToBaseRole(role, null))
+            .collect(Collectors.toList());
+    }
+    
     /**
      * {@inheritDoc}
      */
