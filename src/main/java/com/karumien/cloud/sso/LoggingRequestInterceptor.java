@@ -7,6 +7,8 @@
 package com.karumien.cloud.sso;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,9 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
 
-    // TODO spring config
-    //private int maxPayloadLength = 1000;
-    
+    protected final static List<String> MDC_HEADERS_CONTEXT = Arrays.asList("x-locale", "x-real-ip", "x-request-id", "x-forwarded-for", "x-forwarded-for", "x-original-forwarded-for", "x-trackingid", "user-agent");
+
     private ThreadLocal<Long> startTime = new ThreadLocal<Long>();
     
     /**
@@ -44,9 +45,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        
-        startTime.set(System.currentTimeMillis());        
-        
+                
         ContentCachingRequestWrapper requestCacheWrapperObject = new ContentCachingRequestWrapper(request);
         requestCacheWrapperObject.getParameterMap();
         
@@ -81,24 +80,29 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
             MDC.put("user", user);
         }
 
-        MDC.put("headers_all", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
-        
-        String locale = requestCacheWrapperObject.getHeader("x-locale");
-        if (locale != null) {
-            MDC.put("x-locale", locale);
-        }
-
-        if (requestCacheWrapperObject.getContentAsByteArray().length > 0) {
+        MDC.put("headers", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
+        // MDC_HEADERS_CONTEXT.stream().forEach(h -> scripted(h, requestCacheWrapperObject));
+       
+        //if (requestCacheWrapperObject.getContentAsByteArray().length > 0) {
          //   MDC.put("request", getContentAsString(requestCacheWrapperObject.getContentAsByteArray(), this.maxPayloadLength, 
            //   requestCacheWrapperObject.getCharacterEncoding()));
-        }
+        //}
         
+        startTime.set(System.currentTimeMillis());        
         return true;
     }
 
+    protected void scripted(String header, HttpServletRequest requestCacheWrapperObject) {
+        
+        String locale = requestCacheWrapperObject.getHeader(header);
+        if (locale != null) {
+            MDC.put(header, locale);
+        }
+    }
+
     private String toJson(HttpHeaders headers) {
-        return headers.toString();
-//        StringBuilder sb = new StringBuilder();
+      return headers.toString();
+   //        StringBuilder sb = new StringBuilder();
 //        for (String key : headers.keySet()) {
 //            
 //            if (sb.length()==0) {
@@ -127,14 +131,16 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
         
         long duration = System.currentTimeMillis()-startTime.get();
         MDC.put("status", ""+response.getStatus());
-        MDC.put("duration_ms", ""+duration);
+        MDC.put("duration", ""+duration);
         
         //MDC.put("response", getContentAsString(wrappedResponse.getContentAsByteArray(), this.maxPayloadLength, response.getCharacterEncoding()));
        
         startTime.remove();
         wrappedResponse.copyBodyToResponse();  
         
-        log.info("integration-call");
+        if (!StringUtils.endsWithIgnoreCase(MDC.get("uri"), "/publicKey")) {
+            log.info("integration-call");
+        }
         MDC.clear();
     }
 

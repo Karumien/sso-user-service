@@ -180,7 +180,7 @@ public class AuthController implements AuthApi  {
             
         if (response.getAccessToken() != null) {
             MDC.put("access_token", decodeJWT(response.getAccessToken()));
-            System.out.println(decodeJWT(response.getAccessToken()));
+            //System.out.println(decodeJWT(response.getAccessToken()));
         }
         
         return new ResponseEntity<>(response, HttpStatus.OK);
