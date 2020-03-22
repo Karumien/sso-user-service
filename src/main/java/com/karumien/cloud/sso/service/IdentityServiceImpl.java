@@ -436,8 +436,9 @@ public class IdentityServiceImpl implements IdentityService {
     public void impersonateIdentity(String contactNumber) {
         UserRepresentation userRepresentation = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         UserResource user = keycloak.realm(realm).users().get(userRepresentation.getId());
-        Map<String, Object> map = user.impersonate();
-        System.out.println(map);
+//        Map<String, Object> map = 
+        user.impersonate();
+//        System.out.println(map);
     }
 
     /**

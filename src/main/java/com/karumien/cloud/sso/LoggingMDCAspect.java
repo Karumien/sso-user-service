@@ -48,9 +48,7 @@ public class LoggingMDCAspect {
   public Object prepareMDCContext(ProceedingJoinPoint joinPoint) throws Throwable {
       
       final Signature signatureClazz = joinPoint.getSignature();
-      MDC.put("class", signatureClazz.getDeclaringType().getName());
-      System.out.println("class " + signatureClazz.getDeclaringType().getName());
-
+      MDC.put("class", signatureClazz.getDeclaringType().getSimpleName());
       
       CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
       for (int i = 0; i < codeSignature.getParameterNames().length; i++) {
