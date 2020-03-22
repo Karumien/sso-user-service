@@ -118,7 +118,6 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public Optional<RoleResource> findRoleResource(String roleName) {
-        //TODO: optimize in DB
         try {
             return Optional.of(keycloak.realm(realm).roles().get(roleName));
         } catch (NotFoundException e) {
