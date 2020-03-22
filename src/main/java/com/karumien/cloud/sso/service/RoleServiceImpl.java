@@ -131,7 +131,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<String> getIdentityRoles(UserRepresentation userRepresentation) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
-            .filter(r -> !r.getName().toUpperCase().endsWith("_R") && !r.getName().toUpperCase().endsWith("_W") && !r.getName().toUpperCase().endsWith("_D"))
+            .filter(r -> !r.getName().endsWith("_R") && !r.getName().endsWith("_W") && !r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
             .map(r -> r.getName())
             .collect(Collectors.toList());
     }
@@ -166,7 +166,7 @@ public class RoleServiceImpl implements RoleService {
         
         if (!CollectionUtils.isEmpty(rights)) {
             List<String> rightKeys = rights.stream()
-                .filter(r -> r.getName().toUpperCase().endsWith("_R") || r.getName().toUpperCase().endsWith("_W") || r.getName().toUpperCase().endsWith("_D"))
+                .filter(r -> r.getName().endsWith("_R") || r.getName().endsWith("_W") || r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
                 .map(r -> r.getName()).collect(Collectors.toList());
         
             roleInfo.setRights(CollectionUtils.isEmpty(rightKeys) ? null : rightKeys);
@@ -248,6 +248,7 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleInfo> getRoles() {
         return keycloak.realm(realm).roles().list().stream()
             .filter(role -> !role.getName().startsWith(ModuleService.ROLE_PREFIX))
+            .filter(r -> !r.getName().endsWith("_R") && !r.getName().endsWith("_W") && !r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
             .map(role -> transformRoleToBaseRole(role, null))
             .collect(Collectors.toList());
     }
