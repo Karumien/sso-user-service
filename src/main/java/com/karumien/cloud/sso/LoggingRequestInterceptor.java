@@ -9,6 +9,7 @@ package com.karumien.cloud.sso;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
 
-    protected final static List<String> MDC_HEADERS_CONTEXT = Arrays.asList("x-locale", "x-real-ip", "x-request-id", "x-forwarded-for", "x-forwarded-for", "x-original-forwarded-for", "x-trackingid", "user-agent");
+    protected final static List<String> MDC_HEADERS_CONTEXT = 
+        Arrays.asList("x-locale", "x-real-ip", "x-request-id", "x-forwarded-for", "x-forwarded-for",
+            "x-original-forwarded-for", "x-trackingid", "user-agent");
 
     private ThreadLocal<Long> startTime = new ThreadLocal<Long>();
     
@@ -80,7 +83,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
             MDC.put("user", user);
         }
 
-        MDC.put("headers", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
+        MDC.put("headers_all", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
         // MDC_HEADERS_CONTEXT.stream().forEach(h -> scripted(h, requestCacheWrapperObject));
        
         //if (requestCacheWrapperObject.getContentAsByteArray().length > 0) {
@@ -101,24 +104,25 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
     }
 
     private String toJson(HttpHeaders headers) {
-      return headers.toString();
-   //        StringBuilder sb = new StringBuilder();
-//        for (String key : headers.keySet()) {
-//            
-//            if (sb.length()==0) {
-//                sb.append(" {");
-//            } else {
-//                sb.append(", ");
-//            }
-//            sb.append("\"").append(key).append("\" : [ ");
-//            
-//            sb.append(headers.get(key).stream()
-//                .map( v -> "\"" + v.toString() + "\"")
-//                .collect( Collectors.joining( ", " ) ));
-//            sb.append(" ]");
-//        }
-//        
-//        return sb.append(" }").toString();
+//      return headers.toString();
+
+        StringBuilder sb = new StringBuilder();
+        for (String key : headers.keySet()) {
+            
+            if (sb.length()==0) {
+                sb.append(" {");
+            } else {
+                sb.append(", ");
+            }
+            sb.append("\"").append(key).append("\" : [ ");
+            
+            sb.append(headers.get(key).stream()
+                .map( v -> "\"" + v.toString() + "\"")
+                .collect( Collectors.joining( ", " ) ));
+            sb.append(" ]");
+        }
+        
+        return sb.append(" }").toString();
     }
 
     /**
@@ -131,7 +135,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
         
         long duration = System.currentTimeMillis()-startTime.get();
         MDC.put("status", ""+response.getStatus());
-        MDC.put("duration", ""+duration);
+        MDC.put("duration_ms", ""+duration);
         
         //MDC.put("response", getContentAsString(wrappedResponse.getContentAsByteArray(), this.maxPayloadLength, response.getCharacterEncoding()));
        
