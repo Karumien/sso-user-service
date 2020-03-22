@@ -53,7 +53,7 @@
                                 "identity_id": "%mdc{identityId}"                                
                             },
                             "jwt": "#tryJson{%mdc{access_token}}",
-                            "headers": "%mdc{headers_all}",
+                            "headers": %mdc{headers_all},
                             "duration": "#asLong{%mdc{duration_ms}}"
                         }
                     </pattern>
