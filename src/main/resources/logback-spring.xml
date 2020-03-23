@@ -53,7 +53,6 @@
                                 "identity_id": "%mdc{identityId}"                                
                             },
                             "jwt": "#tryJson{%mdc{access_token}}",
-                            "headers": "#tryJson{%mdc{headers_all}}",
                             "note": "%mdc{note_full}",
                             "duration": "#asLong{%mdc{duration_ms}}"
                         }
@@ -66,7 +65,7 @@
                     <excludeMdcKeyName>moduleId</excludeMdcKeyName>
                     <excludeMdcKeyName>accountNumber</excludeMdcKeyName>
                     <excludeMdcKeyName>access_token</excludeMdcKeyName>
-                    <excludeMdcKeyName>headers_all</excludeMdcKeyName>
+                    <excludeMdcKeyName>headers</excludeMdcKeyName>
                     <excludeMdcKeyName>note_full</excludeMdcKeyName>
                     <excludeMdcKeyName>contactNumber</excludeMdcKeyName>
                     <excludeMdcKeyName>nav4Id</excludeMdcKeyName>

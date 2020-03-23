@@ -470,6 +470,7 @@ public class AccountController implements AccountsApi {
                     IdentityInfo identityInfo = null;
                     
                     if (identity.isPresent()) {
+                        MDC.put("identityId", identity.get().getId());
 
                         if (onBoardingInfo.isOverwriteIdentity()) {
                             identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());

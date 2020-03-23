@@ -83,8 +83,8 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
             MDC.put("user", user);
         }
 
-        MDC.put("headers_all", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
-        // MDC_HEADERS_CONTEXT.stream().forEach(h -> scripted(h, requestCacheWrapperObject));
+        //MDC.put("headers_all", toJson(new ServletServerHttpRequest(requestCacheWrapperObject).getHeaders()));
+        MDC_HEADERS_CONTEXT.stream().forEach(h -> scripted(h, requestCacheWrapperObject));
        
         //if (requestCacheWrapperObject.getContentAsByteArray().length > 0) {
          //   MDC.put("request", getContentAsString(requestCacheWrapperObject.getContentAsByteArray(), this.maxPayloadLength, 
@@ -97,13 +97,13 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
 
     protected void scripted(String header, HttpServletRequest requestCacheWrapperObject) {
         
-        String locale = requestCacheWrapperObject.getHeader(header);
-        if (locale != null) {
-            MDC.put(header, locale);
+        String value = requestCacheWrapperObject.getHeader(header);
+        if (value != null) {
+            MDC.put(header, value);
         }
     }
 
-    private String toJson(HttpHeaders headers) {
+    protected String toJson(HttpHeaders headers) {
 //      return headers.toString();
 
         StringBuilder sb = new StringBuilder();
