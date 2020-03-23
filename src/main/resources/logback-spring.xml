@@ -37,7 +37,6 @@
                     <omitEmptyFields>true</omitEmptyFields>
                     <pattern>
                         {
-                            "env" : "UAT",
                             "trace": {
                                 "trace_id": "%mdc{X-B3-TraceId}",
                                 "span_id": "%mdc{X-B3-SpanId}",

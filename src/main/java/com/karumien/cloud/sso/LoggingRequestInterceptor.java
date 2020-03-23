@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -43,6 +44,9 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
 
     private ThreadLocal<Long> startTime = new ThreadLocal<Long>();
     
+    @Value("${spring.application.env:dev}")
+    private String env;
+    
     /**
      * {@inheritDoc}
      */
@@ -52,6 +56,7 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
         ContentCachingRequestWrapper requestCacheWrapperObject = new ContentCachingRequestWrapper(request);
         requestCacheWrapperObject.getParameterMap();
         
+        MDC.put("env", env);
         MDC.put("method", requestCacheWrapperObject.getMethod());
         MDC.put("uri", requestCacheWrapperObject.getRequestURI());
         MDC.put("protocol", requestCacheWrapperObject.getProtocol());
