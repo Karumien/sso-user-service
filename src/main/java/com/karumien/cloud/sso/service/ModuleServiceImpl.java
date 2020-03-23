@@ -62,7 +62,6 @@ public class ModuleServiceImpl implements ModuleService {
     
     @Autowired 
     private AccountModuleRepository accountModuleRepository;
-    
 
     /**
      * {@inheritDoc}
@@ -107,42 +106,46 @@ public class ModuleServiceImpl implements ModuleService {
     
     private ModuleInfo mapping(RoleInfo roleInfo) {
         
-        if (! roleInfo.getRoleId().contains(ROLE_PREFIX)) {
+        if (! roleInfo.getRoleId().contains(MODULE_PREFIX)) {
             throw new IllegalStateException("Role " + roleInfo + " is not module");
         }
         
         //TODO viliam.litavec: Orika
         ModuleInfo module = new ModuleInfo();
-        module.setModuleId(roleInfo.getRoleId().substring(ROLE_PREFIX.length()));
+        module.setModuleId(getModuleName(roleInfo.getRoleId()));
         return module;
     }
 
     private ModuleInfo mapping(RoleRepresentation roleRepresentation) {
         
-        if (! roleRepresentation.getName().contains(ROLE_PREFIX)) {
+        if (! roleRepresentation.getName().contains(MODULE_PREFIX)) {
             throw new IllegalStateException("Role " + roleRepresentation + " is not module");
         }
         
         //TODO viliam.litavec: Orika
         ModuleInfo module = new ModuleInfo();
-        module.setModuleId(roleRepresentation.getName().substring(ROLE_PREFIX.length()));
+        module.setModuleId(getModuleName(roleRepresentation.getName()));
         return module;
     }
 
     private String getRoleName(String moduleId) {
-        return moduleId.startsWith(ROLE_PREFIX) ? moduleId : ROLE_PREFIX + moduleId;
+        return moduleId.startsWith(MODULE_PREFIX) ? moduleId : MODULE_PREFIX + moduleId;
+    }
+    
+    private String getModuleName(String roleId) {
+        return roleId.startsWith(MODULE_PREFIX) ? roleId.substring(MODULE_PREFIX.length()) : roleId;
     }
 
     private AccountModule activateModule(String accountNumber, String moduleId) {
         AccountModule accountModule = new AccountModule();
-        accountModule.setModuleId(moduleId);
+        accountModule.setModuleId(getModuleName(moduleId));
         accountModule.setAccountNumber(accountService.findAccount(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber)).getAccountNumber());
         return accountModuleRepository.save(accountModule);
     }
 
     private void deactivateModule(String accountNumber, String moduleId) {
         AccountModuleID accountModule = new AccountModuleID();
-        accountModule.setModuleId(moduleId);
+        accountModule.setModuleId(getModuleName(moduleId));
         accountModule.setAccountNumber(accountNumber);
         accountModuleRepository.deleteById(accountModule);
     }
@@ -154,16 +157,16 @@ public class ModuleServiceImpl implements ModuleService {
     @Transactional
     public void activateModules(List<String> modules, List<String> accountNumbers) {
         
-        // TODO: transactional?
         List<String> modulesToAdd = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
-            .map(module -> module.get().toRepresentation().getName())
+            .map(module -> getModuleName(module.get().toRepresentation().getName()))
             .collect(Collectors.toList());
         
         for (String accountNumber : accountNumbers) {
             
-            accountModuleRepository.findIdsByAccount(accountNumber).stream()
-                .filter(m -> !modulesToAdd.contains(m))
+            List<String> existingModules = accountModuleRepository.findIdsByAccount(accountNumber);            
+            modulesToAdd.stream()
+                .filter(m -> !existingModules.contains(m))
                 .forEach(m -> activateModule(accountNumber, m));
             
             accountService.getAccountIdentities(accountNumber, null, null)
@@ -181,7 +184,7 @@ public class ModuleServiceImpl implements ModuleService {
         
         List<String> modulesToDel = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
-            .map(module -> module.get().toRepresentation().getName())
+            .map(module -> getModuleName(module.get().toRepresentation().getName()))
             .collect(Collectors.toList());
         
         for (String accountNumber : accountNumbers) {
@@ -229,4 +232,14 @@ public class ModuleServiceImpl implements ModuleService {
         return accountModuleRepository.findById(new AccountModuleID(moduleId, accountNumber)).isPresent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ModuleInfo> getModules() {
+        return keycloak.realm(realm).roles().list().stream()
+            .filter(role -> role.getName().startsWith(ModuleService.MODULE_PREFIX))
+            .map(role -> mapping(role))
+            .collect(Collectors.toList());
+    }
 }

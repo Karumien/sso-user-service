@@ -18,7 +18,7 @@ import com.karumien.cloud.sso.api.model.ModuleInfo;
  */
 public interface ModuleService {
 
-    String ROLE_PREFIX = "MODULE_";
+    String MODULE_PREFIX = "MODULE_";
 
     ModuleInfo getModule(String moduleId);
 
@@ -35,5 +35,7 @@ public interface ModuleService {
     boolean isActiveModule(String moduleId, String accountNumber);
 
     List<String> getAccountModulesSimple(String accountNumber);
+
+    List<ModuleInfo> getModules();
 
 }

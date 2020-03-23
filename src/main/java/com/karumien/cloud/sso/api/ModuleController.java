@@ -6,6 +6,8 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,5 +64,13 @@ public class ModuleController implements ModulesApi {
     public ResponseEntity<ModuleInfo> updateModule(String moduleId) {
         // TODO viliam.litavec: Need implementation
         return ModulesApi.super.updateModule(moduleId);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<ModuleInfo>> getModules() {
+        return new ResponseEntity<>(moduleService.getModules(), HttpStatus.OK);
     }
 }

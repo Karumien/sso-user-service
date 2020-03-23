@@ -247,7 +247,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleInfo> getRoles() {
         return keycloak.realm(realm).roles().list().stream()
-            .filter(role -> !role.getName().startsWith(ModuleService.ROLE_PREFIX))
+            .filter(role -> !role.getName().startsWith(ModuleService.MODULE_PREFIX))
             .filter(r -> !r.getName().endsWith("_R") && !r.getName().endsWith("_W") && !r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
             .map(role -> transformRoleToBaseRole(role, null))
             .collect(Collectors.toList());
