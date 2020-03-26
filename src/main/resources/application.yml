@@ -46,10 +46,10 @@ spring:
     max-wait: 10000
 server:  
   undertow:
-    worker-threads: 50
+    worker-threads: 32
     direct-buffers: true
-    buffers-per-region: 1024
-    buffer-size: 1024
+    buffers-per-region: 20
+    buffer-size: 16000
     io-threads: 4
   port: ${PORT:2205}
   servlet:

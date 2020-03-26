@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotAuthorizedException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -177,10 +178,9 @@ public class AuthController implements AuthApi  {
                     .code(ErrorDataCodeCredentials.PASSWORD.toString()))), HttpStatus.UNPROCESSABLE_ENTITY);
         }    
             
-//        if (response.getAccessToken() != null) {
-//            MDC.put("access_token", decodeJWT(response.getAccessToken()));
-//            //System.out.println(decodeJWT(response.getAccessToken()));
-//        }
+        if (response.getAccessToken() != null) {
+            MDC.put("access_token", decodeJWT(response.getAccessToken()));
+        }
         
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
