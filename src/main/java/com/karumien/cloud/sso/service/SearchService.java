@@ -68,4 +68,6 @@ public interface SearchService {
      * @return {@link String} group ID
      */
     String getMasterGroupId(String masterGroup);
+
+    Optional<String> findBinaryMaskForRole(String roleId);
 }

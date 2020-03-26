@@ -208,12 +208,14 @@ public class RoleServiceImpl implements RoleService {
         }
 
         Map<String, Integer> maskMap = new HashMap<String, Integer>();
-        keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().forEach(role -> {
-            Optional<RoleResource> roleWithAttributes = findRoleResource(role.getName());
-            if (roleWithAttributes.isPresent() && roleWithAttributes.get().toRepresentation().getAttributes().get(ATTR_BINARY_MASK) != null) {
-                String stringMask = roleWithAttributes.get().toRepresentation().getAttributes().get(ATTR_BINARY_MASK).get(0);
-                Integer binaryMask = Integer.valueOf(stringMask.substring(0, stringMask.length() - 2), 2);
-
+        
+        keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
+                .filter(r -> !isRole(r.getName()))
+                .forEach(role -> {
+            Optional<String> stringMask = searchService.findBinaryMaskForRole(role.getId());            
+            if (stringMask.isPresent()) {
+                Integer binaryMask = Integer.valueOf(stringMask.get().substring(0, stringMask.get().length() - 2), 2);
+    
                 // TODO: use attribute module - no split?
                 String[] splitName = role.getName().split("_");
                 if (splitName[0].equals("ROLE")) {

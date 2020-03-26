@@ -24,6 +24,7 @@ import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.repository.AccountEntityRepository;
 import com.karumien.cloud.sso.api.repository.CredentialRepository;
 import com.karumien.cloud.sso.api.repository.GroupEntityRepository;
+import com.karumien.cloud.sso.api.repository.RoleAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserAttributeRepository;
 import com.karumien.cloud.sso.api.repository.UserEntityRepository;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
@@ -52,6 +53,9 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private AccountEntityRepository accountEntityRepository;
 
+    @Autowired
+    private RoleAttributeRepository roleAttributeRepository;
+    
     @Value("${keycloak.realm}")
     private String realm;
     
@@ -128,5 +132,14 @@ public class SearchServiceImpl implements SearchService {
     public String getMasterGroupId(String masterGroup) {
         return groupEntityRepository.findGroupIdsByName(masterGroup, realm).stream()
             .findFirst().orElseThrow(() -> new AccountNotFoundException("NAME: " + masterGroup));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> findBinaryMaskForRole(String roleId) {
+        return roleAttributeRepository.findBinaryMaskForRole(roleId).stream().findFirst();
     }
 }
