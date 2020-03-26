@@ -41,10 +41,14 @@ spring:
     timeBetweenEvictionRunsMillis: 60000
     minEvictableIdleTimeMillis: 30000
     validationQuery: SELECT 1
-    max-active: 30
-    max-idle: 15
+    max-active: 35
+    max-idle: 20
+    initial-size: 20
     max-wait: 10000
 server:  
+  tomcat:
+    max-threads: 50
+    min-spare-threads: 16
   undertow:
     worker-threads: 32
     direct-buffers: true
