@@ -67,7 +67,7 @@ public class SwaggerConfiguration {
 //            .globalResponseMessage(RequestMethod.DELETE, getCustomizedResponseMessages())                    
 //            .globalResponseMessage(RequestMethod.POST, getCustomizedResponseMessages())                    
 //            .globalResponseMessage(RequestMethod.PUT, getCustomizedResponseMessages())                    
-            .produces(Collections.singleton(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .produces(Collections.singleton(MediaType.APPLICATION_JSON_VALUE))
             .apiInfo(new ApiInfoBuilder().version("1.0").title("Eurowag SSO API (IAM) Documentation")
             .description("Services of EW SSO API (IAM).")
             .build());

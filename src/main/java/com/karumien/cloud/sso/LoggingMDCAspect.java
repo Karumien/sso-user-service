@@ -44,7 +44,7 @@ public class LoggingMDCAspect {
 
   private final static List<String> MDC_CONTEXT = Arrays.asList("accountNumber", "contactNumber", "moduleId", "nav4Id");
     
-  @Around("within(com.karumien.cloud.sso.api..*)")
+  @Around("within(com.karumien.cloud.sso.api.*)")
   public Object prepareMDCContext(ProceedingJoinPoint joinPoint) throws Throwable {
       
       final Signature signatureClazz = joinPoint.getSignature();
@@ -78,7 +78,7 @@ public class LoggingMDCAspect {
 //      return joinPoint.proceed();
 //  }
 
-   @AfterThrowing(pointcut = ("within(com.karumien.cloud.sso.api..*)"), throwing = "e")
+   @AfterThrowing(pointcut = ("within(com.karumien.cloud.sso.api.*)"), throwing = "e")
     public void endpointAfterThrowing(JoinPoint p, Exception e) throws Exception {
        MDC.put("exception", LoggingRequestInterceptor.getContentAsString(getThrowableStackTraceBytes(e), 1000, CharsetNames.CS_UTF8));        
     }
