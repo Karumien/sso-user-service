@@ -628,6 +628,25 @@ paths:
           description: Identity Not Found
         '422':
           description: Role not unassigned
+  /identities/{contactNumber}/rights:
+    get:
+      summary: "Get Identity's Rights Ids"
+      operationId: getIdentityRightIds
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              type: string
+        '410':
+          description: Identity not found  
   /identities/exists:
     get:
       summary: "Check if exist Identity by specified attributes"

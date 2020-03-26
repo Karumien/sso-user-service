@@ -12,7 +12,7 @@ info:
 basePath: /api/v1/iam
 schemes:
   - http
-paths:
+paths: 
   /roles:
     get:
       summary: "Get known Roles"
@@ -71,6 +71,17 @@ paths:
           description: Successfully removed existing role
         '410':
           description: role Gone
+  /roles/rights:
+    get:
+      summary: "Get known Rights"
+      operationId: getRights
+      responses:
+        '200':
+          description: Successfully found Rights
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RoleInfo'  
 definitions:
   RoleInfo:
     type: object

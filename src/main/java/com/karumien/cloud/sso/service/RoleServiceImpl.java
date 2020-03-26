@@ -131,10 +131,17 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<String> getIdentityRoles(UserRepresentation userRepresentation) {
         return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
-            .filter(r -> !r.getName().endsWith("_R") && !r.getName().endsWith("_W") && !r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
+            .filter(r -> isRole(r.getName()))
             .map(r -> r.getName())
             .collect(Collectors.toList());
     }
+
+    protected List<String> getIdentityRights(UserRepresentation userRepresentation) {
+        return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
+            .filter(r -> !isRole(r.getName()))
+            .map(r -> r.getName())
+            .collect(Collectors.toList());
+    }    
 
     /**
      * {@inheritDoc}
@@ -148,8 +155,16 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getIdentityRoles(String contractNumber) {
-        return getIdentityRoles(identityService.findIdentity(contractNumber).orElseThrow(() -> new IdentityNotFoundException(contractNumber)));
+    public List<String> getIdentityRoles(String contactNumber) {
+        return getIdentityRoles(identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getIdentityRights(String contactNumber) {
+        return getIdentityRights(identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
     }
 
     /**
@@ -166,7 +181,7 @@ public class RoleServiceImpl implements RoleService {
         
         if (!CollectionUtils.isEmpty(rights)) {
             List<String> rightKeys = rights.stream()
-                .filter(r -> r.getName().endsWith("_R") || r.getName().endsWith("_W") || r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
+                .filter(r -> !isRole(r.getName()))
                 .map(r -> r.getName()).collect(Collectors.toList());
         
             roleInfo.setRights(CollectionUtils.isEmpty(rightKeys) ? null : rightKeys);
@@ -248,11 +263,23 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleInfo> getRoles() {
         return keycloak.realm(realm).roles().list().stream()
             .filter(role -> !role.getName().startsWith(ModuleService.MODULE_PREFIX))
-            .filter(r -> !r.getName().endsWith("_R") && !r.getName().endsWith("_W") && !r.getName().endsWith("_D") && !r.getName().endsWith("_IE"))
+            .filter(r -> isRole(r.getName()))
             .map(role -> transformRoleToBaseRole(role, null))
             .collect(Collectors.toList());
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<RoleInfo> getRights() {
+        return keycloak.realm(realm).roles().list().stream()
+            .filter(role -> !role.getName().startsWith(ModuleService.MODULE_PREFIX))
+            .filter(r -> !isRole(r.getName()))
+            .map(role -> transformRoleToBaseRole(role, null))
+            .collect(Collectors.toList());
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -267,7 +294,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<String> getIdentityRights(GroupResource groupResource, String contactNumber) {
        
-        // TODO: how to solve rights from more clients? -> user rights?
+        // TODO: how to solve rights from more clients? -> user rights? or clientId?
         List<String> roleIds = getIdentityRoles(contactNumber);
         Set<String> rights = new HashSet<>();
         getAccountRoles(groupResource, false).stream()
@@ -280,7 +307,7 @@ public class RoleServiceImpl implements RoleService {
 //        MappingsRepresentation cm = keycloak.realm(realm).users().get(userRepresentation.getId()).roles().getAll();
 //        return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().getAll()
 //            .getClientMappings().get("selfcare").getMappings().stream()
-//            //.filter(r -> r.getName().toUpperCase().endsWith("_R") || r.getName().toUpperCase().endsWith("_W") || r.getName().toUpperCase().endsWith("_D"))
+//            //.filter(r -> isRole(r.getName())
 //            .map(r -> r.getName())
 //            .collect(Collectors.toList());
     }

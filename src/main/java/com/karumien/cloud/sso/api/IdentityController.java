@@ -318,6 +318,11 @@ public class IdentityController implements IdentitiesApi {
         return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber), HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<List<String>> getIdentityRightIds(String contactNumber) {
+        return new ResponseEntity<>(roleService.getIdentityRights(contactNumber), HttpStatus.OK);
+    }
+
     /**
      * {@inheritDoc}
      */

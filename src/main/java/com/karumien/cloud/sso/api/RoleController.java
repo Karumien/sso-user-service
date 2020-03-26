@@ -64,4 +64,10 @@ public class RoleController implements RolesApi {
     public ResponseEntity<List<RoleInfo>> getRoles() {
         return new ResponseEntity<>(roleService.getRoles(), HttpStatus.OK);
     }
+    
+    @Override
+    public ResponseEntity<List<RoleInfo>> getRights() {
+        return new ResponseEntity<>(roleService.getRights(), HttpStatus.OK);
+    }
+
 }

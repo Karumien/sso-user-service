@@ -126,5 +126,13 @@ public interface RoleService {
 
     List<RoleInfo> getRoles();
 
+    List<String> getIdentityRights(String contactNumber);
+
+    List<RoleInfo> getRights();
+    
+    default boolean isRole(String name) {
+        return !name.endsWith("_R") && !name.endsWith("_W") && !name.endsWith("_D") && !name.endsWith("_IE");
+    }
+
 
 }
