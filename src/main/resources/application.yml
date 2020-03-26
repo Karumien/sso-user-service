@@ -1,7 +1,3 @@
-#app:
-#  env: UAT
-#  version: '@project.version@'
-#  build: '@timestamp@'
 spring:
 #  devtools.restart.enabled=false
   application:
@@ -36,7 +32,7 @@ spring:
     console:
       enabled: false
   datasource:
-    url: jdbc:postgresql://${DB_ADDR:localhost}:${DB_PORT:5432}/${DB_DATABASE:testssodb}?${JDBC_PARAMS:sslmode=require}
+    url: jdbc:postgresql://${DB_ADDR:test-sso-db.postgres.database.azure.com}:${DB_PORT:5432}/${DB_DATABASE:testssodb}?${JDBC_PARAMS:sslmode=require}
     username: ${DB_USER:testsso@test-sso-db}
     password: ${DB_PASSWORD:admMe123}
     driverClassName: org.postgresql.Driver    
@@ -45,12 +41,16 @@ spring:
     timeBetweenEvictionRunsMillis: 60000
     minEvictableIdleTimeMillis: 30000
     validationQuery: SELECT 1
-    max-active: 15
-    max-idle: 10
-    max-wait: 8000
+    max-active: 30
+    max-idle: 15
+    max-wait: 10000
 server:  
   undertow:
-    worker-threads: 500
+    worker-threads: 50
+    direct-buffers: true
+    buffers-per-region: 1024
+    buffer-size: 1024
+    io-threads: 4
   port: ${PORT:2205}
   servlet:
     contextPath: ${CONTEXT_PATH:/api/v1/iam}
@@ -66,28 +66,5 @@ generator:
     lowercase: ${GENERATOR_LOWERCASE:abcdefghijklmnopqrstuvwxyz}
     uppercase: ${GENERATOR_UPPERCASE:ABCDEFGJKLMNPRSTUVWXYZ}
     numbers: ${GENERATOR_NUMBERS:0123456789}
-    specials: ${GENERATOR_SPECIALS:'^$?!@%_-:#&'}
-    all: ${GENERATOR_ALL:'abcdefghijklmnopqrstuvwxyzABCDEFGJKLMNPRSTUVWXYZ0123456789^$?!@%_-:#&'}
-   
-#logbook:
-#  include:
-#    - /api/**
-#  exclude:
-#    - /actuator/**
-#  filter.enabled: true
-#  secure-filter.enabled: true
-#  format.style: json
-#  strategy: default
-## strategy: body-only-if-status-at-least
-#  minimum-status: 400
-#  obfuscate:
-#    headers:
-#      - Authorization
-#      - X-Secret
-#      - x-locale
-#    parameters:
-#      - access_token
-#      - password
-#      - x-locale
-#    write:
-#      chunk-size: 1000
+    specials: ${GENERATOR_SPECIALS:"^$?!@%_-:#&"}
+    all: ${GENERATOR_ALL:abcdefghijklmnopqrstuvwxyzABCDEFGJKLMNPRSTUVWXYZ0123456789^$?!@%_-:#&}
