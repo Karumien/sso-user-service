@@ -47,8 +47,10 @@
                             "context": {
                                 "account_number": "%mdc{accountNumber}",
                                 "contact_number": "%mdc{contactNumber}",
+                                "client_id": "%mdc{clientId}",
                                 "nav4_id": "%mdc{nav4Id}",
                                 "module_id": "%mdc{moduleId}",
+                                "username": "%mdc{usr}",
                                 "identity_id": "%mdc{identityId}"                                
                             },
                             "jwt": "#tryJson{%mdc{access_token}}",
@@ -59,7 +61,9 @@
                 </pattern>
                 <mdc>
                     <excludeMdcKeyName>identityId</excludeMdcKeyName>
+                    <excludeMdcKeyName>usr</excludeMdcKeyName>
                     <excludeMdcKeyName>traceId</excludeMdcKeyName>
+                    <excludeMdcKeyName>clientId</excludeMdcKeyName>
                     <excludeMdcKeyName>duration_ms</excludeMdcKeyName>
                     <excludeMdcKeyName>moduleId</excludeMdcKeyName>
                     <excludeMdcKeyName>accountNumber</excludeMdcKeyName>

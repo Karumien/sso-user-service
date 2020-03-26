@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.jboss.logging.MDC;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
@@ -150,8 +151,12 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByUsernamePassword(String clientId, String clientSecret, String username, String password) {
+        String client = StringUtils.hasText(clientId) ? clientId : this.clientId;
+        MDC.put("clientId", client);
+        MDC.put("usr", username);
+        
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl).realm(realm)
-            .clientId(StringUtils.hasText(clientId) ? clientId : this.clientId).clientSecret(clientSecret)
+            .clientId(client).clientSecret(clientSecret)
             .username(username).password(password).grantType(GrantType.PASSWORD.toString())           
             .build().tokenManager();
             
@@ -163,6 +168,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByClientCredentials(String clientId, String clientSecret) {
+        MDC.put("clientId", clientId);
+
         TokenManager tokenManager = KeycloakBuilder.builder().serverUrl(adminServerUrl)
             .realm(realm).clientId(clientId).clientSecret(clientSecret).grantType(GrantType.CLIENT_CREDENTIALS.toString())
             .build().tokenManager();
@@ -175,19 +182,27 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthorizationResponse loginByToken(String clientId, String refreshToken) {
+        String client = StringUtils.hasText(clientId) ? clientId : this.clientId;
+        MDC.put("clientId", client);
 
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
 
         AdvancedTokenManager tokenManager = new AdvancedTokenManager(
-                new AdvancedTokenConfig(this.adminServerUrl, realm, null, null, 
-                        StringUtils.hasText(clientId) ? clientId : this.clientId, null, OAuth2Constants.REFRESH_TOKEN),
+                new AdvancedTokenConfig(this.adminServerUrl, realm, null, null, client, null, OAuth2Constants.REFRESH_TOKEN),
                 clientBuilder.build(), refreshToken);
         
         return mapping(tokenManager.getAccessToken());            
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IdentityInfo loginByPin(String clientId, String username, String pin) {
+
+        String client = StringUtils.hasText(clientId) ? clientId : this.clientId;
+        MDC.put("clientId", client);
+        MDC.put("usr", username);
         
         if (!StringUtils.hasText(pin)) {
             return null;
@@ -371,12 +386,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthorizationResponse loginByImpersonator(String clientId, String clientSecret, String refreshToken, String username) {
 
-        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
-        identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
+        String client = StringUtils.hasText(clientId) ? clientId : this.clientId;
+        MDC.put("clientId", client);
+        MDC.put("usr", username);
 
+        ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
+//        UserRepresentation identity = identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
+        
         AdvancedTokenManager tokenManager = new AdvancedTokenManager(
-                new AdvancedTokenConfig(this.adminServerUrl, realm, username, null, 
-                        StringUtils.hasText(clientId) ? clientId : this.clientId, StringUtils.hasText(clientId) ? clientSecret : null, 
+                new AdvancedTokenConfig(this.adminServerUrl, realm, username, null, client, StringUtils.hasText(clientId) ? clientSecret : null, 
                                 OAuth2Constants.TOKEN_EXCHANGE_GRANT_TYPE), clientBuilder.build(), refreshToken);
 
         return mapping(tokenManager.getAccessToken());            
