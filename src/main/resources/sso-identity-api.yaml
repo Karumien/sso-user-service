@@ -182,6 +182,23 @@ paths:
             $ref: '#/definitions/IdentityInfo'
         '410':
           description: Gone
+  /identities/nav4/{nav4Id}/state:
+    get:
+      summary: "Get state of the given Identity"
+      operationId: getNav4IdentityState
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully returned Identity's info
+          schema:
+            $ref: '#/definitions/IdentityState'
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
   /identities/nav4/{nav4Id}/roles:
     get:
       summary: "Get Identity's Roles Ids"
@@ -201,6 +218,48 @@ paths:
               type: string
         '410':
           description: Identity not found
+    put:
+      summary: "Change defined Roles on Identity"
+      operationId: "updateNav4IdentityRoles"
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+        - in: body
+          name: roles
+          description: List of Roles's ID to activate
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '202':
+          description: Successfully changed Roles on Identity
+        '410':
+          description: Identity Not Found
+    post:
+      summary: "Add new Roles on Identity"
+      operationId: "assignNav4IdentityRoles"
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string
+        - in: body
+          name: roles
+          description: List of Role's ID to assign
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '201':
+          description: Successfully added new Roles to Identity
+        '410':
+          description: Identity Not Found
   /identities/nav4/{nav4Id}/roles/{roleId}:
     get:
       summary: "Get assigned Roles on Identity"
@@ -468,11 +527,6 @@ paths:
       summary: "Get Identity's Roles Ids"
       operationId: getIdentityRoleIds
       parameters:
-#        - name: accountNumber
-#          in: path
-#          description: Filtering by Account unique CRM ID
-#          required: true
-#          type: string
         - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM ID
@@ -490,30 +544,7 @@ paths:
         '410':
           description: Identity Not Found
     put:
-      summary: "Assign roles on Identity"
-      operationId: "assignIdentityRoles"
-      parameters:
-        - name: contactNumber
-          in: path
-          description: Filtering by Identity CRM ID
-          required: true
-          type: string       
-        - in: body
-          name: roles
-          description: List of Identity's ID to assign
-          schema:
-            type: array
-            items:
-              type: string                    
-      responses:
-        '202':
-          description: Successfully assigned Roles to Identity
-        '409':
-          description: Duplicate Identity with same CRM Contact Number
-        '410':
-          description: Identity Not Found
-    patch:
-      summary: "Assign roles on Identity"
+      summary: "Change defined roles on Identity"
       operationId: "updateIdentityRoles"
       parameters:
         - name: contactNumber
@@ -529,8 +560,31 @@ paths:
             items:
               type: string                    
       responses:
-        '206':
-          description: Successfully patched (assigned) Roles to Identity
+        '202':
+          description: Successfully changed Roles to Identity
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity Not Found
+    post:
+      summary: "Add new roles on Identity"
+      operationId: "assignIdentityRoles"
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: roles
+          description: List of Identity's ID to activate
+          schema:
+            type: array
+            items:
+              type: string                    
+      responses:
+        '201':
+          description: Successfully added new Roles to Identity
         '409':
           description: Duplicate Identity with same CRM Contact Number
         '410':

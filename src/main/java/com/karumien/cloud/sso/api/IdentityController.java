@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -132,7 +134,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<Void> assignIdentityRoles(String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.ADD, null);
-        return new ResponseEntity<>(HttpStatus.PARTIAL_CONTENT);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
     /**
@@ -371,5 +373,31 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<IdentityState> getIdentityState(String contactNumber) {
         return new ResponseEntity<>(identityService.getIdentityState(contactNumber), HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> assignNav4IdentityRoles(String nav4Id, @Valid List<String> roles) {
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), roles, UpdateType.ADD, null);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> updateNav4IdentityRoles(String nav4Id, @Valid List<String> roles) {
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), roles, UpdateType.UPDATE, null);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityState> getNav4IdentityState(String nav4Id) {
+        return new ResponseEntity<>(identityService.getIdentityStateByNav4(nav4Id), HttpStatus.OK);
     }
 }

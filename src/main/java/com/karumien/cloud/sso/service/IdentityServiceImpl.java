@@ -688,6 +688,15 @@ public class IdentityServiceImpl implements IdentityService {
             .collect(Collectors.toList());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IdentityState getIdentityStateByNav4(String nav4Id) {
+        return mappingIdentityState(findIdentityNav4(nav4Id).orElse(null));
+    }
+    
+    
 //    private List<IdentityInfo> mapping(List<UserRepresentation> users) {
 //        return users.stream().map(u -> mapping(u)).collect(Collectors.toList());
 //    }

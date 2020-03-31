@@ -261,4 +261,6 @@ public interface IdentityService {
 
     IdentityState mappingIdentityState(UserRepresentation userRepresentation);
 
+    IdentityState getIdentityStateByNav4(String nav4Id);
+
 }

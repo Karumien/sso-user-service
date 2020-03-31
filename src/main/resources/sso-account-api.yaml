@@ -468,8 +468,8 @@ paths:
               type: string
         '410':
           description: Identity or Account not found
-    patch:
-      summary: "Assign only new roles on Identity"
+    post:
+      summary: "Assign only new Roles to Identity"
       operationId: assignAccountIdentityRoles
       parameters:
         - name: accountNumber
@@ -484,18 +484,18 @@ paths:
           type: string   
         - in: body
           name: roles
-          description: List of Roles's ID to deactivate
+          description: List of Roles's ID to activate
           schema:
             type: array
             items:
               type: string  
       responses:
-        '202':
+        '201':
           description: Successfully added roles to Identity
         '410':
           description: Identity or Account not found
     put:
-      summary: "Update roles on Identity"
+      summary: "Change all roles on Identity"
       operationId: updateAccountIdentityRoles
       parameters:
         - name: accountNumber
@@ -517,7 +517,7 @@ paths:
               type: string  
       responses:
         '202':
-          description: Successfully updated roles on Identity
+          description: Successfully changed roles on Identity
         '410':
           description: Identity or Account not found
     delete:
