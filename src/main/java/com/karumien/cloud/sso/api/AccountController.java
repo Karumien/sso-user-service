@@ -235,7 +235,7 @@ public class AccountController implements AccountsApi {
         identityService.updateRolesOfIdentity(
             accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
             roles, UpdateType.ADD, null);
-        return new ResponseEntity<>(HttpStatus.PARTIAL_CONTENT);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
