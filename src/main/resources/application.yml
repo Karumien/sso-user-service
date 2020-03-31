@@ -47,8 +47,8 @@ spring:
     max-wait: 10000
 server:  
   tomcat:
-    max-threads: 50
-    min-spare-threads: 16
+#    max-threads: 50
+    min-spare-threads: 20
   undertow:
     worker-threads: 32
     direct-buffers: true
