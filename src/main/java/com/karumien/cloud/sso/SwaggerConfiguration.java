@@ -37,6 +37,7 @@ public class SwaggerConfiguration {
 
     @Value("${server.servlet.swaggerPath}")
     private String swaggerPath;
+    
     /**
      * Specification of REST Microservice API v1.0
      * 

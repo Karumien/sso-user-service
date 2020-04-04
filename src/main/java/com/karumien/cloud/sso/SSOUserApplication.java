@@ -28,7 +28,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Performance Service Application.
+ * SSO User Service Application.
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 10. 7. 2019 13:53:43
