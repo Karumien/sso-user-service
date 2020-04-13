@@ -45,6 +45,7 @@ import org.springframework.util.StringUtils;
 import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
+import com.karumien.cloud.sso.api.model.AccountState;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
@@ -375,6 +376,24 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(readOnly = true) 
     public List<String> getAccountIdentitiesLocales(String accountNumber) {
         return accountEntityRepository.getLocales(accountNumber);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AccountState getAccountState(String accountNumber) {
+        return mappingAccountState(findAccount(accountNumber).orElse(null));
+    }
+
+    private AccountState mappingAccountState(AccountEntity account) {
+
+        if (account == null) {
+            return AccountState.NOT_EXISTS;
+        }
+
+        // TODO: AccountState.LOCKED;
+        return AccountState.ACTIVE;            
     }
 	
 }

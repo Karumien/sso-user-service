@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
+import com.karumien.cloud.sso.api.model.AccountState;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.IdentityState;
@@ -115,4 +116,6 @@ public interface AccountService {
     List<String> getAccountIdentitiesLocales(String accountNumber);
 
     List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers);
+
+    AccountState getAccountState(String accountNumber);
 }

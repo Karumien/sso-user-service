@@ -146,7 +146,12 @@ public class IdentityServiceImpl implements IdentityService {
 
         // TODO: Username Policy validation
         String username = identityInfo.getUsername();
-
+        
+        // P538-336 - first identity has same nav4id
+        if (!StringUtils.hasText(identityInfo.getNav4Id())) {
+            identityInfo.setNav4Id(identityInfo.getContactNumber());
+        }
+        
         if (!StringUtils.hasText(identityInfo.getUsername())) {
             username = "generated-" + identityInfo.getContactNumber();
             if (StringUtils.hasText(identityInfo.getNav4Id())) {
@@ -203,6 +208,7 @@ public class IdentityServiceImpl implements IdentityService {
             identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
+            // P538-375
             identity.singleAttribute(ATTR_LOCALE, 
                 StringUtils.isEmpty(identityInfo.getLocale()) ? account.getLocale() : identityInfo.getLocale());
         }
@@ -210,12 +216,25 @@ public class IdentityServiceImpl implements IdentityService {
         Response response = keycloak.realm(realm).users().create(identity);
         identityInfo.setIdentityId(getCreatedId(response));
         identityInfo.setEmailVerified(identity.isEmailVerified());
+        identityInfo.setState(IdentityState.CREATED);
 
         if (identity.getRequiredActions() != null && identity.getRequiredActions().contains(UserActionType.VERIFY_EMAIL.name())) {
             changeEmailUserAction(identityInfo.getIdentityId());
         }
         
-        identityInfo.setState(IdentityState.CREATED);
+        // P538-381 Try change username if not used email in sso
+        if (!isIdentityExists(identityInfo.getEmail())) {
+            
+            String oldUsername = identityInfo.getUsername();
+            identityInfo.setUsername(identityInfo.getEmail());
+
+            try {
+                return updateIdentity(identityInfo.getContactNumber(), identityInfo);
+            } catch (UpdateIdentityException e) {
+                identityInfo.setUsername(oldUsername);
+            }
+        }
+        
         return identityInfo;
     }
 

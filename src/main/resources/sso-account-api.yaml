@@ -200,6 +200,21 @@ paths:
           description: Account not found
         '422':
           description: Module not deactivated
+  /accounts/{accountNumber}/state:
+    get:
+      summary: "Get state of Account"
+      operationId: getAccountState
+      parameters:
+        - name: accountNumber
+          in: path
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successfully returned Account state
+          schema:
+            $ref: '#/definitions/AccountState'
   /accounts/{accountNumber}/roles:
     get:
       summary: "Get Active Roles on Account"
@@ -790,6 +805,9 @@ paths:
             items:
               $ref: '#/definitions/IdentityInfo'       
 definitions:
+  AccountState:
+    type: string
+    enum: [NOT_EXISTS, LOCKED, ACTIVE]
   IdentityState:
     type: string
     enum: [NOT_EXISTS, CREATED, CREDENTIALS_CREATED, ACTIVE]

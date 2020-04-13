@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
+import com.karumien.cloud.sso.api.model.AccountState;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
@@ -514,6 +515,14 @@ public class AccountController implements AccountsApi {
         }
         
         return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<AccountState> getAccountState(String accountNumber) {
+        return new ResponseEntity<>(accountService.getAccountState(accountNumber), HttpStatus.OK);
     }
     
 }
