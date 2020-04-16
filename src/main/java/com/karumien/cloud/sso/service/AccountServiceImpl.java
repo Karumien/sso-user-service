@@ -296,7 +296,9 @@ public class AccountServiceImpl implements AccountService {
             if (!Boolean.TRUE.equals(userRepresentation.isEnabled())) {
                 role.setLocked(true);
             }
-            	        
+
+            role.setState(identityService.mappingIdentityState(userRepresentation));
+            
 	        role.setRoles(roleService.getIdentityRoles(userRepresentation).stream()
                 .filter(k -> accountRoles.contains(k))
                 .collect(Collectors.toList()));
