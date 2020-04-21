@@ -79,6 +79,10 @@ public class SearchServiceImpl implements SearchService {
             return userEntityRepository.findUserIdsByUsername(realm, value.toLowerCase());
         }
 
+        if (attribute == IdentityPropertyType.ATTR_HAS_CREDENTIALS) {
+            return credentialRepository.findUserIdByCredentialsType("password");
+        }
+
         if (attribute == IdentityPropertyType.EMAIL) {
             return userEntityRepository.findUserIdsByEmail(realm, value.toLowerCase());
         }

@@ -694,7 +694,8 @@ public class IdentityServiceImpl implements IdentityService {
 
         List<IdentityInfo> found = new ArrayList<>();
         
-        IdentityPropertyType firstKey = searchFilter.keySet().stream().findFirst().get();
+        IdentityPropertyType firstKey = searchFilter.keySet().stream()
+            .findFirst().get();
         found = mappingIds(searchService.findUserIdsByAttribute(firstKey, searchFilter.remove(firstKey)));
                     
         // filter other 
@@ -719,6 +720,8 @@ public class IdentityServiceImpl implements IdentityService {
             return value.equals(i.getContactNumber());
         case ATTR_NOTE:
             return value.equals(i.getNote());
+        case ATTR_HAS_CREDENTIALS:
+            return i.isHasCredentials() != null ? i.isHasCredentials().equals(Boolean.valueOf(value)) : false;
         case ATTR_NAV4ID:
             return value.equals(i.getNav4Id());
         case ATTR_PHONE:

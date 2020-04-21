@@ -274,7 +274,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<IdentityInfo>> search(String identityId, String username, String accountNumber, String contactNumber,
-            String nav4Id, String email, String phone, String note) {
+            String nav4Id, String email, String phone, String note, Boolean hasCredentials) {
 
         Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ID, identityId);
@@ -285,6 +285,11 @@ public class IdentityController implements IdentitiesApi {
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_NAV4ID, nav4Id);
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_NOTE, note);
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_PHONE, phone);
+        identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_PHONE, phone);
+        
+        if (hasCredentials != null) {
+            identityService.putIfPresent(searchFilter, IdentityPropertyType.ATTR_HAS_CREDENTIALS, "" + hasCredentials);
+        }
         
         if (searchFilter.isEmpty()) {
             new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);

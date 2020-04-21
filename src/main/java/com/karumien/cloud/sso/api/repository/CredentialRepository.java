@@ -36,4 +36,12 @@ public interface CredentialRepository extends JpaSpecificationExecutor<UserEntit
     @Query("select ce.id from CredentialEntity ce where ce.userId = :userId and ce.type = :type")
     List<String> findCredentialsByUserIdAndType(@Param("userId") String userId, @Param("type") String type);
 
+    /**
+     * Search credentials by user id and type.
+     * 
+     * @param type credential type
+     * @return {@link List} of user IDs
+     */
+    @Query("select ce.userId from CredentialEntity ce where ce.type = :type")
+    List<String> findUserIdByCredentialsType(@Param("type") String type);
 }

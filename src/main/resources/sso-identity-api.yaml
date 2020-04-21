@@ -801,6 +801,10 @@ paths:
           name: note
           required: false
           type: string 
+        - in: query
+          name: hasCredentials
+          required: false
+          type: boolean
       responses:
         '200':
           description: Return Identities specified by filter

@@ -19,6 +19,7 @@ public enum IdentityPropertyType {
     ATTR_LOCALE("locale"),
     ATTR_NAV4ID("nav4Id"),
     ATTR_BUSINESS_PRIORITY("businessPriority"),
+    ATTR_HAS_CREDENTIALS("hasCredentials"),
     ATTR_LAST_LOGIN("lastLogin");
 
     private String value;
