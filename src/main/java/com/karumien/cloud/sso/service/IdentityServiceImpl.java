@@ -415,7 +415,7 @@ public class IdentityServiceImpl implements IdentityService {
             identity.setLocked(true);     
         }
         identity.setState(mappingIdentityState(userRepresentation));
-        
+        identity.setHasCredentials(identity.getState() != IdentityState.CREATED);
         return identity;
     }
 

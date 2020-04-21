@@ -919,6 +919,9 @@ definitions:
       locked:
         type: boolean
         description: "Locked status"
+      hasCredentials:
+        type: boolean
+        description: "Identity has credentials"
     example:
       identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034

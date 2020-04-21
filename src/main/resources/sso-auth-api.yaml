@@ -413,3 +413,6 @@ definitions:
       locked:
         type: boolean
         description: "Locked status"
+      hasCredentials:
+        type: boolean
+        description: "Identity has credentials"
