@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.entity.AccountEntity;
+import com.karumien.cloud.sso.api.model.ClientRedirect;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
@@ -563,14 +564,40 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public void resetPasswordUserAction(String contactNumber) {
+    public void resetPasswordUserAction(String contactNumber, ClientRedirect clientRedirect) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         if (!StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
             throw new IdentityEmailNotExistsOrVerifiedException(contactNumber);
         }
-        keycloak.realm(realm).users().get(user.getId()).executeActionsEmail(Arrays.asList(UserActionType.UPDATE_PASSWORD.name()));
+        callUserAction(user.getId(), UserActionType.UPDATE_PASSWORD,
+            clientRedirect != null ? clientRedirect.getClientId() : null, 
+            clientRedirect != null ? clientRedirect.getRedirectUri() : null);
     }
-    
+   
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetPasswordUserActionNav4(String nav4Id, ClientRedirect clientRedirect) {
+        UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+        if (!StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
+            throw new IdentityEmailNotExistsOrVerifiedException("NAV4 ID: " + nav4Id);
+        }
+        callUserAction(user.getId(), UserActionType.UPDATE_PASSWORD,
+            clientRedirect != null ? clientRedirect.getClientId() : null, 
+            clientRedirect != null ? clientRedirect.getRedirectUri() : null);
+    }
+
+    private void callUserAction(String identityId, UserActionType action, String clientId, String redirectUri) {
+        if (StringUtils.hasText(clientId) && StringUtils.hasText(redirectUri)) {
+            keycloak.realm(realm).users().get(identityId).executeActionsEmail(
+                clientId, redirectUri, Arrays.asList(action.name()));
+        } else {
+            keycloak.realm(realm).users().get(identityId).executeActionsEmail(
+                Arrays.asList(action.name()));            
+        }
+    }
+
     /**
      * {@inheritDoc}
      */

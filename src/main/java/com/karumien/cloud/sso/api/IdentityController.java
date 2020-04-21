@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.karumien.cloud.sso.api.handler.IdentitiesApi;
+import com.karumien.cloud.sso.api.model.ClientRedirect;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.ErrorCode;
@@ -176,9 +177,18 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> resetIdentityCredentials(String contactNumber) {
-        identityService.resetPasswordUserAction(contactNumber);
+    public ResponseEntity<Void> resetIdentityCredentials(String contactNumber, ClientRedirect clientRedirect) {
+        identityService.resetPasswordUserAction(contactNumber, clientRedirect);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> resetIdentityNav4Credentials(String nav4Id, @Valid ClientRedirect clientRedirect) {
+        // TODO Auto-generated method stub
+        return IdentitiesApi.super.resetIdentityNav4Credentials(nav4Id, clientRedirect);
     }
 
     /**

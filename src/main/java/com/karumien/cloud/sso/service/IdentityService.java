@@ -16,6 +16,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.UpdateType;
+import com.karumien.cloud.sso.api.model.ClientRedirect;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
@@ -32,17 +33,23 @@ import com.karumien.cloud.sso.api.model.UserActionType;
 public interface IdentityService {
 
     String ATTR_CONTACT_NUMBER = IdentityPropertyType.ATTR_CONTACT_NUMBER.getValue();
+
     String ATTR_ACCOUNT_NUMBER = IdentityPropertyType.ATTR_ACCOUNT_NUMBER.getValue();
+
     String ATTR_NAV4ID = IdentityPropertyType.ATTR_NAV4ID.getValue();
 
     String ATTR_NOTE = IdentityPropertyType.ATTR_NOTE.getValue();
+
     String ATTR_PHONE = IdentityPropertyType.ATTR_PHONE.getValue();
+
     String ATTR_LOCALE = IdentityPropertyType.ATTR_LOCALE.getValue();
-           
+
     String ATTR_BINARY_RIGHTS = IdentityPropertyType.ATTR_BINARY_RIGHTS.getValue();
+
     String ATTR_DRIVER_PIN = IdentityPropertyType.ATTR_DRIVER_PIN.getValue();
 
     String ATTR_BUSINESS_PRIORITY = IdentityPropertyType.ATTR_BUSINESS_PRIORITY.getValue();
+
     String ATTR_LAST_LOGIN = IdentityPropertyType.ATTR_LAST_LOGIN.getValue();
 
     /**
@@ -132,8 +139,10 @@ public interface IdentityService {
      *            unique Identity CRM ID
      * @param roles
      *            {@link List} {@link String} list of ids of roles we want to be on identity
-     * @param updateType update type
-     * @param scope selected roles for apply, empty means all
+     * @param updateType
+     *            update type
+     * @param scope
+     *            selected roles for apply, empty means all
      */
     void updateRolesOfIdentity(String identityId, List<String> roles, UpdateType updateType, List<RoleRepresentation> scope);
 
@@ -160,8 +169,11 @@ public interface IdentityService {
      * 
      * @param contactNumber
      *            unique Identity CRM ID
+     * @param clientRedirect
+     *            client redirect informtions
+     * @param clientRedirect
      */
-    void resetPasswordUserAction(String contactNumber);
+    void resetPasswordUserAction(String contactNumber, ClientRedirect clientRedirect);
 
     /**
      * Initiate {@link UserActionType#VERIFY_EMAIL}.
@@ -240,15 +252,15 @@ public interface IdentityService {
     IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
 
     boolean isIdentityTemporaryLocked(String username);
- 
+
     boolean isActiveRoleNav4(String roleId, String nav4Id);
- 
+
     void refreshBinaryRoles(UserResource userResource);
 
     List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter);
 
     Optional<UserRepresentation> findUserRepresentationById(String identityId);
-    
+
     default void putIfPresent(Map<IdentityPropertyType, String> search, IdentityPropertyType key, String value) {
         if (StringUtils.hasText(value)) {
             search.put(key, value);
@@ -262,5 +274,7 @@ public interface IdentityService {
     IdentityState mappingIdentityState(UserRepresentation userRepresentation);
 
     IdentityState getIdentityStateByNav4(String nav4Id);
+
+    void resetPasswordUserActionNav4(String nav4Id, ClientRedirect clientRedirect);
 
 }

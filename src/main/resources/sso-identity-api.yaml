@@ -353,6 +353,32 @@ paths:
           description: "Can't create Identity's credentials - Error Codes for Attributes: #/definitions/ErrorDataCodeCredentials"
           schema:
             $ref: '#/definitions/ErrorMessage'
+  /identities/nav4/{nav4Id}/credentials/reset:
+    post:
+      summary: "Reset Identity credentials"
+      description: "Method to reset Identity credentials"
+      operationId: resetIdentityNav4Credentials
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+        - in: body
+          name: clientRedirect
+          description: Client identifiaction and return url
+          schema:
+            $ref: '#/definitions/ClientRedirect'
+            example:
+              client_id: "clientzone"
+              redirect_uri: "https://clients.eurowag.com"
+      responses:
+        '201':
+          description: "Successfully sent email for password reset"       
+        '410':
+          description: Identity Not Found
+        '422':
+          description: Can't reset Identity's credentials
   /identities/{contactNumber}/credentials/block:
     put:
       summary: "Block Identity"
@@ -397,6 +423,14 @@ paths:
           description: Filtering by Identity unique CRM ID
           required: true
           type: string       
+        - in: body
+          name: clientRedirect
+          description: Client identifiaction and return url
+          schema:
+            $ref: '#/definitions/ClientRedirect'
+            example:
+              client_id: "clientzone"
+              redirect_uri: "https://clients.eurowag.com/"
       responses:
         '201':
           description: "Successfully sent email for password reset"
@@ -893,6 +927,18 @@ definitions:
       firstName: Karel
       email: KajaN@eurowag.com
       emailVerified: true
+  ClientRedirect:
+    type: object
+    description: "Object for return redirect"
+    properties:
+      client_id:
+        type: string
+        maxLength: 250
+        description: Client Id - identification of client system
+      redirect_uri:
+        type: string
+        maxLength: 2000
+        description: Redirect to uri after login - mandatory is last char of uri - '/'
   Credentials:
     type: object
     description: "Object for setting of Identity credential"
