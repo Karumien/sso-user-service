@@ -186,9 +186,9 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> resetIdentityNav4Credentials(String nav4Id, @Valid ClientRedirect clientRedirect) {
-        // TODO Auto-generated method stub
-        return IdentitiesApi.super.resetIdentityNav4Credentials(nav4Id, clientRedirect);
+    public ResponseEntity<Void> resetIdentityNav4Credentials(String nav4Id, ClientRedirect clientRedirect) {
+        identityService.resetPasswordUserActionNav4(nav4Id, clientRedirect);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     /**
