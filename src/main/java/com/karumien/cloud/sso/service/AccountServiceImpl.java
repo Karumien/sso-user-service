@@ -37,6 +37,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -161,8 +162,9 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<AccountInfo> getAccounts() {        
-        return accountEntityRepository.findAll().stream()
+    public List<AccountInfo> getAccounts(String search, Pageable pageRequest) {        
+        return (StringUtils.hasText(search) ? accountEntityRepository.findAll(search.toLowerCase(), pageRequest) 
+                : accountEntityRepository.findAll(pageRequest)).stream()
             .map(g -> mapping(g))
             .collect(Collectors.toList());
     }

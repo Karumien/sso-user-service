@@ -47,6 +47,7 @@ import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
 import com.karumien.cloud.sso.service.RoleService;
+import com.karumien.cloud.sso.util.PageableUtils;
 
 import io.swagger.annotations.Api;
 
@@ -60,6 +61,9 @@ import io.swagger.annotations.Api;
 @Api(value = "Account Service", description = "Management of Accounts (Customers)", tags = { "Account Service" })
 public class AccountController implements AccountsApi {
 
+    private static final List<String> DEFAULT_PROPERTIES = 
+        Arrays.asList("accountNumber", "name", "compRegNo", "contactEmail", "note", "locale");
+    
     @Autowired
     private AccountService accountService;
 
@@ -115,13 +119,15 @@ public class AccountController implements AccountsApi {
 
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<AccountInfo>> getAccounts() {
-        return new ResponseEntity<>(accountService.getAccounts(), HttpStatus.OK);
+    public ResponseEntity<List<AccountInfo>> getAccounts(Integer page, Integer size, List<String> sort, String search) {
+        return new ResponseEntity<>(
+            accountService.getAccounts(search, PageableUtils.getRequest(page, size, sort, DEFAULT_PROPERTIES)), 
+            HttpStatus.OK);
     }
 
     /**
@@ -356,11 +362,12 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
     }
     
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<AccountInfo>> search(String compRegNo, String accountNumber, String name, String contactEmail, String note) {
+    public ResponseEntity<List<AccountInfo>> search(String accountNumber, String compRegNo, String name, String contactEmail, String note) {
 
         Map<AccountPropertyType, String> searchFilter = new HashMap<>();
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_COMP_REG_NO, compRegNo);

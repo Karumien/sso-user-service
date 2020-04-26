@@ -268,7 +268,7 @@ public class IdentityController implements IdentitiesApi {
 
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
     }
-    
+        
     /**
      * {@inheritDoc}
      */

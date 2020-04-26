@@ -13,6 +13,7 @@
  */
 package com.karumien.cloud.sso.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -27,6 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
+import com.karumien.cloud.sso.util.PageableUtils;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -62,7 +64,7 @@ public class AccountServiceTest {
 //        Assert.assertEquals(Account.getAccountId(), "TEST" + id);
 //        Assert.assertEquals(Account.getDescription(), "TEST-Account");
                 
-        List<AccountInfo> accounts = accountService.getAccounts();
+        List<AccountInfo> accounts = accountService.getAccounts(null, PageableUtils.getRequest(0, 100, Arrays.asList("name,ASC"), Arrays.asList("name")));
         Assert.assertNotNull(accounts);
         Assert.assertFalse(accounts.isEmpty());
         
@@ -85,7 +87,4 @@ public class AccountServiceTest {
         accountService.deleteAccount("QWESS342343ADSDAS");
     }    
     
-    
-    
-
 }

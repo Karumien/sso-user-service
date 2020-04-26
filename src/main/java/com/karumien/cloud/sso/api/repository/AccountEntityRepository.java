@@ -9,6 +9,8 @@ package com.karumien.cloud.sso.api.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +39,10 @@ public interface AccountEntityRepository extends JpaSpecificationExecutor<Accoun
     @Query("select a.id from AccountEntity a where a.contactEmail like :value")
     List<String> findIdsByContactEmail(@Param("value") String value);
 
+    @Query("select a from AccountEntity a where lower(a.name) like %:name%")
+    Page<AccountEntity> findAll(String name, Pageable pageRequest);
+
     @Query(nativeQuery = true, value = "select locale from view_account_identities_locales where account_id = :accountNumber")
     List<String> getLocales(@Param("accountNumber") String accountNumber);
+
 }

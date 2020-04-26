@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.keycloak.representations.idm.RoleRepresentation;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.entity.AccountEntity;
@@ -39,7 +40,7 @@ public interface AccountService {
 
     void deleteAccount(String accountNumber);
 
-    List<AccountInfo> getAccounts();
+    List<AccountInfo> getAccounts(String search, Pageable pageable);
 
 
     /**
