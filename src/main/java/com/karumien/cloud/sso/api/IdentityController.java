@@ -292,7 +292,7 @@ public class IdentityController implements IdentitiesApi {
         }
         
         if (searchFilter.isEmpty()) {
-            new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+           return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
         List<IdentityInfo> found = identityService.search(searchFilter);
