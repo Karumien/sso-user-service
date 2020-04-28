@@ -31,7 +31,7 @@ public interface GroupEntityRepository extends JpaSpecificationExecutor<GroupEnt
      * @param realm realm name
      * @return {@link List} of {@link String} group IDs
      */
-    @Query("select ge.id from GroupEntity ge where ge.name = :name and ge.realm = :realm and ge.parent is null")
+    @Query("select ge.id from GroupEntity ge where ge.name = :name and ge.realm = :realm and (ge.parent is null or ge.parent = ' ')")
     List<String> findGroupIdsByName(@Param("name") String name, @Param("realm") String realm);
 
 }
