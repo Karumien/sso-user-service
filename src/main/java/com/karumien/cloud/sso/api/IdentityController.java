@@ -273,7 +273,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityInfo>> search(String identityId, String username, String accountNumber, String contactNumber,
+    public ResponseEntity<List<IdentityInfo>> searchIdentity(String identityId, String username, String accountNumber, String contactNumber,
             String nav4Id, String email, String phone, String note, Boolean hasCredentials) {
 
         Map<IdentityPropertyType, String> searchFilter = new HashMap<>();

@@ -367,7 +367,7 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<AccountInfo>> search(String accountNumber, String compRegNo, String name, String contactEmail, String note) {
+    public ResponseEntity<List<AccountInfo>> searchAccount(String accountNumber, String compRegNo, String name, String contactEmail, String note) {
 
         Map<AccountPropertyType, String> searchFilter = new HashMap<>();
         accountService.putIfPresent(searchFilter, AccountPropertyType.ATTR_COMP_REG_NO, compRegNo);

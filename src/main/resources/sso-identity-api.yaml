@@ -767,7 +767,7 @@ paths:
   /identities/search:
     get:
       summary: "Search Identity by specified attributes"
-      operationId: search
+      operationId: searchIdentity
       parameters:
         - in: query
           name: identityId

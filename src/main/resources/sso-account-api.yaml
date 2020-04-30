@@ -757,7 +757,7 @@ paths:
   /accounts/search:
     get:
       summary: "Search Account by specified attributes"
-      operationId: search
+      operationId: searchAccount
       parameters:
         - in: query
           name: accountNumber
