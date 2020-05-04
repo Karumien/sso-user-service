@@ -250,7 +250,7 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> exists(String username, String contactNumber, String nav4Id) {
+    public ResponseEntity<Void> existsIdentity(String username, String contactNumber, String nav4Id) {
         
         if (StringUtils.hasText(username)) {
             return new ResponseEntity<>(identityService.isIdentityExists(username) ? HttpStatus.OK : HttpStatus.GONE);

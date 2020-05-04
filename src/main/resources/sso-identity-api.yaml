@@ -738,7 +738,7 @@ paths:
   /identities/exists:
     get:
       summary: "Check if exist Identity by specified attributes"
-      operationId: exists
+      operationId: existsIdentity
       parameters:
         - in: query
           name: username

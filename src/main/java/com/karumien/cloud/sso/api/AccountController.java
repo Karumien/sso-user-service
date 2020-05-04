@@ -105,7 +105,7 @@ public class AccountController implements AccountsApi {
     }
     
     @Override
-    public ResponseEntity<Void> exists(String compRegNo, String accountNumber) {
+    public ResponseEntity<Void> existsAccount(String compRegNo, String accountNumber) {
                  
         if (StringUtils.hasText(accountNumber)) {
             accountService.getAccount(accountNumber);
