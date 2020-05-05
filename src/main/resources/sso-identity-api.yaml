@@ -182,6 +182,46 @@ paths:
             $ref: '#/definitions/IdentityInfo'
         '410':
           description: Gone
+    put:
+      summary: Update Identity
+      operationId: updateNav4Identity
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+        - name: identity
+          in: body
+          description: The Identity to update
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+      responses:
+        '202':
+          description: Successfully updated
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '410':
+          description: Identity Not Found
+    delete:
+      summary: "Remove existing Identity"
+      operationId: deleteNav4Identity
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '204':
+          description: Successfully removed existing Identity
+        '410':
+          description: Identity Not Found
   /identities/nav4/{nav4Id}/state:
     get:
       summary: "Get state of the given Identity"

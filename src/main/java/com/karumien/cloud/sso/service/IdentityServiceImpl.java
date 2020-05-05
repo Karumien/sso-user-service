@@ -72,13 +72,25 @@ public class IdentityServiceImpl implements IdentityService {
     @Autowired
     private SearchService searchService;
 
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void deleteIdentity(String contactNumber) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        delete(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteIdentityNav4(String nav4Id) {
+        UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+        delete(user);
+    }
+    
+    private void delete(UserRepresentation user) {
         keycloak.realm(realm).users().delete(user.getId());
     }
 
@@ -86,9 +98,13 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo) {
-
-        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+    public IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity) {
+        UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
+        update(user, identity);
+        return getIdentityByNav4(nav4Id);
+    }        
+    
+    private void update(UserRepresentation identity, IdentityInfo identityInfo) {
 
         if (StringUtils.hasText(identityInfo.getUsername())) {
             identity.setUsername(identityInfo.getUsername());
@@ -129,8 +145,19 @@ public class IdentityServiceImpl implements IdentityService {
         } catch (BadRequestException e) {
             throw new UpdateIdentityException(e.getMessage());
         }
+        
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo) {
+
+        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        update(identity, identityInfo);
         return getIdentity(contactNumber);
+
     }
 
     private String patch(String value) {

@@ -74,6 +74,15 @@ public class IdentityController implements IdentitiesApi {
         identityService.deleteIdentity(contactNumber);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> deleteNav4Identity(String nav4Id) {
+        identityService.deleteIdentityNav4(nav4Id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
     /**
      * {@inheritDoc}
@@ -346,6 +355,14 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<IdentityInfo> updateIdentity(String contactNumber, IdentityInfo identity) {
         return new ResponseEntity<>( identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> updateNav4Identity(String nav4Id, @Valid IdentityInfo identity) {
+        return new ResponseEntity<>( identityService.updateIdentityNav4(nav4Id, identity), HttpStatus.ACCEPTED);
     }
     
     /**

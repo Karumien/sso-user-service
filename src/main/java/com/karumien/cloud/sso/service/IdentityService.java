@@ -277,4 +277,8 @@ public interface IdentityService {
 
     void resetPasswordUserActionNav4(String nav4Id, ClientRedirect clientRedirect);
 
+    IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity);
+
+    void deleteIdentityNav4(String nav4Id);
+
 }
