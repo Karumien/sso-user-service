@@ -790,6 +790,7 @@ paths:
           description: Accounts specified by filter not found
         '406':
           description: Empty search criteria is not allowed
+  /accounts/onboarding:
     post:
       summary: Onboarding process import
       operationId: onboarding

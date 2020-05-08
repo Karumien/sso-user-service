@@ -502,7 +502,7 @@ public class AccountController implements AccountsApi {
             }
         }
         
-        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
+        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.CREATED); 
     }
     
     /**
