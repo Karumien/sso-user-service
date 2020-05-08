@@ -65,6 +65,14 @@ public class SearchServiceImpl implements SearchService {
     @Override
     @Transactional(readOnly = true)
     public List<String> findUserIdsByAttribute(IdentityPropertyType attribute, String value) {
+
+        if (attribute == IdentityPropertyType.ATTR_HAS_CREDENTIALS) {
+            return credentialRepository.findUserIdByCredentialsType("password");
+        }
+
+        if (!StringUtils.hasText(value)) {
+            return new ArrayList<>();
+        }
         
         if (attribute == IdentityPropertyType.ID) {
             UserEntity user = userEntityRepository.findById(value).orElse(null);
@@ -77,10 +85,6 @@ public class SearchServiceImpl implements SearchService {
         
         if (attribute == IdentityPropertyType.USERNAME) {
             return userEntityRepository.findUserIdsByUsername(realm, value.toLowerCase());
-        }
-
-        if (attribute == IdentityPropertyType.ATTR_HAS_CREDENTIALS) {
-            return credentialRepository.findUserIdByCredentialsType("password");
         }
 
         if (attribute == IdentityPropertyType.EMAIL) {
