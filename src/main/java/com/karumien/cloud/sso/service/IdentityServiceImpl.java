@@ -265,6 +265,7 @@ public class IdentityServiceImpl implements IdentityService {
             }
         }
         
+        identityInfo.setNoUseEmailAsUsername(null);
         return identityInfo;
     }
 
