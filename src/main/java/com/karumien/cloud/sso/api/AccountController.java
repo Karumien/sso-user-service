@@ -40,7 +40,6 @@ import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.OnBoardingInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
-import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.AuthService;
@@ -388,30 +387,6 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<OnBoardingInfo>> getOnboardingExport(@Valid List<String> contactNumbers) {
-        
-        List<OnBoardingInfo> found = new ArrayList<>();        
-        for (IdentityInfo identity : identityService.getIdentities(contactNumbers)) {
-            OnBoardingInfo info = new OnBoardingInfo();
-            info.setIdentity(identity);
-            if (StringUtils.hasText(identity.getAccountNumber())) {
-                try {
-                    // TODO: assigned not effective
-                    info.setRoles(roleService.getIdentityRoles(identity.getContactNumber()));
-                    info.setAccount(accountService.getAccount(identity.getAccountNumber()));
-                } catch (AccountNotFoundException e) {
-                }
-            }
-            found.add(info);
-        }
-
-        return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK); 
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ResponseEntity<IdentityState> getIdentityState(String accountNumber, String contactNumber) {
         return new ResponseEntity<>(accountService.getIdentityState(accountNumber, contactNumber), HttpStatus.OK);
     }
@@ -481,14 +456,15 @@ public class AccountController implements AccountsApi {
                         MDC.put("identityId", identity.get().getId());
 
                         if (onBoardingInfo.isOverwriteIdentity()) {
-                            identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), onBoardingInfo.getIdentity());
+                            identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), 
+                                onBoardingInfo.getIdentity());
                         } else {
                             identityInfo = identityService.mapping(identity.get());
                         }
                         
                         if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles()) && onBoardingInfo.isOverwriteRoles()) {
                             identityService.updateRolesOfIdentity(
-                                identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.UPDATE, null);
+                                identityInfo.getIdentityId(), onBoardingInfo.getRoles(), UpdateType.ADD, null);
                         }
                         
                     } else {
@@ -500,7 +476,7 @@ public class AccountController implements AccountsApi {
                     }   
                     
                     try {
-                        if ((!identity.isPresent() || identity.isPresent() && onBoardingInfo.isOverwriteIdentity()) 
+                        if ((!identity.isPresent() || identity.isPresent() && onBoardingInfo.isOverwritePassword()) 
                                 && identityInfo != null && onBoardingInfo.getCredentials() != null) {
                             if (StringUtils.hasText(onBoardingInfo.getIdentity().getNav4Id())) {
                                 identityService.createIdentityCredentialsNav4(onBoardingInfo.getIdentity().getNav4Id(), onBoardingInfo.getCredentials());
@@ -509,15 +485,20 @@ public class AccountController implements AccountsApi {
                             }
                             identityInfo.setState(IdentityState.CREDENTIALS_CREATED);
                         }
-                    } catch (PasswordPolicyException e) {
-                        throw e;
                     } finally {
                         found.add(identityInfo);
                     }
                 }
                 
             } catch (Exception e) {
-                log.warn("Error import " + onBoardingInfo, e);
+                if (found.size() == 1) {
+                    if (e instanceof RuntimeException) {
+                       throw e;
+                    } else {
+                       return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);                  
+                    }
+                }
+                log.warn("Error import " + onBoardingInfo, e);                    
             }
         }
         

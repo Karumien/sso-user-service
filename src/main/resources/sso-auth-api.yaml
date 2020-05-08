@@ -416,3 +416,6 @@ definitions:
       hasCredentials:
         type: boolean
         description: "Identity has credentials"
+      noUseEmailAsUsername:
+        type: boolean
+        description: "Dont't use email as username"

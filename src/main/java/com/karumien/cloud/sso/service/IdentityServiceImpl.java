@@ -251,7 +251,9 @@ public class IdentityServiceImpl implements IdentityService {
         }
         
         // P538-381 Try change username if not used email in sso
-        if (!StringUtils.hasText(identityInfo.getUsername()) && !isIdentityExists(identityInfo.getEmail())) {
+        if (!Boolean.TRUE.equals(identityInfo.isNoUseEmailAsUsername()) 
+                && !StringUtils.hasText(identityInfo.getUsername()) 
+                && !isIdentityExists(identityInfo.getEmail())) {
             
             String oldUsername = identityInfo.getUsername();
             identityInfo.setUsername(identityInfo.getEmail());

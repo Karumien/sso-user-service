@@ -790,28 +790,6 @@ paths:
           description: Accounts specified by filter not found
         '406':
           description: Empty search criteria is not allowed
-  /accounts/onboarding:
-    get:
-      summary: Onboarding process - source data
-      operationId: getOnboardingExport
-      parameters:
-        - in: body
-          name: contactNumbers
-          description: The contactNumbers to import
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: Account's activated roles
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/OnBoardingInfo'
-        '410':
-          description: No Identity Found
     post:
       summary: Onboarding process import
       operationId: onboarding
@@ -863,6 +841,9 @@ definitions:
         type: boolean
         default: false
       overwriteRoles:
+        type: boolean
+        default: false
+      overwritePassword:
         type: boolean
         default: false
   IdentityInfo:
@@ -926,6 +907,9 @@ definitions:
       hasCredentials:
         type: boolean
         description: "Identity has credentials"
+      noUseEmailAsUsername:
+        type: boolean
+        description: "Dont't use email as username"
     example:
       identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034
