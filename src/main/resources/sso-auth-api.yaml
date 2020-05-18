@@ -377,19 +377,19 @@ definitions:
       lastName:
         type: string
         description: "Last name/ surname of the Identity"
-        maxLength: 50
+        maxLength: 255
       firstName:
         type: string
         description: "First name of the Identity"
-        maxLength: 50
+        maxLength: 255
       username:
         type: string
         description: "Unique username"
-        maxLength: 50
+        maxLength: 100
       email:
         type: string
         description: "Primary email used primary for password reset"
-        maxLength: 100
+        maxLength: 255
       emailVerified:
         type: boolean
         description: "Verified status of itentity email"

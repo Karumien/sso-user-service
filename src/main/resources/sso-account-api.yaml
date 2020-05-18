@@ -96,7 +96,7 @@ paths:
           required: true
           type: string       
       responses:
-        '200':
+        '204':
           description: Successfully removed existing Account
         '410':
           description: Account not found
@@ -111,7 +111,7 @@ paths:
           in: path
           description: Filtering by Account CRM ID
           required: true
-          type: string   
+          type: string  
       responses:
         '200':
           description: Account's activated modules
@@ -137,6 +137,11 @@ paths:
             type: array
             items:
               type: string                    
+        - name: applyRoles
+          in: query
+          description: Apply missing roles to all valid users
+          required: false
+          type: boolean         
       responses:
         '202':
           description: Successfully Activated Modules on Account
@@ -199,6 +204,11 @@ paths:
           description: Filtering by Module ID
           required: true
           type: string    
+        - name: applyRoles
+          in: query
+          description: Apply missing roles to all valid users
+          required: false
+          type: boolean         
       responses:
         '202':
           description: Successfully activated Module on Account
@@ -407,7 +417,7 @@ paths:
           required: true
           type: string    
       responses:
-        '200':
+        '204':
           description: Successfully removed existing Identity
         '409':
           description: Duplicate Identity with same CRM ContactNumber
@@ -661,7 +671,7 @@ paths:
           required: true
           type: string    
       responses:
-        '202':
+        '204':
           description: Successfully unassigned Role from Identity
         '410':
           description: Identity or Account not found
@@ -689,7 +699,7 @@ paths:
   /accounts/{accountNumber}/identities/{contactNumber}/credentials:
     get:
       summary: "Check if credentials exists"
-      operationId: hasIdentityCredentials
+      operationId: hasAccountIdentityCredentials
       parameters:
         - name: contactNumber
           in: path
@@ -809,7 +819,123 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/IdentityInfo'       
+              $ref: '#/definitions/IdentityInfo'    
+  /accounts/rebirth:
+    post:
+      summary: "Create rebirth skeleton"
+      description: "Method to create rebirth skeleton"
+      operationId: createRebirth
+      parameters: 
+        - in: body
+          name: onBoardingInfos
+          description: The Account/Identities/Roles to import
+          required: true
+          schema:
+            $ref: '#/definitions/OnBoardingInfo'
+      responses:
+        '201':
+          description: Successfully imported / updated
+          schema:
+            $ref: '#/definitions/IdentityInfo'    
+        '422':
+          description: "Can't create skeleton (missing nav4Id?)"   
+  /accounts/rebirth/nav4/{nav4Id}:
+    get:
+      description: "Get rebirth skeleton"
+      operationId: getRebirthIdentityNav4
+      parameters: 
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully imported / updated
+          schema:
+            $ref: '#/definitions/OnBoardingInfo'
+        '410':
+          description: "Rebirth skeleton not exists"   
+        '422':
+          description: "Can't read skeleton"
+    post:
+      summary: "Rebirth from skeleton"
+      description: "Method to rebirth Identity from skeleton"
+      operationId: rebirthIdentityNav4
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '201':
+          description: "Successfully rebirthed from skeleton"    
+          schema:
+            $ref: '#/definitions/IdentityInfo'   
+        '410':
+          description: "Rebirth skeleton not exists"   
+        '422':
+          description: Can't create Identity from skeleton
+    delete:
+      summary: "Undo Rebirth from skeleton"
+      description: "Method to undone rebirth Identity back to skeleton"
+      operationId: undoRebirthIdentityNav4
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '204':
+          description: "Successfully undo rebirhed identity back to skeleton"       
+        '410':
+          description: "Rebirth skeleton not exists"   
+        '422':
+          description: Can't undo rebirth Identity back to skeleton
+  /accounts/support/nav4/{nav4Id}:
+    get:
+      description: "Get support for Identity (search support)"
+      operationId: searchSupportIdentityNav4
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Solution found - see note
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '410':
+          description: Not found (new customer) - ask CRM to migrate it
+    post:
+      description: "Apply solution of Identity (support it)"
+      operationId: applySupportIdentityNav4
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Nothing to do
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '201':
+          description: Created (from skeleton)
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '202':
+          description: Reset email sent
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '410':
+          description: Not found (new customer) - ask CRM to migrate it
+
 definitions:
   AccountState:
     type: string
@@ -869,19 +995,19 @@ definitions:
       lastName:
         type: string
         description: "Last name/ surname of the Identity"
-        maxLength: 50
+        maxLength: 255
       firstName:
         type: string
         description: "First name of the Identity"
-        maxLength: 50
+        maxLength: 255
       username:
         type: string
         description: "Unique username"
-        maxLength: 50
+        maxLength: 100
       email:
         type: string
         description: "Primary email used primary for password reset"
-        maxLength: 100
+        maxLength: 255
       emailVerified:
         type: boolean
         description: "Verified status of itentity email"

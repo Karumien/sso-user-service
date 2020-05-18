@@ -57,7 +57,7 @@ public class IdentityController implements IdentitiesApi {
     
     @Autowired
     private AuthService authService;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -278,6 +278,31 @@ public class IdentityController implements IdentitiesApi {
         return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);    
     }
         
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> hasIdentityCredentials(String contactNumber) {
+        IdentityState state = identityService.getIdentityState(contactNumber);
+        
+        return new ResponseEntity<>(
+            state == IdentityState.CREDENTIALS_CREATED || state == IdentityState.ACTIVE ?
+                HttpStatus.OK : HttpStatus.NOT_FOUND);    
+    }
+        
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> hasIdentityNav4Credentials(String nav4Id) {
+        IdentityState state = identityService.getIdentityStateByNav4(nav4Id);
+        
+        return new ResponseEntity<>(
+            state == IdentityState.CREDENTIALS_CREATED || state == IdentityState.ACTIVE ?
+                HttpStatus.OK : HttpStatus.NOT_FOUND);    
+    }
+    
+   
     /**
      * {@inheritDoc}
      */

@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.entity.AccountModule;
 import com.karumien.cloud.sso.api.entity.AccountModuleID;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
@@ -155,7 +156,7 @@ public class ModuleServiceImpl implements ModuleService {
      */
     @Override
     @Transactional
-    public void activateModules(List<String> modules, List<String> accountNumbers) {
+    public void activateModules(List<String> modules, List<String> accountNumbers, Boolean applyRoles) {
         
         List<String> modulesToAdd = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
@@ -170,7 +171,12 @@ public class ModuleServiceImpl implements ModuleService {
                 .forEach(m -> activateModule(accountNumber, m));
             
             accountService.getAccountIdentities(accountNumber, null, null)
-                .forEach(identity -> identityService.refreshBinaryRoles(keycloak.realm(realm).users().get(identity.getIdentityId())));
+                .forEach(identity -> {
+                    if (Boolean.TRUE.equals(applyRoles)) {
+                        identityService.updateRolesOfIdentity(identity.getIdentityId(), TLM_DEFAULT_ROLES, UpdateType.ADD, null);
+                    }
+                    identityService.refreshBinaryRoles(keycloak.realm(realm).users().get(identity.getIdentityId()));
+                });
         }
         
     }

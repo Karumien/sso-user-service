@@ -109,7 +109,7 @@ public class ModuleServiceTest {
         accountService.createAccount(account);
         accountService.createAccount(account1);
         
-        moduleService.activateModules(Arrays.asList(moduleId, moduleId2), Arrays.asList(accountNumber, accountNumber2));
+        moduleService.activateModules(Arrays.asList(moduleId, moduleId2), Arrays.asList(accountNumber, accountNumber2), false);
 
         List<ModuleInfo> modules = moduleService.getAccountModules(accountNumber);
         Assert.assertEquals(modules.size(), 2);

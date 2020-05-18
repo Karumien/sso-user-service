@@ -6,6 +6,7 @@
  */
 package com.karumien.cloud.sso.api;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,12 +20,15 @@ import javax.validation.Valid;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.karumien.cloud.sso.api.entity.RebirthEntity;
 import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
@@ -40,13 +44,16 @@ import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.OnBoardingInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
+import com.karumien.cloud.sso.service.RebirthService;
 import com.karumien.cloud.sso.service.RoleService;
 import com.karumien.cloud.sso.util.PageableUtils;
+import com.karumien.cloud.sso.util.TrippleDes;
 
 import io.swagger.annotations.Api;
 
@@ -77,7 +84,16 @@ public class AccountController implements AccountsApi {
     
     @Autowired
     private AuthService authService;
+    
+    @Autowired
+    private RebirthService rebirthService;
+    
+    @Autowired
+    private ObjectMapper mapper;
 
+    @Value("${DB_PASSWORD:admMe123}")
+    private String secret;
+    
     /**
      * {@inheritDoc}
      */
@@ -103,6 +119,9 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<>(accountService.getAccount(accountNumber), HttpStatus.OK);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseEntity<Void> existsAccount(String compRegNo, String accountNumber) {
                  
@@ -123,6 +142,85 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
+    public ResponseEntity<IdentityInfo> rebirthIdentityNav4(String nav4Id) {
+        
+        OnBoardingInfo onboarding;
+        try {
+            onboarding = getOnboarding(nav4Id, false);
+        } catch (IOException e) {
+            return new ResponseEntity<IdentityInfo>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        ResponseEntity<List<IdentityInfo>> onboardingResponse = onboarding(Arrays.asList(onboarding));
+        if (onboardingResponse.getStatusCode() == HttpStatus.CREATED) {
+            return new ResponseEntity<IdentityInfo>(onboardingResponse.getBody().get(0), HttpStatus.CREATED);
+        }
+        
+//        "overwriteAccount" : false,
+//        "overwriteIdentity" : false,
+//        "overwriteRoles" : true,
+//        "overwritePassword" : false
+
+        return new ResponseEntity<IdentityInfo>(onboardingResponse.getStatusCode());
+    }
+
+    private OnBoardingInfo getOnboarding(String nav4Id, boolean maskPassword) throws IOException {
+        RebirthEntity rebirth = rebirthService.getRebirth(nav4Id);
+        
+        OnBoardingInfo onboarding = mapper.readValue(rebirth.getValue(), OnBoardingInfo.class);
+        
+        if (StringUtils.hasText(rebirth.getPassword())) {
+            Credentials credentials = onboarding.getCredentials();
+            if (credentials == null) {
+                credentials = new Credentials();
+            }
+            
+            String password;
+            try {
+                password = new TrippleDes(secret).decrypt(rebirth.getPassword());
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+
+            if (StringUtils.hasText(password)) {
+                credentials.setPassword(maskPassword ? "*****" : password);
+            }
+            onboarding.setCredentials(credentials);
+        }
+        return onboarding;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> searchSupportIdentityNav4(String nav4Id) {
+        // TODO Auto-generated method stub
+        return AccountsApi.super.searchSupportIdentityNav4(nav4Id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> applySupportIdentityNav4(String nav4Id) {
+        // TODO Auto-generated method stub
+        return AccountsApi.super.applySupportIdentityNav4(nav4Id);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> undoRebirthIdentityNav4(String nav4Id) {
+        // TODO Auto-generated method stub
+        return AccountsApi.super.undoRebirthIdentityNav4(nav4Id);
+    }
+       
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ResponseEntity<List<AccountInfo>> getAccounts(Integer page, Integer size, List<String> sort, String search) {
         return new ResponseEntity<>(
             accountService.getAccounts(search, PageableUtils.getRequest(page, size, sort, DEFAULT_PROPERTIES)), 
@@ -133,17 +231,80 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> activateAccountModule(String accountNumber, String moduleId) {
-        moduleService.activateModules(Arrays.asList(moduleId), Arrays.asList(accountNumber));
+    public ResponseEntity<Void> activateAccountModule(String accountNumber, String moduleId, Boolean applyRoles) {
+        moduleService.activateModules(Arrays.asList(moduleId), Arrays.asList(accountNumber), applyRoles);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> hasAccountIdentityCredentials(String contactNumber) {
+        IdentityState state = identityService.getIdentityState(contactNumber);
+        
+        return new ResponseEntity<>(
+            state == IdentityState.CREDENTIALS_CREATED || state == IdentityState.ACTIVE ?
+                HttpStatus.OK : HttpStatus.NOT_FOUND);  
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> createRebirth(OnBoardingInfo onBoardingInfos) {
+        if (!StringUtils.hasText(onBoardingInfos.getIdentity().getNav4Id())) {
+            throw new IdNotFoundException("NAV4 ID");
+        }
+
+        String password = null;
+        
+        if (onBoardingInfos.getCredentials() != null) {
+            password = onBoardingInfos.getCredentials().getPassword();    
+            if (StringUtils.hasText(password)) {
+                onBoardingInfos.getCredentials().setPassword(null);
+                try {
+                    password = new TrippleDes(secret).encrypt(password);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
+        
+        try {
+            rebirthService.createRebirth(RebirthEntity.builder()
+                .nav4Id(onBoardingInfos.getIdentity().getNav4Id())
+                .password(password)
+                .value(mapper.writeValueAsString(onBoardingInfos))
+                .build());
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.UNPROCESSABLE_ENTITY);        
+        }
+        return new ResponseEntity<>(HttpStatus.CREATED);        
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<OnBoardingInfo> getRebirthIdentityNav4(String nav4Id) {
+        
+        OnBoardingInfo onboarding;
+        try {
+            onboarding = getOnboarding(nav4Id, true);
+        } catch (IOException e) {
+            return new ResponseEntity<OnBoardingInfo>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        
+        return new ResponseEntity<OnBoardingInfo>(onboarding, HttpStatus.OK);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> activateAccountModules(String accountNumber, List<String> modules) {
-        moduleService.activateModules(modules, Arrays.asList(accountNumber));
+    public ResponseEntity<Void> activateAccountModules(String accountNumber, @Valid List<String> modules, @Valid Boolean applyRoles) {
+        moduleService.activateModules(modules, Arrays.asList(accountNumber), applyRoles);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

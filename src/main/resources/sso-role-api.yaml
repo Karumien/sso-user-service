@@ -67,7 +67,7 @@ paths:
           required: true
           type: string       
       responses:
-        '200':
+        '204':
           description: Successfully removed existing role
         '410':
           description: role Gone

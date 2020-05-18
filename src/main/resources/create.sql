@@ -17,6 +17,14 @@ CREATE TABLE PLUGIN_ACCOUNT_MODULE
    PRIMARY KEY (module_id, account_id)
 );
 
+CREATE TABLE PLUGIN_REBIRTH
+(
+   id varchar(36) NOT NULL,
+   value varchar(3000) NOT NULL,
+   password varchar(512),
+   PRIMARY KEY (id)
+);
+
 ALTER TABLE PLUGIN_ACCOUNT_MODULE 
 ADD CONSTRAINT fk_plugin_account_account FOREIGN KEY (account_id) REFERENCES PLUGIN_ACCOUNT (id) ON DELETE CASCADE;
 

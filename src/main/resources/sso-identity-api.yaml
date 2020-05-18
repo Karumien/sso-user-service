@@ -358,13 +358,29 @@ paths:
           required: true
           type: string    
       responses:
-        '202':
+        '204':
           description: Successfully unassigned Role from Identity
         '410':
           description: Identity not found
         '422':
           description: Role not unassigned
   /identities/nav4/{nav4Id}/credentials:
+    get:
+      summary: "Check if credentials exists"
+      operationId: hasIdentityNav4Credentials
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Identity has credentials
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity or Credentials Not Found
     post:
       summary: "Create Identity credentials"
       description: "Method to create Identity credentials for given customer"
@@ -418,7 +434,7 @@ paths:
         '410':
           description: Identity Not Found
         '422':
-          description: Can't reset Identity's credentials
+          description: Can't reset Identity's credentials  
   /identities/{contactNumber}/credentials/block:
     put:
       summary: "Block Identity"
@@ -535,7 +551,7 @@ paths:
           required: true
           type: string       
       responses:
-        '200':
+        '204':
           description: "Driver PIN has been deleted"
         '409':
           description: Duplicate Identity with same CRM Contact Number
@@ -680,7 +696,7 @@ paths:
             items:
               type: string                    
       responses:
-        '202':
+        '204':
           description: Successfully unsassigned Roles from Identity
         '409':
           description: Duplicate Identity with same CRM Contact Number
@@ -927,19 +943,19 @@ definitions:
       lastName:
         type: string
         description: "Last name/ surname of the Identity"
-        maxLength: 50
+        maxLength: 255
       firstName:
         type: string
         description: "First name of the Identity"
-        maxLength: 50
+        maxLength: 255
       username:
         type: string
         description: "Unique username"
-        maxLength: 50
+        maxLength: 100
       email:
         type: string
         description: "Primary email used primary for password reset"
-        maxLength: 100
+        maxLength: 255
       emailVerified:
         type: boolean
         description: "Verified status of itentity email"
