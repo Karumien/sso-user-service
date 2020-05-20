@@ -14,6 +14,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
 
+import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
@@ -119,4 +120,6 @@ public interface AccountService {
     List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers);
 
     AccountState getAccountState(String accountNumber);
+
+    AccountInfo updateAccount(String accountNumber, AccountInfo accountInfo, UpdateType update);
 }

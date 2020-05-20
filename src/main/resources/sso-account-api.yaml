@@ -86,6 +86,48 @@ paths:
             $ref: '#/definitions/AccountInfo'
         '410':
           description: Account not found
+    put:
+      description: Update Account
+      operationId: updateAccount
+      parameters:
+        - in: path
+          name: accountNumber
+          description: Filtering by Account CRM ID
+          required: true
+          type: string  
+        - name: account
+          in: body
+          description: The Account to update/patch
+          schema:
+            $ref: '#/definitions/AccountInfo'
+      responses:
+        '202':
+          description: Successfully updated
+          schema:
+            $ref: '#/definitions/AccountInfo'
+        '410':
+          description: Account not found
+    patch:
+      description: Patch Account
+      operationId: patchAccount
+      parameters:
+        - in: path
+          name: accountNumber
+          description: Filtering by Account CRM ID
+          required: true
+          type: string       
+        - name: account
+          in: body
+          description: The Account to update/patch
+          schema:
+            $ref: '#/definitions/AccountInfo'
+      responses:
+        '202':
+          description: Successfully updated/patched
+          schema:
+            $ref: '#/definitions/AccountInfo'
+        '410':
+          description: Account not found
     delete:
       summary: "Remove existing Account"
       operationId: "deleteAccount"
@@ -396,6 +438,39 @@ paths:
       responses:
         '202':
           description: Successfully updated
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '409':
+          description: Conflict in username/CRM Contact Number/Navision 4 ID
+        '410':
+          description: Identity or Account not found
+    patch:
+      summary: Patch Identity
+      operationId: patchAccountIdentity
+      parameters:
+        - name: accountNumber
+          in: path
+          description: Filtering by Account unique CRM Account Number
+          required: true
+          type: string
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string  
+        - name: identity
+          in: body
+          description: The Identity to update/patch
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+      responses:
+        '202':
+          description: Successfully updated/patched
           schema:
             $ref: '#/definitions/IdentityInfo'
         '409':

@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
@@ -103,6 +104,25 @@ public class AccountServiceImpl implements AccountService {
         } catch (DuplicateKeyException e) {
             throw new AccountDuplicateException(account.getAccountNumber());
         }
+    }
+    
+    private String patch(String oldValue, String newValue, UpdateType update) {
+        return update == UpdateType.UPDATE || update == UpdateType.ADD && StringUtils.hasText(newValue) ? newValue : oldValue;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public AccountInfo updateAccount(String accountNumber, AccountInfo accountInfo, UpdateType update) {
+        AccountEntity accountEntity = findAccount(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber));
+        accountEntity.setCompRegNo(patch(accountEntity.getCompRegNo(), accountInfo.getCompRegNo(), update));
+        accountEntity.setContactEmail(patch(accountEntity.getContactEmail(), accountInfo.getContactEmail(), update));
+        accountEntity.setLocale(patch(accountEntity.getLocale(), accountInfo.getLocale(), update));
+        accountEntity.setName(patch(accountEntity.getName(), accountInfo.getName(), update));
+        accountEntity.setNote(patch(accountEntity.getNote(), accountInfo.getNote(), update));
+        return mapping(accountEntityRepository.save(accountEntity));
     }
     
     /**

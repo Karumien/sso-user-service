@@ -98,23 +98,26 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity) {
+    public IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity, UpdateType update) {
         UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
-        update(user, identity);
+        update(user, identity, update);
         return getIdentityByNav4(nav4Id);
     }        
     
-    private void update(UserRepresentation identity, IdentityInfo identityInfo) {
+    private void update(UserRepresentation identity, IdentityInfo newIdentityInfo, UpdateType update) {
 
-        if (StringUtils.hasText(identityInfo.getUsername())) {
-            identity.setUsername(identityInfo.getUsername());
+        if (StringUtils.hasText(newIdentityInfo.getUsername())) {
+            identity.setUsername(newIdentityInfo.getUsername());
         }
 
-        identity.setFirstName(patch(identityInfo.getFirstName()));
-        identity.setLastName(patch(identityInfo.getLastName()));
-        identity.setEmail(patch(identityInfo.getEmail()));
+        identity.setFirstName(patch(identity.getFirstName(), newIdentityInfo.getFirstName(), update));
+        identity.setLastName(patch(identity.getLastName(), newIdentityInfo.getLastName(), update));
+        identity.setEmail(patch(identity.getEmail(), newIdentityInfo.getEmail(), update));
+
+        if (update == UpdateType.UPDATE || update == UpdateType.ADD && newIdentityInfo.isEmailVerified() != null) {
+            identity.setEmailVerified(Boolean.TRUE.equals(newIdentityInfo.isEmailVerified()) && StringUtils.hasText(newIdentityInfo.getEmail()));        
+        }
         
-        identity.setEmailVerified(Boolean.TRUE.equals(identityInfo.isEmailVerified()) && StringUtils.hasText(identityInfo.getEmail()));
         if (!StringUtils.hasText(identity.getEmail()) || Boolean.TRUE.equals(identity.isEmailVerified())) {
             identity.getRequiredActions().remove(UserActionType.VERIFY_EMAIL.name());
         }
@@ -122,20 +125,26 @@ public class IdentityServiceImpl implements IdentityService {
         if (StringUtils.hasText(identity.getEmail()) && !Boolean.TRUE.equals(identity.isEmailVerified())) {
             identity.getRequiredActions().add(UserActionType.VERIFY_EMAIL.name());
             changeEmailUserAction(identity.getId());
-        }
-        
-        if (StringUtils.hasText(identityInfo.getPhone())) {
-            identity.singleAttribute(ATTR_PHONE, identityInfo.getPhone());
+        }        
+
+        if (StringUtils.hasText(newIdentityInfo.getPhone())) {
+            identity.singleAttribute(ATTR_PHONE, newIdentityInfo.getPhone());
         } else {
-            identity.getAttributes().remove(ATTR_PHONE);
+            if (update == UpdateType.UPDATE) {
+                identity.getAttributes().remove(ATTR_PHONE);
+            }
         }
 
-        if (StringUtils.hasText(identityInfo.getNote())) {
-            identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
+        if (StringUtils.hasText(newIdentityInfo.getNote())) {
+            identity.singleAttribute(ATTR_NOTE, newIdentityInfo.getNote());
         }
 
-        if (StringUtils.hasText(identityInfo.getLocale())) {
-            identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale());
+        if (StringUtils.hasText(newIdentityInfo.getLocale())) {
+            identity.singleAttribute(ATTR_LOCALE, newIdentityInfo.getLocale());
+        } else {
+            if (update == UpdateType.UPDATE) {
+                identity.getAttributes().remove(ATTR_LOCALE);
+            }
         }
 
         UserResource userResource = keycloak.realm(realm).users().get(identity.getId());
@@ -152,16 +161,16 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo) {
+    public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo, UpdateType update) {
 
         UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        update(identity, identityInfo);
+        update(identity, identityInfo, update);
         return getIdentity(contactNumber);
 
     }
-
-    private String patch(String value) {
-        return StringUtils.hasText(value) ? value : "";
+    
+    private String patch(String oldValue, String newValue, UpdateType update) {
+        return update == UpdateType.UPDATE || update == UpdateType.ADD && StringUtils.hasText(newValue) ? newValue : oldValue;
     }
 
     /**
@@ -259,7 +268,7 @@ public class IdentityServiceImpl implements IdentityService {
             identityInfo.setUsername(identityInfo.getEmail());
 
             try {
-                return updateIdentity(identityInfo.getContactNumber(), identityInfo);
+                return updateIdentity(identityInfo.getContactNumber(), identityInfo, UpdateType.UPDATE);
             } catch (UpdateIdentityException e) {
                 identityInfo.setUsername(oldUsername);
             }

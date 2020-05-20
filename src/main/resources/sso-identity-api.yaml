@@ -84,6 +84,34 @@ paths:
           description: Conflict in username/CRM Contact Number/Navision 4 ID
         '410':
           description: Identity Not Found
+    patch:
+      summary: patch Identity
+      operationId: patchIdentity
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM Contact Number
+          required: true
+          type: string       
+        - name: identity
+          in: body
+          description: The Identity to update
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+      responses:
+        '202':
+          description: Successfully updated/patched
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '409':
+          description: Conflict in username/CRM Contact Number/Navision 4 ID
+        '410':
+          description: Identity Not Found
     delete:
       summary: "Remove existing Identity"
       operationId: deleteIdentity
@@ -208,6 +236,32 @@ paths:
             $ref: '#/definitions/IdentityInfo'
         '410':
           description: Identity Not Found
+    patch:
+      summary: Patch Identity
+      operationId: patchNav4Identity
+      parameters:
+        - name: nav4Id
+          in: path
+          description: Filtering by Identity unique NAV4 ID
+          required: true
+          type: string       
+        - name: identity
+          in: body
+          description: The Identity to update/patch
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+            example:
+              lastName: Novak
+              firstName: Karel
+              username: KajaN
+              email: KajaN@eurowag.com
+      responses:
+        '202':
+          description: Successfully updated/patched
+          schema:
+            $ref: '#/definitions/IdentityInfo'
+        '410':
+          description: Identity Not Found      
     delete:
       summary: "Remove existing Identity"
       operationId: deleteNav4Identity

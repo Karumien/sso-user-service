@@ -101,6 +101,22 @@ public class AccountController implements AccountsApi {
     public ResponseEntity<AccountInfo> createAccount(AccountInfo account) {
         return new ResponseEntity<>(accountService.createAccount(account), HttpStatus.CREATED);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<AccountInfo> updateAccount(String accountNumber, AccountInfo accountInfo) {
+        return new ResponseEntity<>(accountService.updateAccount(accountNumber, accountInfo, UpdateType.UPDATE), HttpStatus.ACCEPTED);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<AccountInfo> patchAccount(String accountNumber, AccountInfo accountInfo) {
+        return new ResponseEntity<>(accountService.updateAccount(accountNumber, accountInfo, UpdateType.ADD), HttpStatus.ACCEPTED);
+    }
 
     /**
      * {@inheritDoc}
@@ -519,10 +535,18 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<IdentityInfo> updateAccountIdentity(String accountNumber, String contactNumber, IdentityInfo identity) {
         getAccountIdentity(accountNumber, contactNumber);
-        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, UpdateType.UPDATE), HttpStatus.ACCEPTED);
     }
     
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<IdentityInfo> patchAccountIdentity(String accountNumber, String contactNumber, IdentityInfo identity) {
+        getAccountIdentity(accountNumber, contactNumber);
+        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, UpdateType.ADD), HttpStatus.ACCEPTED);
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -618,7 +642,7 @@ public class AccountController implements AccountsApi {
 
                         if (onBoardingInfo.isOverwriteIdentity()) {
                             identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), 
-                                onBoardingInfo.getIdentity());
+                                onBoardingInfo.getIdentity(), UpdateType.UPDATE);
                         } else {
                             identityInfo = identityService.mapping(identity.get());
                         }

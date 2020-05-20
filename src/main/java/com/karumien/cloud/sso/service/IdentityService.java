@@ -249,7 +249,7 @@ public interface IdentityService {
      *            changes
      * @return {@link IdentityInfo} saved identity after changes
      */
-    IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity);
+    IdentityInfo updateIdentity(String contactNumber, IdentityInfo identity, UpdateType update);
 
     boolean isIdentityTemporaryLocked(String username);
 
@@ -277,7 +277,7 @@ public interface IdentityService {
 
     void resetPasswordUserActionNav4(String nav4Id, ClientRedirect clientRedirect);
 
-    IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity);
+    IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity, UpdateType update);
 
     void deleteIdentityNav4(String nav4Id);
 
