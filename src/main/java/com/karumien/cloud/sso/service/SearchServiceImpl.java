@@ -58,6 +58,15 @@ public class SearchServiceImpl implements SearchService {
     
     @Value("${keycloak.realm}")
     private String realm;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> getValueByAttributeOfUserId(IdentityPropertyType attribute, String userId) {
+        return userAttributeRepository.findValueByAttributeOfUserId(attribute.getValue(), userId);
+    }
     
     /**
      * {@inheritDoc}

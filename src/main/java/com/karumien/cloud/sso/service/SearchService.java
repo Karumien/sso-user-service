@@ -70,4 +70,6 @@ public interface SearchService {
     String getMasterGroupId(String masterGroup);
 
     Optional<String> findBinaryMaskForRole(String roleId);
+
+    List<String> getValueByAttributeOfUserId(IdentityPropertyType attribute, String userId);
 }

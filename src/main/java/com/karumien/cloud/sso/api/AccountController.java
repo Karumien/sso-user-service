@@ -33,12 +33,14 @@ import com.karumien.cloud.sso.api.handler.AccountsApi;
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.api.model.AccountPropertyType;
 import com.karumien.cloud.sso.api.model.AccountState;
+import com.karumien.cloud.sso.api.model.ClientRedirect;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.ErrorCode;
 import com.karumien.cloud.sso.api.model.ErrorData;
 import com.karumien.cloud.sso.api.model.ErrorDataCodeCredentials;
 import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
+import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityRoleInfo;
 import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
@@ -46,12 +48,15 @@ import com.karumien.cloud.sso.api.model.OnBoardingInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
+import com.karumien.cloud.sso.exceptions.RebirthNotFoundException;
+import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
 import com.karumien.cloud.sso.service.ModuleService;
 import com.karumien.cloud.sso.service.RebirthService;
 import com.karumien.cloud.sso.service.RoleService;
+import com.karumien.cloud.sso.service.SearchService;
 import com.karumien.cloud.sso.util.PageableUtils;
 import com.karumien.cloud.sso.util.TrippleDes;
 
@@ -88,6 +93,9 @@ public class AccountController implements AccountsApi {
     @Autowired
     private RebirthService rebirthService;
     
+    @Autowired
+    private SearchService searchService;
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -211,8 +219,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> searchSupportIdentityNav4(String nav4Id) {
-        // TODO Auto-generated method stub
-        return AccountsApi.super.searchSupportIdentityNav4(nav4Id);
+        return new ResponseEntity<>(supportIdentityNav4(nav4Id, false), HttpStatus.OK);
     }
     
     /**
@@ -220,10 +227,94 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> applySupportIdentityNav4(String nav4Id) {
-        // TODO Auto-generated method stub
-        return AccountsApi.super.applySupportIdentityNav4(nav4Id);
+        return new ResponseEntity<>(supportIdentityNav4(nav4Id, true), HttpStatus.OK);
     }
     
+    
+    private IdentityInfo supportIdentityNav4(String nav4Id, boolean apply) {
+        
+        switch (identityService.getIdentityStateByNav4(nav4Id)) {
+            case ACTIVE: 
+                IdentityInfo identityA = identityService.getIdentityByNav4(nav4Id);
+                identityA.setNote(addNote("Identity is " + identityA.getState() + " - no action needed - last successfully customer's login at " 
+                        + searchService.getValueByAttributeOfUserId(IdentityPropertyType.ATTR_LAST_LOGIN, identityA.getIdentityId())  
+                            + ", customer can use forgotten password flow with username = " + identityA.getUsername(), identityA.getNote()));
+                return identityA;
+
+            case CREATED: 
+            case CREDENTIALS_CREATED: 
+                IdentityInfo identityC = identityService.getIdentityByNav4(nav4Id);
+                if (apply) {
+                    ClientRedirect clientRedirect = new ClientRedirect();
+                    clientRedirect.setClientId("clientzone");
+                    clientRedirect.setRedirectUri("http://clients.eurowag.com/");
+                    identityService.resetPasswordUserActionNav4(nav4Id, clientRedirect);
+                    identityC.setNote(addNote("Identity is " + identityC.getState() + " - new reset email sent to "
+                        + identityC.getEmail() + ", username = " + identityC.getUsername(), identityC.getNote()));
+                } else {
+                    identityC.setNote(addNote("Identity is " + identityC.getState() + " - ready for new reset email send to "
+                        + identityC.getEmail() + ", username = " + identityC.getUsername(), identityC.getNote()));
+                }
+                return identityC;
+
+            case NOT_EXISTS:
+
+                try {
+                    IdentityInfo identityO = getOnboarding(nav4Id, false).getIdentity();
+                    
+                    if (apply) {
+                    
+                        ResponseEntity<IdentityInfo> response = rebirthIdentityNav4(nav4Id);
+                        IdentityInfo created = response.getBody();
+                        
+                        if (created.getState() == IdentityState.CREATED) {
+
+                            IdentityInfo identityCX = identityService.getIdentityByNav4(nav4Id);
+                            ClientRedirect clientRedirect = new ClientRedirect();
+                            clientRedirect.setClientId("clientzone");
+                            clientRedirect.setRedirectUri("http://clients.eurowag.com/");
+                            identityService.resetPasswordUserActionNav4(nav4Id, clientRedirect);
+                            identityCX.setNote(addNote("Identity created by /rebirth function from full NAV4 export, state " + identityCX.getState() + " - new reset email sent to "
+                                + identityCX.getEmail() + ", username = " + identityCX.getUsername(), identityCX.getNote()));
+                            return identityCX;
+                        } 
+                        
+                        created.setNote(addNote("Identity created by /rebirth function from full NAV4 export - customer can use old known password or use forgotten password flow with username = " + created.getUsername(), created.getNote()));
+                        return created;
+
+                    } else {
+                        identityO.setNote(addNote("Identity ready for /rebirth from full NAV4 export", identityO.getNote()));
+                        return identityO;
+                    }
+
+                } catch (IOException e) {
+                    
+                    IdentityInfo newCustomer = new IdentityInfo();
+                    newCustomer.setNav4Id(nav4Id);
+                    newCustomer.setState(IdentityState.NOT_EXISTS);
+                    newCustomer.setNote("IOException: Problem with /rebirth function - please contact SSO team (@SvobodaMiroslav) for investigate: nav4Id = "+nav4Id);
+                    return newCustomer;
+                    
+                    
+                } catch (RebirthNotFoundException e) {
+                    
+                    IdentityInfo newCustomer = new IdentityInfo();
+                    newCustomer.setNav4Id(nav4Id);
+                    newCustomer.setState(IdentityState.NOT_EXISTS);
+                    newCustomer.setNote("New customer - please contact CRM team (@StedryAdam) for migrate from CRM: nav4Id = "+nav4Id);
+                    return newCustomer;
+                }
+                
+            default:
+                throw new UnsupportedApiOperationException("Unknown type" + identityService.getIdentityStateByNav4(nav4Id));
+        }
+        
+    }
+
+    private String addNote(String message, String note) {
+        return message + (note == null ? "" : "\n" + note);
+    }
+
     /**
      * {@inheritDoc}
      */

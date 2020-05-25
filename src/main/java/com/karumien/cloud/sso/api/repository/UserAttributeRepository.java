@@ -36,5 +36,17 @@ public interface UserAttributeRepository extends JpaSpecificationExecutor<UserAt
      */
     @Query("select ua.userId from UserAttribute ua where ua.name = :attribute and ua.value = :value")
     List<String> findUserIdsByAttribute(@Param("attribute") String attribute, @Param("value") String value);
+    
+    /**
+     * Search Users by UserAttribute name and value.
+     * 
+     * @param attribute
+     *            name ie contactNumber
+     * @param userId
+     *            specific user by id
+     * @return {@link List} of attribute values
+     */
+    @Query("select ua.value from UserAttribute ua where ua.name = :attribute and ua.userId = :userId")
+    List<String> findValueByAttributeOfUserId(@Param("attribute") String attribute, @Param("userId") String userId);
 
 }
