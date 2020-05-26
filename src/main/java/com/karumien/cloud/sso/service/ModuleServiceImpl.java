@@ -170,7 +170,8 @@ public class ModuleServiceImpl implements ModuleService {
                 .filter(m -> !existingModules.contains(m))
                 .forEach(m -> activateModule(accountNumber, m));
             
-            accountService.getAccountIdentities(accountNumber, null, null)
+            accountService.getAccountIdentities(accountNumber, null, null).stream()
+                .filter(identity -> identity.getNav4Id() != null)
                 .forEach(identity -> {
                     if (Boolean.TRUE.equals(applyRoles)) {
                         identityService.updateRolesOfIdentity(identity.getIdentityId(), TLM_DEFAULT_ROLES, UpdateType.ADD, null);
