@@ -192,7 +192,8 @@ public class IdentityServiceImpl implements IdentityService {
         if (!StringUtils.hasText(identityInfo.getUsername())) {
             username = "generated-" + identityInfo.getContactNumber();
             if (StringUtils.hasText(identityInfo.getNav4Id())) {
-                username += "-n4-" + identityInfo.getNav4Id();
+                // P538-677 - only nav4id in username
+                username = identityInfo.getNav4Id();
             }
         }
 
