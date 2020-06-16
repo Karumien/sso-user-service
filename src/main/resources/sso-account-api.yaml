@@ -522,7 +522,8 @@ paths:
           description: Duplicate Identity with same CRM Contact Number
   /accounts/{accountNumber}/identities/roles:
     get:
-      summary: "Get detail of the given Identity"
+      summary: "Get identites roles filtered by CRM Contact IDs"
+      description: "Specific method for CSC"
       operationId: getAccountIdentitiesRoles
       parameters:
         - in: path
@@ -538,6 +539,34 @@ paths:
           collectionFormat: csv
           items:
             type: string
+      responses:
+        '200':
+          description: Successfully returned Identity's Roles
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/IdentityRoleInfo'
+        '410':
+          description: Identity or Account not found  
+    post:
+      summary: "Get identites roles filtered by CRM Contact IDs"
+      description: "Specific method for CSC"
+      operationId: getFilteredAccountIdentitiesRoles
+      parameters:
+        - in: path
+          name: accountNumber
+          description: Filtering by Account unique CRM ID
+          required: true
+          type: string
+        - in: body
+          description: "CRM Contacts IDs"
+          required: false
+          name: name
+          schema:
+            type: array
+            items:
+              type: string
+            example: ["C701523", "C708224"]
       responses:
         '200':
           description: Successfully returned Identity's Roles

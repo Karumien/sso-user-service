@@ -562,10 +562,19 @@ public class AccountController implements AccountsApi {
     }
     
     /**
+     * @deprecated use {@link #getFilteredAccountIdentitiesRoles(String, List)}
+     */
+    @Deprecated
+    @Override
+    public ResponseEntity<List<IdentityRoleInfo>> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
+        return new ResponseEntity<>(accountService.getAccountIdentitiesRoles(accountNumber, contactNumbers), HttpStatus.OK);
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityRoleInfo>> getAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
+    public ResponseEntity<List<IdentityRoleInfo>> getFilteredAccountIdentitiesRoles(String accountNumber, List<String> contactNumbers) {
         return new ResponseEntity<>(accountService.getAccountIdentitiesRoles(accountNumber, contactNumbers), HttpStatus.OK);
     }
     
