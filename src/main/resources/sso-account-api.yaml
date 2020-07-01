@@ -1151,7 +1151,7 @@ definitions:
       noUseEmailAsUsername:
         type: boolean
         description: "Dont't use email as username"
-      ExtendedInfo: 
+      extendedInfo: 
         $ref: "#/definitions/ExtendedInfo"
     example:
       identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
