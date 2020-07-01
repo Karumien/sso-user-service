@@ -7,8 +7,11 @@
 package com.karumien.cloud.sso.service;
 
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +40,7 @@ import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityState;
+import com.karumien.cloud.sso.api.model.LoginInfo;
 import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
@@ -101,7 +105,7 @@ public class IdentityServiceImpl implements IdentityService {
     public IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity, UpdateType update) {
         UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
         update(user, identity, update);
-        return getIdentityByNav4(nav4Id);
+        return getIdentityByNav4(nav4Id, false);
     }        
     
     private void update(UserRepresentation identity, IdentityInfo newIdentityInfo, UpdateType update) {
@@ -165,7 +169,7 @@ public class IdentityServiceImpl implements IdentityService {
 
         UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
         update(identity, identityInfo, update);
-        return getIdentity(contactNumber);
+        return getIdentity(contactNumber, false);
 
     }
     
@@ -370,21 +374,21 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo getIdentity(String contactNumber) {
-        return mapping(findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
+    public IdentityInfo getIdentity(String contactNumber, boolean withLoginInfo) {
+        return mapping(findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)), withLoginInfo);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<IdentityInfo> getIdentities(List<String> contactNumbers) {
+    public List<IdentityInfo> getIdentities(List<String> contactNumbers, boolean withLoginInfo) {
         
         List<IdentityInfo> data = new ArrayList<>();
         
         for (String contactNumber : contactNumbers) {
             searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber)
-                .forEach(userId -> data.add(mapping(keycloak.realm(realm).users().get(userId).toRepresentation())));
+                .forEach(userId -> data.add(mapping(keycloak.realm(realm).users().get(userId).toRepresentation(), withLoginInfo)));
         }
         
         return data;
@@ -433,7 +437,7 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo mapping(UserRepresentation userRepresentation) {
+    public IdentityInfo mapping(UserRepresentation userRepresentation, boolean withLoginInfo) {
 
         // TODO: Orica Mapper
         IdentityInfo identity = new IdentityInfo();
@@ -454,6 +458,17 @@ public class IdentityServiceImpl implements IdentityService {
         if (! Boolean.TRUE.equals(userRepresentation.isEnabled())) {
             identity.setLocked(true);     
         }
+        
+        if (withLoginInfo) {
+            LoginInfo loginInfo = new LoginInfo();
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");  
+            loginInfo.setCreated(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp())));
+            loginInfo.setLastLogin(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null));
+            loginInfo.setLastLogout(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null));
+            loginInfo.setLastLoginError(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null));
+            identity.setLoginInfo(loginInfo);
+        }
+        
         identity.setState(mappingIdentityState(userRepresentation));
         identity.setHasCredentials(identity.getState() != IdentityState.CREATED);
         return identity;
@@ -524,7 +539,7 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public IdentityInfo getIdentityByUsername(String username) {
-        return mapping(findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username = " + username)));
+        return mapping(findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username = " + username)), false);
     }
 
     /**
@@ -695,10 +710,10 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo getIdentityByNav4(String nav4Id) {
+    public IdentityInfo getIdentityByNav4(String nav4Id, boolean withLoginInfo) {
         String userId = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, nav4Id).stream().findFirst()
                 .orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
-        return mapping(keycloak.realm(realm).users().get(userId).toRepresentation());
+        return mapping(keycloak.realm(realm).users().get(userId).toRepresentation(), withLoginInfo);
     }
 
     /**
@@ -773,7 +788,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     private List<IdentityInfo> mappingIds(List<String> userIds) {
         return userIds.stream().map(id -> findUserRepresentationById(id))
-            .filter(f -> f.isPresent()).map(u -> mapping(u.get()))
+            .filter(f -> f.isPresent()).map(u -> mapping(u.get(), false))
             .collect(Collectors.toList());
     }
 

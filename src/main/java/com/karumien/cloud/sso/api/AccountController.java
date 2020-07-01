@@ -105,7 +105,7 @@ public class AccountController implements AccountsApi {
     /**
      * {@inheritDoc}
      */
-    @Override
+    @Override 
     public ResponseEntity<AccountInfo> createAccount(AccountInfo account) {
         return new ResponseEntity<>(accountService.createAccount(account), HttpStatus.CREATED);
     }
@@ -235,7 +235,7 @@ public class AccountController implements AccountsApi {
         
         switch (identityService.getIdentityStateByNav4(nav4Id)) {
             case ACTIVE: 
-                IdentityInfo identityA = identityService.getIdentityByNav4(nav4Id);
+                IdentityInfo identityA = identityService.getIdentityByNav4(nav4Id, true);
                 identityA.setNote(addNote("Identity is " + identityA.getState() + " - no action needed - last successfully customer's login at " 
                         + searchService.getValueByAttributeOfUserId(IdentityPropertyType.ATTR_LAST_LOGIN, identityA.getIdentityId())  
                             + ", customer can use forgotten password flow with username = " + identityA.getUsername(), identityA.getNote()));
@@ -243,7 +243,7 @@ public class AccountController implements AccountsApi {
 
             case CREATED: 
             case CREDENTIALS_CREATED: 
-                IdentityInfo identityC = identityService.getIdentityByNav4(nav4Id);
+                IdentityInfo identityC = identityService.getIdentityByNav4(nav4Id, false);
                 if (apply) {
                     ClientRedirect clientRedirect = new ClientRedirect();
                     clientRedirect.setClientId("clientzone");
@@ -269,7 +269,7 @@ public class AccountController implements AccountsApi {
                         
                         if (created.getState() == IdentityState.CREATED) {
 
-                            IdentityInfo identityCX = identityService.getIdentityByNav4(nav4Id);
+                            IdentityInfo identityCX = identityService.getIdentityByNav4(nav4Id, false);
                             ClientRedirect clientRedirect = new ClientRedirect();
                             clientRedirect.setClientId("clientzone");
                             clientRedirect.setRedirectUri("http://clients.eurowag.com/");
@@ -462,16 +462,17 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
-    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers), HttpStatus.OK);
+    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, Boolean loginInfo) {
+    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers, Boolean.TRUE.equals(loginInfo)), HttpStatus.OK);
     }
+    
         
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> getAccountIdentity(String accountNumber, String contactNumber) {
-        return new ResponseEntity<>(accountService.getAccountIdentity(accountNumber, contactNumber), HttpStatus.OK);
+    public ResponseEntity<IdentityInfo> getAccountIdentity(String accountNumber, String contactNumber, Boolean loginInfo) {
+        return new ResponseEntity<>(accountService.getAccountIdentity(accountNumber, contactNumber, Boolean.TRUE.equals(loginInfo)), HttpStatus.OK);
     }
 
     /**
@@ -488,7 +489,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> assignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         identityService.updateRolesOfIdentity(
-            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            accountService.getAccountIdentity(accountNumber, contactNumber, false).getIdentityId(), 
             Arrays.asList(roleId), UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -507,7 +508,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> assignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
-            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            accountService.getAccountIdentity(accountNumber, contactNumber, false).getIdentityId(), 
             roles, UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -518,7 +519,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> updateAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
-            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            accountService.getAccountIdentity(accountNumber, contactNumber, false).getIdentityId(), 
             roles, UpdateType.UPDATE, accountService.getAccountRolesRepresentation(accountNumber));
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
@@ -529,7 +530,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> unassignAccountIdentityRoles(String accountNumber, String contactNumber, List<String> roles) {
         identityService.updateRolesOfIdentity(
-            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            accountService.getAccountIdentity(accountNumber, contactNumber, false).getIdentityId(), 
             roles, UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -540,7 +541,7 @@ public class AccountController implements AccountsApi {
     @Override
     public ResponseEntity<Void> unassignAccountIdentityRole(String accountNumber, String contactNumber, String roleId) {
         identityService.updateRolesOfIdentity(
-            accountService.getAccountIdentity(accountNumber, contactNumber).getIdentityId(), 
+            accountService.getAccountIdentity(accountNumber, contactNumber, false).getIdentityId(), 
             Arrays.asList(roleId), UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -583,7 +584,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<String>> getAccountIdentityRoleIds(String accountNumber, String contactNumber) {
-        getAccountIdentity(accountNumber, contactNumber);
+        getAccountIdentity(accountNumber, contactNumber, false);
         
         // TODO: https://jira.eurowag.com/browse/P572-313
         return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber).stream()
@@ -597,7 +598,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<String>> getAccountIdentityRightIds(String accountNumber, String contactNumber) {
-        getAccountIdentity(accountNumber, contactNumber);
+        getAccountIdentity(accountNumber, contactNumber, false);
         return new ResponseEntity<>(accountService.getAccountRightsOfIdentity(contactNumber), HttpStatus.OK);
     }
     
@@ -615,7 +616,7 @@ public class AccountController implements AccountsApi {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ResponseEntity<Void> createIdentityCredentials(String accountNumber, String contactNumber, Credentials credentials) {
-        getAccountIdentity(accountNumber, contactNumber);
+        getAccountIdentity(accountNumber, contactNumber, false);
         try {
             identityService.createIdentityCredentials(contactNumber, credentials);
         } catch (PasswordPolicyException e) {            
@@ -634,7 +635,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> updateAccountIdentity(String accountNumber, String contactNumber, IdentityInfo identity) {
-        getAccountIdentity(accountNumber, contactNumber);
+        getAccountIdentity(accountNumber, contactNumber, false);
         return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, UpdateType.UPDATE), HttpStatus.ACCEPTED);
     }
     
@@ -643,7 +644,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> patchAccountIdentity(String accountNumber, String contactNumber, IdentityInfo identity) {
-        getAccountIdentity(accountNumber, contactNumber);
+        getAccountIdentity(accountNumber, contactNumber, false);
         return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, UpdateType.ADD), HttpStatus.ACCEPTED);
     }
     
@@ -744,7 +745,7 @@ public class AccountController implements AccountsApi {
                             identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), 
                                 onBoardingInfo.getIdentity(), UpdateType.UPDATE);
                         } else {
-                            identityInfo = identityService.mapping(identity.get());
+                            identityInfo = identityService.mapping(identity.get(), false);
                         }
                         
                         if (!CollectionUtils.isEmpty(onBoardingInfo.getRoles()) && onBoardingInfo.isOverwriteRoles()) {

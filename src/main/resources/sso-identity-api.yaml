@@ -47,6 +47,11 @@ paths:
           description: Filtering by Identity unique CRM Contact Number
           required: true
           type: string       
+        - name: loginInfo
+          in: query
+          description: Attach login informations 
+          required: false
+          type: boolean
       responses:
         '200':
           description: Successfully returned Identity's info
@@ -202,7 +207,12 @@ paths:
           in: path
           description: Filtering by Identity unique NAV4 ID
           required: true
-          type: string       
+          type: string      
+        - name: loginInfo
+          in: query
+          description: Attach login informations 
+          required: false
+          type: boolean
       responses:
         '200':
           description: Successfully returned Identity's info
@@ -1039,6 +1049,8 @@ definitions:
       noUseEmailAsUsername:
         type: boolean
         description: "Dont't use email as username"
+      loginInfo: 
+        $ref: "#/definitions/LoginInfo"
     example:
       identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034
@@ -1117,3 +1129,25 @@ definitions:
         type: array
         items:
           type: string
+  LoginInfo:
+    type: object
+    description: "Information about login"
+    properties:
+      created:
+        type: string
+        description: "Identity created information"
+        maxLength: 255
+      lastLogin:
+        type: string
+        description: "Last successfull login information"
+        maxLength: 255
+      lastLogout:
+        type: string
+        description: "Last successfull logout information"
+        maxLength: 255
+      lastLoginError:
+        type: string
+        description: "Last unsuccessfull login information"
+        maxLength: 255
+        
+        

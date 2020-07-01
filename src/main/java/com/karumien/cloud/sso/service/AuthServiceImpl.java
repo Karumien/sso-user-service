@@ -209,7 +209,7 @@ public class AuthServiceImpl implements AuthService {
         }
             
         UserRepresentation user = identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
-        IdentityInfo identityInfo = identityService.mapping(user);
+        IdentityInfo identityInfo = identityService.mapping(user, false);
         try {
             if (pin.equals(identityService.getPinOfIdentityDriver(identityInfo.getContactNumber()).getPin())) {
                 identityInfo.setBinaryRights(roleService.getRolesBinary(user));

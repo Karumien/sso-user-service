@@ -20,7 +20,9 @@ public enum IdentityPropertyType {
     ATTR_NAV4ID("nav4Id"),
     ATTR_BUSINESS_PRIORITY("businessPriority"),
     ATTR_HAS_CREDENTIALS("hasCredentials"),
-    ATTR_LAST_LOGIN("lastLogin");
+    ATTR_LAST_LOGIN("lastLogin"),
+    ATTR_LAST_LOGOUT("lastLogout"),
+    ATTR_LAST_LOGIN_ERROR("lastLoginError");
 
     private String value;
 

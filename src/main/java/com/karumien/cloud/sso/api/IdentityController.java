@@ -105,8 +105,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> getIdentity(String contactNumber) {
-        return new ResponseEntity<>(identityService.getIdentity(contactNumber), HttpStatus.OK);
+    public ResponseEntity<IdentityInfo> getIdentity(String contactNumber, Boolean loginInfo) {
+        return new ResponseEntity<>(identityService.getIdentity(contactNumber, Boolean.TRUE.equals(loginInfo)), HttpStatus.OK);
     }
 
     /**
@@ -132,7 +132,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRole(String contactNumber, String roleId) {
-        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), Arrays.asList(roleId), UpdateType.ADD, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber, false).getIdentityId(), Arrays.asList(roleId), UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
@@ -141,7 +141,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignIdentityRoles(String contactNumber, List<String> roles) {
-        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.ADD, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber, false).getIdentityId(), roles, UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
@@ -150,7 +150,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> updateIdentityRoles(String contactNumber, List<String> roles) {
-        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.UPDATE, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber, false).getIdentityId(), roles, UpdateType.UPDATE, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
@@ -159,7 +159,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRole(String contactNumber, String roleId) {
-        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber, false).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     
@@ -168,7 +168,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignIdentityRoles(String contactNumber, List<String> roles) {
-        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber).getIdentityId(), roles, UpdateType.DELETE, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentity(contactNumber, false).getIdentityId(), roles, UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -264,12 +264,12 @@ public class IdentityController implements IdentitiesApi {
         }
 
         if (StringUtils.hasText(contactNumber)) {
-            identityService.getIdentity(contactNumber);
+            identityService.getIdentity(contactNumber, false);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
         if (StringUtils.hasText(nav4Id)) {
-            identityService.getIdentityByNav4(nav4Id);
+            identityService.getIdentityByNav4(nav4Id, false);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
@@ -354,8 +354,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> getNav4Identity(String nav4Id) {
-    	IdentityInfo identity = identityService.getIdentityByNav4(nav4Id);
+    public ResponseEntity<IdentityInfo> getNav4Identity(String nav4Id, Boolean loginInfo) {
+    	IdentityInfo identity = identityService.getIdentityByNav4(nav4Id, Boolean.TRUE.equals(loginInfo));
     	return new ResponseEntity<IdentityInfo>(identity, identity != null ? HttpStatus.OK : HttpStatus.GONE);
     }
     
@@ -425,7 +425,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignNav4IdentityRole(String nav4Id, String roleId) {
-        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), Arrays.asList(roleId), UpdateType.ADD, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id, false).getIdentityId(), Arrays.asList(roleId), UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
     
@@ -434,7 +434,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> unassignNav4IdentityRole(String nav4Id, String roleId) {
-        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id, false).getIdentityId(), Arrays.asList(roleId), UpdateType.DELETE, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -451,7 +451,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> assignNav4IdentityRoles(String nav4Id, List<String> roles) {
-        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), roles, UpdateType.ADD, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id, false).getIdentityId(), roles, UpdateType.ADD, null);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
@@ -460,7 +460,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<Void> updateNav4IdentityRoles(String nav4Id, List<String> roles) {
-        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id).getIdentityId(), roles, UpdateType.UPDATE, null);
+        identityService.updateRolesOfIdentity(identityService.getIdentityByNav4(nav4Id, false).getIdentityId(), roles, UpdateType.UPDATE, null);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 

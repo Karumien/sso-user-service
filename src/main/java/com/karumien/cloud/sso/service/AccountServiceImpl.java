@@ -194,9 +194,9 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional(readOnly = true)
-    public IdentityInfo getAccountIdentity(String accountNumber, String contactNumber) {
+    public IdentityInfo getAccountIdentity(String accountNumber, String contactNumber, boolean withLoginInfo) {
         getAccount(accountNumber);
-        IdentityInfo identity = identityService.getIdentity(contactNumber);
+        IdentityInfo identity = identityService.getIdentity(contactNumber, withLoginInfo);
         if (accountNumber != null && accountNumber.equals(identity.getAccountNumber())) {
             return identity;
         }
@@ -232,7 +232,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers) {
+    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, boolean withLoginInfo) {
 
         List<IdentityInfo> identities = getAccountIdentitiesIds(accountNumber, contactNumbers).stream()
             .map(identityId -> identityService.findUserRepresentationById(identityId))
@@ -241,7 +241,7 @@ public class AccountServiceImpl implements AccountService {
             .filter(u -> searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).isPresent()
                  && searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).get().equals(accountNumber))
             .filter(u -> !StringUtils.hasText(roleId) || roleService.getIdentityRoles(u).contains(roleId))
-            .map(user -> identityService.mapping(user))
+            .map(user -> identityService.mapping(user, withLoginInfo))
             .collect(Collectors.toList());
         
         return identities;
@@ -253,7 +253,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional(readOnly = true)	
 	public boolean deleteAccountIdentity(String accountNumber, String contactNumber) {
-	    getAccountIdentity(accountNumber, contactNumber);	    
+	    getAccountIdentity(accountNumber, contactNumber, false);	    
 		identityService.deleteIdentity(contactNumber);
 		return true;
 	}

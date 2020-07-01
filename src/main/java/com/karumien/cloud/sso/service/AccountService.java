@@ -53,9 +53,12 @@ public interface AccountService {
      *            Filtered by roleId
      * @param contactNumbers
      *            IDs of identities for filter
+     * @param withIdentityInfo
+     *            attach informations about login
+     *            
      * @return {@link List} {@link IdentityInfo} list of identities
      */
-    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber);
+    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber, boolean withLoginInfo);
 
     /**
      * Return {@link IdentityInfo} for account and contact ID
@@ -64,9 +67,11 @@ public interface AccountService {
      *            Account CRM ID
      * @param contactNumber
      *            Contact CRM ID
+     * @param withIdentityInfo
+     *            attach informations about login
      * @return {@link IdentityInfo} identity info for selected crmContractId
      */
-    IdentityInfo getAccountIdentity(String accountNumber, String contactNumber);
+    IdentityInfo getAccountIdentity(String accountNumber, String contactNumber, boolean withIdentityInfo);
 
     /**
      * Remove identity from account members base on contact Id

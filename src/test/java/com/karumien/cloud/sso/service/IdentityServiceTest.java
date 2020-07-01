@@ -57,7 +57,7 @@ public class IdentityServiceTest {
     	identityService.deleteIdentity("CRM00001");
     	IdentityInfo identity = null;
 		try {
-			identity = identityService.getIdentity("CRM00001");
+			identity = identityService.getIdentity("CRM00001", false);
 		} catch (IdentityNotFoundException e) {
 			if (identity == null) {
 				identity = new IdentityInfo();

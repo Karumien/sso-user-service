@@ -52,6 +52,10 @@ public interface IdentityService {
 
     String ATTR_LAST_LOGIN = IdentityPropertyType.ATTR_LAST_LOGIN.getValue();
 
+    String ATTR_LAST_LOGOUT = IdentityPropertyType.ATTR_LAST_LOGOUT.getValue();
+
+    String ATTR_LAST_LOGIN_ERROR = IdentityPropertyType.ATTR_LAST_LOGIN_ERROR.getValue();
+
     /**
      * Create Identity in target SSO.
      * 
@@ -94,9 +98,11 @@ public interface IdentityService {
      * 
      * @param contactNumber
      *            unique Identity CRM ID
+     * @param withLoginInfo
+     *            attach login info informations
      * @return {@link IdentityInfo}
      */
-    IdentityInfo getIdentity(String contactNumber);
+    IdentityInfo getIdentity(String contactNumber, boolean withLoginInfo);
 
     /**
      * Return base information about Identity by {@code contactNumber}.
@@ -210,16 +216,19 @@ public interface IdentityService {
 
     boolean isActiveRole(String roleId, String contactNumber);
 
-    IdentityInfo mapping(UserRepresentation userRepresentation);
+    IdentityInfo mapping(UserRepresentation userRepresentation, boolean withLoginInfo);
 
     /**
      * Return identity base on nav4Id from request parameter
      * 
      * @param nav4Id
      *            {@link String} nav4Id id of identity we want to find
+     * @param withLoginInfo
+     *            attach login info informations
+     *            
      * @return {@link IdentityInfo} Identity we want to get
      */
-    IdentityInfo getIdentityByNav4(String nav4Id);
+    IdentityInfo getIdentityByNav4(String nav4Id, boolean withLoginInfo);
 
     /**
      * Returns list of user's required actions.
@@ -267,7 +276,7 @@ public interface IdentityService {
         }
     }
 
-    List<IdentityInfo> getIdentities(List<String> contactNumbers);
+    List<IdentityInfo> getIdentities(List<String> contactNumbers, boolean withLoginInfo);
 
     IdentityState getIdentityState(String contactNumber);
 
