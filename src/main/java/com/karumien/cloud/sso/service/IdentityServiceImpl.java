@@ -40,7 +40,7 @@ import com.karumien.cloud.sso.api.model.DriverPin;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityState;
-import com.karumien.cloud.sso.api.model.LoginInfo;
+import com.karumien.cloud.sso.api.model.ExtendedInfo;
 import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
@@ -460,13 +460,13 @@ public class IdentityServiceImpl implements IdentityService {
         }
         
         if (withLoginInfo) {
-            LoginInfo loginInfo = new LoginInfo();
+            ExtendedInfo extendedInfo = new ExtendedInfo();
             DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");  
-            loginInfo.setCreated(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp())));
-            loginInfo.setLastLogin(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null));
-            loginInfo.setLastLogout(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null));
-            loginInfo.setLastLoginError(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null));
-            identity.setLoginInfo(loginInfo);
+            extendedInfo.setCreated(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp())));
+            extendedInfo.setLastLogin(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null));
+            extendedInfo.setLastLogout(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null));
+            extendedInfo.setLastLoginError(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null));
+            identity.setExtendedInfo(extendedInfo);
         }
         
         identity.setState(mappingIdentityState(userRepresentation));

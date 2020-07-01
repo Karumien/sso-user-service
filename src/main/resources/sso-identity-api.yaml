@@ -47,7 +47,7 @@ paths:
           description: Filtering by Identity unique CRM Contact Number
           required: true
           type: string       
-        - name: loginInfo
+        - name: extendedInfo
           in: query
           description: Attach login informations 
           required: false
@@ -208,7 +208,7 @@ paths:
           description: Filtering by Identity unique NAV4 ID
           required: true
           type: string      
-        - name: loginInfo
+        - name: extendedInfo
           in: query
           description: Attach login informations 
           required: false
@@ -1049,8 +1049,8 @@ definitions:
       noUseEmailAsUsername:
         type: boolean
         description: "Dont't use email as username"
-      loginInfo: 
-        $ref: "#/definitions/LoginInfo"
+      extendedInfo: 
+        $ref: "#/definitions/ExtendedInfo"
     example:
       identityId: fe29248c-f3aa-4310-8fcf-91eacdd324xx
       accountNumber: 31034
@@ -1129,7 +1129,7 @@ definitions:
         type: array
         items:
           type: string
-  LoginInfo:
+  ExtendedInfo:
     type: object
     description: "Information about login"
     properties:
