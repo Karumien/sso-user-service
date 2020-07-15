@@ -306,7 +306,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<IdentityInfo>> searchIdentity(String identityId, String username, String accountNumber, String contactNumber,
-            String nav4Id, String email, String phone, String note, Boolean hasCredentials) {
+            String nav4Id, String email, String phone, String note, Boolean hasCredentials, Boolean extendedInfo) {
 
         Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ID, identityId);
@@ -327,7 +327,7 @@ public class IdentityController implements IdentitiesApi {
            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
-        List<IdentityInfo> found = identityService.search(searchFilter);
+        List<IdentityInfo> found = identityService.search(searchFilter, Boolean.TRUE.equals(extendedInfo));
         return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK);
     }
     

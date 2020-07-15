@@ -266,7 +266,7 @@ public interface IdentityService {
 
     void refreshBinaryRoles(UserResource userResource);
 
-    List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter);
+    List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter, boolean extendedInfo);
 
     Optional<UserRepresentation> findUserRepresentationById(String identityId);
 

@@ -925,6 +925,11 @@ paths:
           name: hasCredentials
           required: false
           type: boolean
+        - name: extendedInfo
+          in: query
+          description: Attach login informations 
+          required: false
+          type: boolean
       responses:
         '200':
           description: Return Identities specified by filter
@@ -1131,23 +1136,22 @@ definitions:
           type: string
   ExtendedInfo:
     type: object
-    description: "Information about login"
+    description: "Extended informations about identity"
     properties:
       created:
         type: string
-        description: "Identity created information"
-        maxLength: 255
+        format: date-time
+        description: "Identity created date/time"
       lastLogin:
         type: string
-        description: "Last successfull login information"
-        maxLength: 255
+        format: date-time
+        description: "Last successfull login date/time"
       lastLogout:
         type: string
-        description: "Last successfull logout information"
-        maxLength: 255
+        format: date-time
+        description: "Last successfull logout date/time"
       lastLoginError:
         type: string
-        description: "Last unsuccessfull login information"
-        maxLength: 255
-        
+        format: date-time
+        description: "Last unsuccessfull login date/time"
         

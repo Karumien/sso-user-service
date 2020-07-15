@@ -8,7 +8,13 @@ package com.karumien.cloud.sso.service;
 
 import java.net.URI;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,10 +43,10 @@ import com.karumien.cloud.sso.api.entity.AccountEntity;
 import com.karumien.cloud.sso.api.model.ClientRedirect;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
+import com.karumien.cloud.sso.api.model.ExtendedInfo;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityState;
-import com.karumien.cloud.sso.api.model.ExtendedInfo;
 import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
@@ -60,6 +66,8 @@ import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
  */
 @Service
 public class IdentityServiceImpl implements IdentityService {
+
+    private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -461,11 +469,11 @@ public class IdentityServiceImpl implements IdentityService {
         
         if (withLoginInfo) {
             ExtendedInfo extendedInfo = new ExtendedInfo();
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");  
-            extendedInfo.setCreated(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp())));
-            extendedInfo.setLastLogin(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null));
-            extendedInfo.setLastLogout(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null));
-            extendedInfo.setLastLoginError(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null));
+            DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);  
+            extendedInfo.setCreated(offset(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp()))));
+            extendedInfo.setLastLogin(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null)));
+            extendedInfo.setLastLogout(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null)));
+            extendedInfo.setLastLoginError(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null)));
             identity.setExtendedInfo(extendedInfo);
         }
         
@@ -474,6 +482,41 @@ public class IdentityServiceImpl implements IdentityService {
         return identity;
     }
 
+    private OffsetDateTime offset(String dateString) {
+        if (dateString == null || dateString.length() < 19) {
+            return null;
+        }
+        
+        if (dateString.length() > 19) {
+            dateString = dateString.substring(0, 19);
+        }
+        
+        try {
+            DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);  
+            Date date = dateFormat.parse(dateString);
+            
+            LocalDateTime time = convertToLocalDateViaInstant(date);
+            ZonedDateTime zoned = ZonedDateTime.of(time, ZoneId.of("UTC"));
+            ZonedDateTime zoned2 = zoned.withZoneSameInstant(ZoneId.systemDefault());
+            return zoned2.toOffsetDateTime();
+        } catch (ParseException e) {
+        }
+        
+        return null;
+    }
+    
+    protected LocalDateTime convertToLocalDateViaMilisecond(Date dateToConvert) {
+        return Instant.ofEpochMilli(dateToConvert.getTime())
+          .atZone(ZoneId.systemDefault())
+          .toLocalDateTime();
+    }
+
+    protected LocalDateTime convertToLocalDateViaInstant(Date dateToConvert) {
+        return dateToConvert.toInstant()
+          .atZone(ZoneId.systemDefault())
+          .toLocalDateTime();
+    }
+    
     /**
      * {@inheritDoc}
      */
@@ -745,13 +788,13 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter) {
+    public List<IdentityInfo> search(Map<IdentityPropertyType, String> searchFilter, boolean extendedInfo) {
 
         List<IdentityInfo> found = new ArrayList<>();
         
         IdentityPropertyType firstKey = searchFilter.keySet().stream()
             .findFirst().get();
-        found = mappingIds(searchService.findUserIdsByAttribute(firstKey, searchFilter.remove(firstKey)));
+        found = mappingIds(searchService.findUserIdsByAttribute(firstKey, searchFilter.remove(firstKey)), extendedInfo);
                     
         // filter other 
         for (IdentityPropertyType key : searchFilter.keySet()) {
@@ -786,9 +829,9 @@ public class IdentityServiceImpl implements IdentityService {
         }
     }
 
-    private List<IdentityInfo> mappingIds(List<String> userIds) {
+    private List<IdentityInfo> mappingIds(List<String> userIds, boolean extendedInfo) {
         return userIds.stream().map(id -> findUserRepresentationById(id))
-            .filter(f -> f.isPresent()).map(u -> mapping(u.get(), false))
+            .filter(f -> f.isPresent()).map(u -> mapping(u.get(), extendedInfo))
             .collect(Collectors.toList());
     }
 
