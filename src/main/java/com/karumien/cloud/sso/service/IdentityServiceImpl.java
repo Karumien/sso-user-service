@@ -843,8 +843,4 @@ public class IdentityServiceImpl implements IdentityService {
         return mappingIdentityState(findIdentityNav4(nav4Id).orElse(null));
     }
     
-    
-//    private List<IdentityInfo> mapping(List<UserRepresentation> users) {
-//        return users.stream().map(u -> mapping(u)).collect(Collectors.toList());
-//    }
 }
