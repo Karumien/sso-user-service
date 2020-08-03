@@ -7,6 +7,8 @@
 package com.karumien.cloud.sso.api;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -211,6 +213,11 @@ public class AccountController implements AccountsApi {
             }
             onboarding.setCredentials(credentials);
         }
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        onboarding.setNote((StringUtils.hasText(onboarding.getNote()) ? onboarding.getNote() + ", " : "")
+    		+ LocalDateTime.now().format(formatter) + "-RBRTH");
+        
         return onboarding;
     }
 

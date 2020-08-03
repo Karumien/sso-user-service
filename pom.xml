@@ -5,7 +5,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.6.RELEASE</version>
+        <version>2.2.9.RELEASE</version>
         <relativePath/>
     </parent>
 	
@@ -39,7 +39,7 @@
         <docker.repository.url>cloud.docker.com/repository/docker/karumien</docker.repository.url>
         <docker.tag>latest</docker.tag>
 		
-        <keycloak.version>9.0.3</keycloak.version>
+        <keycloak.version>10.0.1</keycloak.version>
 		<logstash-logback.version>6.2</logstash-logback.version>
 		<commons-io.version>2.6</commons-io.version>
 		

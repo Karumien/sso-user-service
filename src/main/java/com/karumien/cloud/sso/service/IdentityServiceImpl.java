@@ -133,11 +133,12 @@ public class IdentityServiceImpl implements IdentityService {
         if (!StringUtils.hasText(identity.getEmail()) || Boolean.TRUE.equals(identity.isEmailVerified())) {
             identity.getRequiredActions().remove(UserActionType.VERIFY_EMAIL.name());
         }
-        
-        if (StringUtils.hasText(identity.getEmail()) && !Boolean.TRUE.equals(identity.isEmailVerified())) {
-            identity.getRequiredActions().add(UserActionType.VERIFY_EMAIL.name());
-            changeEmailUserAction(identity.getId());
-        }        
+
+        // P538-590 
+//        if (StringUtils.hasText(identity.getEmail()) && !Boolean.TRUE.equals(identity.isEmailVerified())) {
+//            identity.getRequiredActions().add(UserActionType.VERIFY_EMAIL.name());
+//            changeEmailUserAction(identity.getId());
+//        }        
 
         if (StringUtils.hasText(newIdentityInfo.getPhone())) {
             identity.singleAttribute(ATTR_PHONE, newIdentityInfo.getPhone());
@@ -265,12 +266,16 @@ public class IdentityServiceImpl implements IdentityService {
 
         Response response = keycloak.realm(realm).users().create(identity);
         identityInfo.setIdentityId(getCreatedId(response));
-        identityInfo.setEmailVerified(identity.isEmailVerified());
+        
         identityInfo.setState(IdentityState.CREATED);
 
-        if (identity.getRequiredActions() != null && identity.getRequiredActions().contains(UserActionType.VERIFY_EMAIL.name())) {
-            changeEmailUserAction(identityInfo.getIdentityId());
-        }
+        // P538-590
+        identityInfo.setEmailVerified(true);
+//        identityInfo.setEmailVerified(identity.isEmailVerified());
+//        if (identity.getRequiredActions() != null && identity.getRequiredActions().contains(UserActionType.VERIFY_EMAIL.name())) {
+//            changeEmailUserAction(identityInfo.getIdentityId());
+//        }
+        
         
         // P538-381 Try change username if not used email in sso
         if (!Boolean.TRUE.equals(identityInfo.isNoUseEmailAsUsername()) 
