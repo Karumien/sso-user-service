@@ -39,7 +39,7 @@
         <docker.repository.url>cloud.docker.com/repository/docker/karumien</docker.repository.url>
         <docker.tag>latest</docker.tag>
 		
-        <keycloak.version>9.0.3</keycloak.version>
+        <keycloak.version>10.0.2</keycloak.version>
 		<logstash-logback.version>6.2</logstash-logback.version>
 		<commons-io.version>2.6</commons-io.version>
 		
