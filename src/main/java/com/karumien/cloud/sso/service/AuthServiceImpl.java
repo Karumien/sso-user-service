@@ -41,6 +41,7 @@ import com.karumien.cloud.sso.api.model.PasswordPolicy;
 import com.karumien.cloud.sso.api.model.UsernamePolicy;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
+import com.karumien.cloud.sso.exceptions.InvalidPinException;
 import com.karumien.cloud.sso.internal.AdvancedTokenConfig;
 import com.karumien.cloud.sso.internal.AdvancedTokenManager;
 
@@ -76,6 +77,9 @@ public class AuthServiceImpl implements AuthService {
    
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
+    
+    @Autowired
+    private SearchService searchService;
 
     protected AuthorizationResponse mapping(AccessTokenResponse token) {
         
@@ -209,15 +213,15 @@ public class AuthServiceImpl implements AuthService {
         }
             
         UserRepresentation user = identityService.findIdentityByUsername(username).orElseThrow(() -> new IdentityNotFoundException("username " + username));
-        IdentityInfo identityInfo = identityService.mapping(user, false);
-        try {
-            if (pin.equals(identityService.getPinOfIdentityDriver(identityInfo.getContactNumber()).getPin())) {
-                identityInfo.setBinaryRights(roleService.getRolesBinary(user));
-                return identityInfo;
-            }
-        } catch (AttributeNotFoundException e) {
-        }
-        return null;
+        String pinStored = searchService.getSimpleAttribute(user.getAttributes(), IdentityService.ATTR_DRIVER_PIN).orElseThrow(() -> new AttributeNotFoundException(IdentityService.ATTR_DRIVER_PIN));
+        
+        if (pin.equalsIgnoreCase(pinStored)) {
+            IdentityInfo identityInfo = identityService.mapping(user, false);
+            identityInfo.setBinaryRights(roleService.getRolesBinary(user));        	
+            return identityInfo;
+        } 
+        
+        throw new InvalidPinException("Invalid PIN for user " + username);
     }
 
     /**
