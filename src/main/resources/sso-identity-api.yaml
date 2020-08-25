@@ -301,8 +301,6 @@ paths:
           description: Successfully returned Identity's info
           schema:
             $ref: '#/definitions/IdentityState'
-        '409':
-          description: Duplicate Identity with same CRM Contact Number
   /identities/nav4/{nav4Id}/roles:
     get:
       summary: "Get Identity's Roles Ids"
@@ -441,8 +439,6 @@ paths:
       responses:
         '200':
           description: Identity has credentials
-        '409':
-          description: Duplicate Identity with same CRM Contact Number
         '410':
           description: Identity or Credentials Not Found
     post:

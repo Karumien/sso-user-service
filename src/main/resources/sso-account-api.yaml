@@ -850,6 +850,8 @@ paths:
       responses:
         '201':
           description: "Identity creadentials has been created or reset"
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
         '410':
           description: Identity or Account not found
         '422':
