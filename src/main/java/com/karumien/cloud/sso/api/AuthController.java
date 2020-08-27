@@ -88,7 +88,7 @@ public class AuthController implements AuthApi  {
             try {
                 switch (user.getGrantType()) {
                 case REFRESH_TOKEN:
-                    response = authService.loginByToken(user.getClientId(), user.getRefreshToken());
+                    response = authService.loginByToken(user.getClientId(), user.getClientSecret(), user.getRefreshToken());
                     break;
                 case PASSWORD:
                     response = authService.loginByUsernamePassword(user.getClientId(), user.getClientSecret(), user.getUsername(), user.getPassword());
@@ -114,14 +114,19 @@ public class AuthController implements AuthApi  {
                 }
             
             } catch (javax.ws.rs.BadRequestException e) {
-                // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
-                ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
-                    .errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class))
-                    .errdata(identityService.getUserRequiredActions(
-                        user.getUsername()).stream().map(a -> new ErrorData()
-                            .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
-                            .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
-                );        
+            	
+            	ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(401)
+    				.errmsg(JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class));	
+            		
+            	if (user.getGrantType() != GrantType.REFRESH_TOKEN) {
+	                // TODO: Fixed KeyCloak error for invalid CLIENT_CREDENTIALS returns 400 => means 401 unauthorized
+	                	error = error.errno(user.getGrantType() == GrantType.CLIENT_CREDENTIALS ? 402 : 400)
+	                    .errdata(identityService.getUserRequiredActions(
+	                        user.getUsername()).stream().map(a -> new ErrorData()
+	                            .description(messageSource.getMessage("user.action." + a.toLowerCase().replace('_', '-'), null, LocaleContextHolder.getLocale()))
+	                            .code(a.toLowerCase().replace('_', '-'))).collect(Collectors.toList())
+	                );        
+            	} 
                 
                 // update-password flow
                 if (StringUtils.hasText(user.getNewPassword()) && error.getErrdata().size() == 1 && UserActionType.UPDATE_PASSWORD.getValue().equals(error.getErrdata().get(0).getCode())) {
@@ -137,7 +142,11 @@ public class AuthController implements AuthApi  {
                 ErrorMessage error = new ErrorMessage().errcode(ErrorCode.ERROR).errno(errorNo).errmsg(errorMsg);
                 
                 switch (user.getGrantType()) {
-                case CLIENT_CREDENTIALS:
+                case REFRESH_TOKEN:
+                    errorNo = 405;
+                    errorMsg = messageSource.getMessage("client.missing.secret", null, LocaleContextHolder.getLocale());
+                    break;
+            	case CLIENT_CREDENTIALS:
                     errorNo = 402;
                     break;
                 case PIN:
@@ -161,7 +170,7 @@ public class AuthController implements AuthApi  {
                     break;
                 }
     
-                if (StringUtils.hasText(errorMsg)) {
+                if (!StringUtils.hasText(errorMsg)) {
                     errorMsg = JsonPath.parse((ByteArrayInputStream) e.getResponse().getEntity()).read("$.error_description", String.class);
                 }
                 error.errno(errorNo).errmsg(errorMsg);

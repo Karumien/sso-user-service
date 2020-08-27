@@ -185,14 +185,14 @@ public class AuthServiceImpl implements AuthService {
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationResponse loginByToken(String clientId, String refreshToken) {
+    public AuthorizationResponse loginByToken(String clientId, String clientSecrect, String refreshToken) {
         String client = StringUtils.hasText(clientId) ? clientId : this.clientId;
         MDC.put("clientId", client);
 
         ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder().connectionPoolSize(10);
 
         AdvancedTokenManager tokenManager = new AdvancedTokenManager(
-                new AdvancedTokenConfig(this.adminServerUrl, realm, null, null, client, null, OAuth2Constants.REFRESH_TOKEN),
+                new AdvancedTokenConfig(this.adminServerUrl, realm, null, null, client, clientSecrect, OAuth2Constants.REFRESH_TOKEN),
                 clientBuilder.build(), refreshToken);
         
         return mapping(tokenManager.getAccessToken());            
