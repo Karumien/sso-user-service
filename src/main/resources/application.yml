@@ -72,3 +72,6 @@ generator:
     numbers: ${GENERATOR_NUMBERS:0123456789}
     specials: ${GENERATOR_SPECIALS:"^$?!@%_-:#&"}
     all: ${GENERATOR_ALL:abcdefghijklmnopqrstuvwxyzABCDEFGJKLMNPRSTUVWXYZ0123456789^$?!@%_-:#&}
+azure:
+  application-insights:
+    instrumentation-key: ${INSIGHTS_INSTRUMENTATION_KEY:}
