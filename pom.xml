@@ -3,9 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-       <groupId>org.springframework.boot</groupId>
-	   <artifactId>spring-boot-starter-parent</artifactId>
-	   <version>2.3.4.RELEASE</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.4.RELEASE</version>
+        <relativePath/>
     </parent>
 	
 	<groupId>com.karumien.cloud.sso</groupId>
@@ -50,6 +51,8 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-shade-plugin.version>3.2.2</maven-shade-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+    
+    	<postgresql.version>42.2.14</postgresql.version><!-- problematic version 42.2.16  -->
     </properties>
 	
 	<developers>
@@ -256,13 +259,6 @@
 	
 	<build>
         <plugins>
-        	<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-compiler-plugin</artifactId>
-			    <configuration>
-			        <release>11</release>
-			    </configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
