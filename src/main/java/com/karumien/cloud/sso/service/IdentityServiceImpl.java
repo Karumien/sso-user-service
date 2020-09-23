@@ -408,16 +408,22 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}  
      */
     @Override
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
-        List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
-        if (userIds.size() > 1) {
-            throw new IdentityDuplicateException(contactNumber);
-        }
-        String userId = userIds.stream().findFirst().orElse(null);
-        return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());
+    	String searchedUserId = null;
+    	
+    	if (contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30) {
+    		searchedUserId = contactNumber; 
+    	} else { 
+	        List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
+	        if (userIds.size() > 1) {
+	            throw new IdentityDuplicateException(contactNumber);
+	        }
+	        searchedUserId = userIds.stream().findFirst().orElse(null);
+    	} 
+        return Optional.ofNullable(searchedUserId == null ? null : keycloak.realm(realm).users().get(searchedUserId).toRepresentation());
     }
 
     /**

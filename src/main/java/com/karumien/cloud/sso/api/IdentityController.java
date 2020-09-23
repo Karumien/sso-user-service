@@ -60,8 +60,8 @@ public class IdentityController implements IdentitiesApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> createIdentity(IdentityInfo Identity) {
-        return new ResponseEntity<>(identityService.createIdentity(Identity), HttpStatus.CREATED);
+    public ResponseEntity<IdentityInfo> createIdentity(IdentityInfo identity) {
+        return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.CREATED);
     }
 
     /**
