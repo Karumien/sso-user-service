@@ -42,6 +42,9 @@ public interface ModuleService {
         
         "ROLE_TLM08_LMM_R","ROLE_TLM08_LMT_R",
         
+        //deprecated roles
+        "ROLE_TLM05_EX_IE", "ROLE_TLM05_EX_R", "ROLE_TLM05_EX_W",
+        
         "ROLE_ADMIN","ROLE_DISPATCHER"
     );
 
