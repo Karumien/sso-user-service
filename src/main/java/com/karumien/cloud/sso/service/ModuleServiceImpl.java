@@ -21,6 +21,7 @@ import javax.ws.rs.NotFoundException;
 
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RoleResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,12 +172,14 @@ public class ModuleServiceImpl implements ModuleService {
                 .forEach(m -> activateModule(accountNumber, m));
             
             accountService.getAccountIdentities(accountNumber, null, null, false).stream()
-                .filter(identity -> identity.getNav4Id() != null)
+                .filter(identity -> identity.getContactNumber() != null && !identity.getContactNumber().contains("_"))
                 .forEach(identity -> {
-                    if (Boolean.TRUE.equals(applyRoles)) {
-                        identityService.updateRolesOfIdentity(identity.getIdentityId(), TLM_DEFAULT_ROLES, UpdateType.ADD, null);
+                    UserResource userResource = keycloak.realm(realm).users().get(identity.getIdentityId());
+                	if (Boolean.TRUE.equals(applyRoles)) {
+                    	identityService.updateRolesOfIdentity(identity.getIdentityId(), TLM_DEFAULT_ROLES, UpdateType.DELETE, null);
+                    	identityService.updateRolesOfIdentity(identity.getIdentityId(), TLM_DEFAULT_ROLES_2020, UpdateType.ADD, null);
                     }
-                    identityService.refreshBinaryRoles(keycloak.realm(realm).users().get(identity.getIdentityId()));
+                    identityService.refreshBinaryRoles(userResource);
                 });
         }
         

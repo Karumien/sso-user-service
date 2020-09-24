@@ -45,6 +45,9 @@ public interface ModuleService {
         "ROLE_ADMIN","ROLE_DISPATCHER"
     );
 
+    List<String> TLM_DEFAULT_ROLES_2020 = Arrays.asList(
+        "ROLE_TLM", "ROLE_ADMIN","ROLE_DISPATCHER"
+    );
 
     ModuleInfo getModule(String moduleId);
 
