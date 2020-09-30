@@ -26,21 +26,28 @@
  */
 package com.karumien.cloud.sso.service;
 
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.NumberUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.karumien.cloud.sso.api.dto.GroupInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -50,6 +57,7 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  * @since 1.0, 22. 8. 2019 18:59:57
  */
 @Service
+@Slf4j
 public class GroupServiceImpl implements GroupService {
 
     @Value("${keycloak.realm}")
@@ -67,55 +75,51 @@ public class GroupServiceImpl implements GroupService {
     @Autowired
     private LocalizationService localizationService;
     
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-        //TODO: apply buyed services
-        return keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)).toRepresentation()
-            .getSubGroups().stream()
-           .map(g -> mappingModule(g))
-           .collect(Collectors.toList());               
+    	return getSelfcareModulesFromResources().stream().map(rawModule -> convertToModuleInfo(rawModule)).collect(Collectors.toList()); 
     }
-    
-    private ModuleInfo mappingModule(GroupRepresentation group) {
 
-        // TODO viliam: Orica
+	private ModuleInfo convertToModuleInfo(GroupInfo rawModule) {
         ModuleInfo moduleInfo = new ModuleInfo();
-        moduleInfo.setName(group.getName());
-        moduleInfo.setModuleId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_MODULE_ID).orElse(null));
-        String businessPriority = searchService.getSimpleAttribute(group.getAttributes(), ATTR_BUSINESS_PRIORITY).orElse(null);
-        if (businessPriority != null) {
-            moduleInfo.setBusinessPriority(NumberUtils.parseNumber(businessPriority, Integer.class));
-        }
+        moduleInfo.setName(rawModule.getName());
+        moduleInfo.setModuleId(rawModule.getModuleId());
+        moduleInfo.setBusinessPriority(rawModule.getBusinessPriority());
         moduleInfo.setTranslation(localizationService.translate(
                 moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(), 
-                        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
+                		rawModule.getAttributes(), LocaleContextHolder.getLocale(), rawModule.getName()));
         
-        moduleInfo.setGroups(group.getSubGroups().stream()
-            .map(rg -> mappingRightGroup(rg))
-            .collect(Collectors.toList()));
+        moduleInfo.setGroups(rawModule.getGroups() == null ? null : rawModule.getGroups().stream().map(group -> convertToRightGroup(group)).collect(Collectors.toList()));
         return moduleInfo;
-    }
-    
-    private RightGroup mappingRightGroup(GroupRepresentation group) {
+	}
 
-        // TODO viliam: Orica
-        RightGroup rightGroup = new RightGroup();
+	private RightGroup convertToRightGroup(GroupInfo group) {
+		RightGroup rightGroup = new RightGroup();
         rightGroup.setName(group.getName());
-        rightGroup.setGroupId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_RIGHT_GROUP_ID).orElse(null));
-        rightGroup.setServiceId(searchService.getSimpleAttribute(group.getAttributes(), ATTR_SERVICE_ID).orElse(null));
-        String businessPriority = searchService.getSimpleAttribute(group.getAttributes(), ATTR_BUSINESS_PRIORITY).orElse(null);
-        if (businessPriority != null) {
-            rightGroup.setBusinessPriority(NumberUtils.parseNumber(businessPriority, Integer.class));
-        }
+        rightGroup.setGroupId(group.getModuleId());
+        rightGroup.setServiceId(group.getServiceId());
+        rightGroup.setBusinessPriority(group.getBusinessPriority());
         rightGroup.setTranslation(localizationService.translate(
                 rightGroup.getGroupId() == null ? null : "group" + "." + rightGroup.getGroupId().toLowerCase(), 
                         group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
         
         return rightGroup;
-    }
+	}
+
+	@Cacheable
+    public List<GroupInfo> getSelfcareModulesFromResources() {
+		try {
+		    List<GroupInfo> modules = Arrays.asList(new ObjectMapper().readValue(new ClassPathResource("json/modulesInfo.json").getFile(), GroupInfo[].class));
+		    return modules;
+		} catch (Exception ex) {
+		    log.error("Exception when reading modulesInfo resource JSON", ex);
+		    return List.of();
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
