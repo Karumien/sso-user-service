@@ -1,0 +1,1 @@
+[{"moduleId":"EMBEDDING","name":"Embedding","serviceId":null,"translation":null,"businessPriority":50,"groups":[{"moduleId":"EMBEDDING_CARD_LIST","name":"Card list","serviceId":"serviceId","translation":null,"businessPriority":20,"groups":null,"attributes":{"translation[cs]":["Seznam karet"]}}],"attributes":{"translation[cs]":["Embedding"]}}]
