@@ -69,7 +69,7 @@ create index ix_user_attribute_name_value on user_attribute(name, value);
 ---
 
 UPDATE 
-  PLUGIN_ACCOUNT a 
+   a 
 SET 
   locale = lca.locale 
 FROM (select account_id, locale from view_account_locales_max) as lca
@@ -124,3 +124,11 @@ where u.value = '73699'
 
 select r.name, u.* from user_role_mapping u right join keycloak_role r on (r.id = u.role_id)
 where u.user_id = 'f91ebe0e-4bec-4aae-b9fd-21a9da2f2aeb'
+
+---
+ALTER TABLE PLUGIN_ACCOUNT
+ADD CREATED timestamp NOT NULL 
+DEFAULT now()
+
+ALTER TABLE PLUGIN_ACCOUNT
+ADD UPDATED timestamp

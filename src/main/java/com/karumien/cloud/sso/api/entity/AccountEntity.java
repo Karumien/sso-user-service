@@ -7,10 +7,13 @@
 package com.karumien.cloud.sso.api.entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import lombok.Data;
@@ -48,6 +51,23 @@ public class AccountEntity implements Serializable {
     
     @Column(name = "LOCALE", length = 50)
     private String locale;
+    
+    @Column(name = "CREATED")
+    private LocalDateTime created;
+    
+    @Column(name = "UPDATED")
+    private LocalDateTime updated;
+    
+    @PrePersist 
+    public void beforeCreate() {
+    	created = LocalDateTime.now();
+    	updated = LocalDateTime.now();
+    }
+    
+    @PreUpdate 
+    public void beforeUpdate() {
+    	updated = LocalDateTime.now();
+    }
 
 }
 
