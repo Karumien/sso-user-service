@@ -38,9 +38,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.NumberUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.api.model.RoleInfo;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -50,6 +54,7 @@ import com.karumien.cloud.sso.api.model.RoleInfo;
  * @since 1.0, 22. 8. 2019 18:59:57
  */
 @Service
+@Slf4j
 public class GroupServiceImpl implements GroupService {
 
     @Value("${keycloak.realm}")
@@ -66,21 +71,31 @@ public class GroupServiceImpl implements GroupService {
 
     @Autowired
     private LocalizationService localizationService;
+
+    @Autowired
+    private ObjectMapper mapper; 
     
     /**
      * {@inheritDoc}
      */
     @Override
     public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-        //TODO: apply buyed services
-        return keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)).toRepresentation()
-            .getSubGroups().stream()
-           .map(g -> mappingModule(g))
-           .collect(Collectors.toList());               
+    	
+    	List<ModuleInfo> specification = keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)).toRepresentation()
+                .getSubGroups().stream()
+                .map(g -> mappingModule(g))
+                .collect(Collectors.toList());
+    	
+    	// FIXME: remove
+    	try {
+			log.info(mapper.writeValueAsString(specification));
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+        return specification;               
     }
     
     private ModuleInfo mappingModule(GroupRepresentation group) {
-
         // TODO viliam: Orica
         ModuleInfo moduleInfo = new ModuleInfo();
         moduleInfo.setName(group.getName());
