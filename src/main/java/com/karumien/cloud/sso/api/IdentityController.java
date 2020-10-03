@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -306,7 +307,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<IdentityInfo>> searchIdentity(String identityId, String username, String accountNumber, String contactNumber,
-            String nav4Id, String email, String phone, String note, Boolean hasCredentials, Boolean extendedInfo) {
+            String nav4Id, String email, String phone, String note, Boolean hasCredentials, Boolean extendedInfo, Boolean driver) {
 
         Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
         identityService.putIfPresent(searchFilter, IdentityPropertyType.ID, identityId);
@@ -328,8 +329,16 @@ public class IdentityController implements IdentitiesApi {
         }
 
         List<IdentityInfo> found = identityService.search(searchFilter, Boolean.TRUE.equals(extendedInfo));
+        if(driver != null) {
+        	found = found.stream().filter(identityInfo -> driver.booleanValue() == isDriverContactNumber(identityInfo.getContactNumber())).collect(Collectors.toList());
+        }
         return CollectionUtils.isEmpty(found) ? new ResponseEntity<>(HttpStatus.GONE) : new ResponseEntity<>(found, HttpStatus.OK);
     }
+    
+    private boolean isDriverContactNumber(String contactNumber) {
+		return contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30;
+	}
+
     
     /**
      * {@inheritDoc}

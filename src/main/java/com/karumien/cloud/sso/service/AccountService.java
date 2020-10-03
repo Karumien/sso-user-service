@@ -43,7 +43,6 @@ public interface AccountService {
 
     List<AccountInfo> getAccounts(String search, Pageable pageable);
 
-
     /**
      * Return all identidities that are under this account
      * 
@@ -51,6 +50,7 @@ public interface AccountService {
      *            Account CRM ID
      * @param roleId
      *            Filtered by roleId
+     * @param driver if specified, filters for only drivers / non-drivers
      * @param contactNumbers
      *            IDs of identities for filter
      * @param withIdentityInfo
@@ -58,7 +58,7 @@ public interface AccountService {
      *            
      * @return {@link List} {@link IdentityInfo} list of identities
      */
-    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber, boolean withLoginInfo);
+    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber, boolean withLoginInfo, Boolean driver);
 
     /**
      * Return {@link IdentityInfo} for account and contact ID
