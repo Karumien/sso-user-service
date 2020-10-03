@@ -78,7 +78,7 @@ paths:
           name: accountNumber
           description: Filtering by Account CRM ID
           required: true
-          type: string       
+          type: string 
       responses:
         '200':
           description: Successfully returned Account's info
@@ -323,7 +323,7 @@ paths:
           in: path
           description: Filtering by Account CRM ID
           required: true
-          type: string       
+          type: string  
         - in: body
           name: identity
           description: The Identity to create
@@ -361,6 +361,11 @@ paths:
         - name: extendedInfo
           in: query
           description: Attach login informations 
+          required: false
+          type: boolean
+        - name: driver
+          in: query
+          description: only drivers / non-drivers
           required: false
           type: boolean
       responses:

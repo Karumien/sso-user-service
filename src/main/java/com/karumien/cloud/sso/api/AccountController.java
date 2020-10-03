@@ -469,8 +469,8 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, Boolean loginInfo) {
-    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers, Boolean.TRUE.equals(loginInfo)), HttpStatus.OK);
+    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, Boolean loginInfo, Boolean driver) {
+    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers, Boolean.TRUE.equals(loginInfo), driver), HttpStatus.OK);
     }
     
         

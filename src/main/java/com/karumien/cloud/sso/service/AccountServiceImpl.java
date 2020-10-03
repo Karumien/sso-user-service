@@ -209,7 +209,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional(readOnly = true)
     public List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers) {
-
         List<String> userIds = null;
         
         // add all identities from account when no filter specified
@@ -221,20 +220,23 @@ public class AccountServiceImpl implements AccountService {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         }
-        
-        return userIds;
-        
-    }
-    
 
-    /**
+        return userIds;
+    }
+
+    private boolean isDriverContactNumber(String contactNumber) {
+		return contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30;
+	}
+
+	/**
      * {@inheritDoc}
      */
     @Override
     @Transactional(readOnly = true)
-    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, boolean withLoginInfo) {
+    public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, boolean withLoginInfo, Boolean driver) {
 
         List<IdentityInfo> identities = getAccountIdentitiesIds(accountNumber, contactNumbers).stream()
+        	.filter(contactNumber -> driver == null || (driver.booleanValue() == isDriverContactNumber(contactNumber)))
             .map(identityId -> identityService.findUserRepresentationById(identityId))
             .filter(Optional::isPresent)
             .map(Optional::get)
