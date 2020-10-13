@@ -97,7 +97,12 @@ paths:
           in: path
           description: Filtering by Identity unique CRM Contact Number
           required: true
-          type: string       
+          type: string  
+        - name: cascade
+          in: query
+          description: Update all identities with same CRM Contact Number (ignore duplicity)
+          required: false
+          type: boolean     
         - name: identity
           in: body
           description: The Identity to update

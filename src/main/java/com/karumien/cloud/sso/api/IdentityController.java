@@ -356,7 +356,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<IdentityInfo> getNav4Identity(String nav4Id, Boolean loginInfo) {
     	IdentityInfo identity = identityService.getIdentityByNav4(nav4Id, Boolean.TRUE.equals(loginInfo));
-    	return new ResponseEntity<IdentityInfo>(identity, identity != null ? HttpStatus.OK : HttpStatus.GONE);
+    	return new ResponseEntity<>(identity, identity != null ? HttpStatus.OK : HttpStatus.GONE);
     }
     
     /**
@@ -377,15 +377,17 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> updateIdentity(String contactNumber, IdentityInfo identity) {
-        return new ResponseEntity<>( identityService.updateIdentity(contactNumber, identity, UpdateType.UPDATE), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, UpdateType.UPDATE), HttpStatus.ACCEPTED);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> patchIdentity(String contactNumber, IdentityInfo identity) {
-        return new ResponseEntity<>( identityService.updateIdentity(contactNumber, identity, UpdateType.ADD), HttpStatus.ACCEPTED);
+    public ResponseEntity<IdentityInfo> patchIdentity(String contactNumber, Boolean cascade, IdentityInfo identity) {
+        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, 
+    		Boolean.TRUE.equals(cascade) ? UpdateType.ADD_CASCADE : UpdateType.ADD), 
+    		HttpStatus.ACCEPTED);
     }
         
     /**
@@ -393,7 +395,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> updateNav4Identity(String nav4Id, IdentityInfo identity) {
-        return new ResponseEntity<>( identityService.updateIdentityNav4(nav4Id, identity, UpdateType.UPDATE), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(identityService.updateIdentityNav4(nav4Id, identity, UpdateType.UPDATE), HttpStatus.ACCEPTED);
     }
 
     /**
@@ -401,7 +403,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<IdentityInfo> patchNav4Identity(String nav4Id, IdentityInfo identity) {
-        return new ResponseEntity<>( identityService.updateIdentityNav4(nav4Id, identity, UpdateType.ADD), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(identityService.updateIdentityNav4(nav4Id, identity, UpdateType.ADD), HttpStatus.ACCEPTED);
     }
 
     /**
