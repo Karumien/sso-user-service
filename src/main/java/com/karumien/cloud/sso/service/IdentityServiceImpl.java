@@ -853,7 +853,7 @@ public class IdentityServiceImpl implements IdentityService {
         case ATTR_HAS_CREDENTIALS:
             return i.isHasCredentials() != null ? i.isHasCredentials().equals(Boolean.valueOf(value)) : false;
         case ATTR_NAV4ID:
-            return "".equals(value) && StringUtils.hasText(i.getNav4Id()) || value.equals(i.getNav4Id());
+            return "".equals(value) && !StringUtils.hasText(i.getNav4Id()) || value.equals(i.getNav4Id());
         case ATTR_PHONE:
             return value.equals(i.getPhone());
         default:
