@@ -931,6 +931,11 @@ paths:
           description: Attach login informations 
           required: false
           type: boolean
+        - name: driver
+          in: query
+          description: only drivers / non-drivers
+          required: false
+          type: boolean
       responses:
         '200':
           description: Return Identities specified by filter

@@ -22,8 +22,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.Size;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
@@ -56,7 +58,9 @@ import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
+import com.karumien.cloud.sso.exceptions.UnsupportedLocaleException;
 import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
+import com.karumien.cloud.sso.util.ValidationUtil;
 
 
 /**
@@ -84,7 +88,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private SearchService searchService;
-
+    
     /**
      * {@inheritDoc}
      */
@@ -154,7 +158,8 @@ public class IdentityServiceImpl implements IdentityService {
         }
 
         if (StringUtils.hasText(newIdentityInfo.getLocale())) {
-            identity.singleAttribute(ATTR_LOCALE, newIdentityInfo.getLocale());
+        	ValidationUtil.validateLocale(newIdentityInfo.getLocale());
+            identity.singleAttribute(ATTR_LOCALE, newIdentityInfo.getLocale().toLowerCase());
         } else {
             if (update == UpdateType.UPDATE) {
                 identity.getAttributes().remove(ATTR_LOCALE);
@@ -280,9 +285,12 @@ public class IdentityServiceImpl implements IdentityService {
             identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
-            // P538-375
-            identity.singleAttribute(ATTR_LOCALE, 
-                StringUtils.isEmpty(identityInfo.getLocale()) ? account.getLocale() : identityInfo.getLocale());
+        	//P538-541
+        	ValidationUtil.validateLocale(identityInfo.getLocale());
+        	identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale().toLowerCase());
+        } else {
+        	// P538-375
+        	identity.singleAttribute(ATTR_LOCALE, account.getLocale());
         }
 
         Response response = keycloak.realm(realm).users().create(identity);
@@ -317,7 +325,7 @@ public class IdentityServiceImpl implements IdentityService {
         return identityInfo;
     }
 
-    /**
+	/**
      * {@inheritDoc}
      */
     public String getCreatedId(Response response) {
