@@ -124,6 +124,7 @@ public class SearchServiceImpl implements SearchService {
                 if (account.isPresent()) {
                     return Arrays.asList(value);
                 }
+                break;
             default:
                 break;
             }

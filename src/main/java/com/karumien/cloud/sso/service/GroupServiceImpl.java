@@ -43,12 +43,12 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.dto.GroupInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 
 import lombok.extern.slf4j.Slf4j;
-
 
 /**
  * Implementation {@link AccountService} for Account Management.
@@ -60,54 +60,56 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GroupServiceImpl implements GroupService {
 
-    @Value("${keycloak.realm}")
-    private String realm;
+  @Value("${keycloak.realm}")
+  private String realm;    
+  
+  @Autowired
+  private Keycloak keycloak;
+    
+  @Autowired
+  private SearchService searchService;
+    
+  @Autowired
+  private RoleService roleService;
 
-    @Autowired
-    private Keycloak keycloak;
-    
-    @Autowired
-    private SearchService searchService;
-    
-    @Autowired
-    private RoleService roleService;
+  @Autowired
+  private LocalizationService localizationService;
 
-    @Autowired
-    private LocalizationService localizationService;
-    
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-    	return getSelfcareModulesFromResources().stream().map(rawModule -> convertToModuleInfo(rawModule)).collect(Collectors.toList()); 
-    }
+  @Autowired
+  private ObjectMapper mapper; 
+     
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
+  	return getSelfcareModulesFromResources().stream().map(rawModule -> convertToModuleInfo(rawModule)).collect(Collectors.toList()); 
+  }
 
-	private ModuleInfo convertToModuleInfo(GroupInfo rawModule) {
-        ModuleInfo moduleInfo = new ModuleInfo();
-        moduleInfo.setName(rawModule.getName());
-        moduleInfo.setModuleId(rawModule.getModuleId());
-        moduleInfo.setBusinessPriority(rawModule.getBusinessPriority());
-        moduleInfo.setTranslation(localizationService.translate(
-                moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(), 
-                		rawModule.getAttributes(), LocaleContextHolder.getLocale(), rawModule.getName()));
+  private ModuleInfo convertToModuleInfo(GroupInfo rawModule) {
+    ModuleInfo moduleInfo = new ModuleInfo();
+    moduleInfo.setName(rawModule.getName());
+    moduleInfo.setModuleId(rawModule.getModuleId());
+    moduleInfo.setBusinessPriority(rawModule.getBusinessPriority());
+    moduleInfo.setTranslation(localizationService.translate(
+      moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(), 
+   	    rawModule.getAttributes(), LocaleContextHolder.getLocale(), rawModule.getName()));
         
-        moduleInfo.setGroups(rawModule.getGroups() == null ? null : rawModule.getGroups().stream().map(group -> convertToRightGroup(group)).collect(Collectors.toList()));
-        return moduleInfo;
+    moduleInfo.setGroups(rawModule.getGroups() == null ? null : rawModule.getGroups().stream().map(group -> convertToRightGroup(group)).collect(Collectors.toList()));
+    return moduleInfo;
 	}
 
 	private RightGroup convertToRightGroup(GroupInfo group) {
 		RightGroup rightGroup = new RightGroup();
-        rightGroup.setName(group.getName());
-        rightGroup.setGroupId(group.getModuleId());
-        rightGroup.setServiceId(group.getServiceId());
-        rightGroup.setBusinessPriority(group.getBusinessPriority());
-        rightGroup.setTranslation(localizationService.translate(
-                rightGroup.getGroupId() == null ? null : "group" + "." + rightGroup.getGroupId().toLowerCase(), 
-                        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
+    rightGroup.setName(group.getName());
+    rightGroup.setGroupId(group.getModuleId());
+    rightGroup.setServiceId(group.getServiceId());
+    rightGroup.setBusinessPriority(group.getBusinessPriority());
+    rightGroup.setTranslation(localizationService.translate(
+      rightGroup.getGroupId() == null ? null : "group" + "." + rightGroup.getGroupId().toLowerCase(), 
+        group.getAttributes(), LocaleContextHolder.getLocale(), group.getName()));
         
-        return rightGroup;
+    return rightGroup;
 	}
 
 	@Cacheable

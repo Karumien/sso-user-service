@@ -171,7 +171,7 @@ public class ModuleServiceImpl implements ModuleService {
                 .filter(m -> !existingModules.contains(m))
                 .forEach(m -> activateModule(accountNumber, m));
             
-            accountService.getAccountIdentities(accountNumber, null, null, false).stream()
+            accountService.getAccountIdentities(accountNumber, null, null, false, null).stream()
                 .filter(identity -> identity.getContactNumber() != null && !identity.getContactNumber().contains("_"))
                 .forEach(identity -> {
                     UserResource userResource = keycloak.realm(realm).users().get(identity.getIdentityId());
@@ -203,7 +203,7 @@ public class ModuleServiceImpl implements ModuleService {
                 .filter(m -> modulesToDel.contains(m))
                 .forEach(m -> deactivateModule(accountNumber, m));
             
-            accountService.getAccountIdentities(accountNumber, null, null, false)
+            accountService.getAccountIdentities(accountNumber, null, null, false, null)
                 .forEach(identity -> identityService.refreshBinaryRoles(keycloak.realm(realm).users().get(identity.getIdentityId())));
         }
 

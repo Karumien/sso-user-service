@@ -18,11 +18,14 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.constraints.Size;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
@@ -55,7 +58,9 @@ import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
+import com.karumien.cloud.sso.exceptions.UnsupportedLocaleException;
 import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
+import com.karumien.cloud.sso.util.ValidationUtil;
 
 
 /**
@@ -83,7 +88,7 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private SearchService searchService;
-
+    
     /**
      * {@inheritDoc}
      */
@@ -153,7 +158,8 @@ public class IdentityServiceImpl implements IdentityService {
         }
 
         if (StringUtils.hasText(newIdentityInfo.getLocale())) {
-            identity.singleAttribute(ATTR_LOCALE, newIdentityInfo.getLocale());
+        	ValidationUtil.validateLocale(newIdentityInfo.getLocale());
+            identity.singleAttribute(ATTR_LOCALE, newIdentityInfo.getLocale().toLowerCase());
         } else {
             if (update == UpdateType.UPDATE) {
                 identity.getAttributes().remove(ATTR_LOCALE);
@@ -176,8 +182,25 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo, UpdateType update) {
 
-        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        update(identity, identityInfo, update);
+    	if (update == UpdateType.ADD_CASCADE) {
+    		
+	        List<UserRepresentation> identities = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber).stream()
+	        	.map(identity -> keycloak.realm(realm).users().get(identity).toRepresentation())
+    			.collect(Collectors.toList());
+
+	        if (identities.isEmpty()) {
+	        	 throw new IdentityNotFoundException(contactNumber);
+	        }
+	        
+	        identities.forEach(identity -> update(identity, identityInfo, UpdateType.ADD));
+	        
+    	} else {
+    	
+	        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+	        update(identity, identityInfo, update);
+
+    	}
+    	
         return getIdentity(contactNumber, false);
 
     }
@@ -197,10 +220,10 @@ public class IdentityServiceImpl implements IdentityService {
         // TODO: Username Policy validation
         String username = identityInfo.getUsername();
         
-        // P538-336 - first identity has same nav4id
-        if (!StringUtils.hasText(identityInfo.getNav4Id())) {
-            identityInfo.setNav4Id(identityInfo.getContactNumber());
-        }
+        // P538-336 - first identity has same nav4id - removed by P538-930
+        // if (!StringUtils.hasText(identityInfo.getNav4Id())) {
+        //   identityInfo.setNav4Id(identityInfo.getContactNumber());
+        // }
         
         if (!StringUtils.hasText(identityInfo.getUsername())) {
             username = "generated-" + identityInfo.getContactNumber();
@@ -247,8 +270,11 @@ public class IdentityServiceImpl implements IdentityService {
             }
             identity.singleAttribute(ATTR_NAV4ID, identityInfo.getNav4Id());
         } else {
-            if (!CollectionUtils.isEmpty(searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, identityInfo.getContactNumber()))) {
-                throw new IdentityDuplicateException("Identity with same contactNumber already exists, use nav4Id for uniqueness");
+        	Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
+        	searchFilter.put(IdentityPropertyType.ATTR_CONTACT_NUMBER, identityInfo.getContactNumber());
+        	searchFilter.put(IdentityPropertyType.ATTR_NAV4ID, "");
+        	if (!CollectionUtils.isEmpty(search(searchFilter, false))) {
+                throw new IdentityDuplicateException("Identity with same contactNumber already exists (empty nav4Id), use nav4Id for uniqueness");
             }
         }
 
@@ -259,9 +285,12 @@ public class IdentityServiceImpl implements IdentityService {
             identity.singleAttribute(ATTR_NOTE, identityInfo.getNote());
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
-            // P538-375
-            identity.singleAttribute(ATTR_LOCALE, 
-                StringUtils.isEmpty(identityInfo.getLocale()) ? account.getLocale() : identityInfo.getLocale());
+        	//P538-541
+        	ValidationUtil.validateLocale(identityInfo.getLocale());
+        	identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale().toLowerCase());
+        } else {
+        	// P538-375
+        	identity.singleAttribute(ATTR_LOCALE, account.getLocale());
         }
 
         Response response = keycloak.realm(realm).users().create(identity);
@@ -296,7 +325,7 @@ public class IdentityServiceImpl implements IdentityService {
         return identityInfo;
     }
 
-    /**
+	/**
      * {@inheritDoc}
      */
     public String getCreatedId(Response response) {
@@ -832,7 +861,7 @@ public class IdentityServiceImpl implements IdentityService {
         case ATTR_HAS_CREDENTIALS:
             return i.isHasCredentials() != null ? i.isHasCredentials().equals(Boolean.valueOf(value)) : false;
         case ATTR_NAV4ID:
-            return value.equals(i.getNav4Id());
+            return "".equals(value) && !StringUtils.hasText(i.getNav4Id()) || value.equals(i.getNav4Id());
         case ATTR_PHONE:
             return value.equals(i.getPhone());
         default:

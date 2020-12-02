@@ -78,7 +78,7 @@ paths:
           name: accountNumber
           description: Filtering by Account CRM ID
           required: true
-          type: string       
+          type: string 
       responses:
         '200':
           description: Successfully returned Account's info
@@ -121,6 +121,11 @@ paths:
           description: The Account to update/patch
           schema:
             $ref: '#/definitions/AccountInfo'
+        - name: cascade
+          in: query
+          description: Update all identities with same CRM Contact Number as CRM Account Number (non-migrated identities)
+          required: false
+          type: boolean
       responses:
         '202':
           description: Successfully updated/patched
@@ -323,7 +328,7 @@ paths:
           in: path
           description: Filtering by Account CRM ID
           required: true
-          type: string       
+          type: string  
         - in: body
           name: identity
           description: The Identity to create
@@ -361,6 +366,11 @@ paths:
         - name: extendedInfo
           in: query
           description: Attach login informations 
+          required: false
+          type: boolean
+        - name: driver
+          in: query
+          description: only drivers / non-drivers
           required: false
           type: boolean
       responses:
@@ -468,6 +478,11 @@ paths:
           description: Filtering by Identity unique CRM Contact Number
           required: true
           type: string  
+        - name: cascade
+          in: query
+          description: Update all identities with same CRM Contact Number (ignore duplicity)
+          required: false
+          type: boolean
         - name: identity
           in: body
           description: The Identity to update/patch

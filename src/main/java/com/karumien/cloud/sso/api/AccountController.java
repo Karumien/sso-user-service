@@ -124,8 +124,30 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<AccountInfo> patchAccount(String accountNumber, AccountInfo accountInfo) {
-        return new ResponseEntity<>(accountService.updateAccount(accountNumber, accountInfo, UpdateType.ADD), HttpStatus.ACCEPTED);
+    public ResponseEntity<AccountInfo> patchAccount(String accountNumber, AccountInfo accountInfo, Boolean cascade) {
+    	AccountInfo account = accountService.updateAccount(accountNumber, accountInfo, UpdateType.ADD);
+
+    	// cascade update identity with contactNumber = accountNumber
+    	if (Boolean.TRUE.equals(cascade)) {
+    		IdentityInfo identity = new IdentityInfo();
+    		
+    		if (StringUtils.hasText(accountInfo.getContactEmail())) {
+    			identity.setEmail(accountInfo.getContactEmail());
+    		}
+
+
+    		if (StringUtils.hasText(accountInfo.getName())) {
+    			identity.setFirstName(accountInfo.getName());
+    			identity.setLastName("");
+    		}
+    		
+    		// identity.setLocale(accountInfo.getLocale());
+			// identity.setPhone(accountInfo.getContactPhone());
+    		
+    		patchAccountIdentity(accountNumber, accountNumber, cascade, identity);
+    	}
+          		      		
+    	return new ResponseEntity<>(account, HttpStatus.ACCEPTED);
     }
 
     /**
@@ -469,8 +491,8 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, Boolean loginInfo) {
-    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers, Boolean.TRUE.equals(loginInfo)), HttpStatus.OK);
+    public ResponseEntity<List<IdentityInfo>> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, Boolean loginInfo, Boolean driver) {
+    	return new ResponseEntity<>(accountService.getAccountIdentities(accountNumber, roleId, contactNumbers, Boolean.TRUE.equals(loginInfo), driver), HttpStatus.OK);
     }
     
         
@@ -650,9 +672,11 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<IdentityInfo> patchAccountIdentity(String accountNumber, String contactNumber, IdentityInfo identity) {
+    public ResponseEntity<IdentityInfo> patchAccountIdentity(String accountNumber, String contactNumber, Boolean cascade, IdentityInfo identity) {
         getAccountIdentity(accountNumber, contactNumber, false);
-        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, UpdateType.ADD), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(identityService.updateIdentity(contactNumber, identity, 
+    		Boolean.TRUE.equals(cascade) ? UpdateType.ADD_CASCADE : UpdateType.ADD), 
+    		HttpStatus.ACCEPTED);
     }
     
     /**
