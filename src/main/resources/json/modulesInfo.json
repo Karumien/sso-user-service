@@ -1,1 +1,395 @@
-[{"moduleId":"EMBEDDING","name":"Embedding","serviceId":null,"translation":null,"businessPriority":50,"groups":[{"moduleId":"EMBEDDING_CARD_LIST","name":"Card list","serviceId":"serviceId","translation":null,"businessPriority":20,"groups":null,"attributes":{"translation[cs]":["Seznam karet"]}}],"attributes":{"translation[cs]":["Embedding"]}}]
+[
+	{
+		"moduleId": "FINANCE",
+		"name": "Finance",
+		"businessPriority": 10,
+		"groups": [
+			{
+				"groupId": "TRANSACTION",
+				"name": "Transactions",
+				"serviceId": "SERVICE_FINANCE",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Transakce"
+					]
+				}
+			},
+			{
+				"groupId": "BILLINGDOC",
+				"name": "Billing Documents",
+				"serviceId": "SERVICE_FINANCE",
+				"businessPriority": 2,
+				"attributes": {
+					"translation[cs]": [
+						"Fakturační dokumenty"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Finance"
+			]
+		}
+	},
+	{
+		"moduleId": "USER",
+		"name": "User management",
+		"businessPriority": 20,
+		"groups": [
+			{
+				"groupId": "MANAGEMENT",
+				"name": "User management",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Správa uživatelů"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Správa uživatelů"
+			]
+		}
+	},
+	{
+		"moduleId": "VEHICLES",
+		"name": "Vehicle and OBU management",
+		"businessPriority": 30,
+		"groups": [
+			{
+				"groupId": "MANAGEMENT",
+				"name": "Vehicle management",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Správa vozidel"
+					]
+				}
+			},
+			{
+				"groupId": "OBU",
+				"name": "OBU management",
+				"businessPriority": 2,
+				"attributes": {
+					"translation[cs]": [
+						"Správa OBU"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Správa vozidel a OBU"
+			]
+		}
+	},
+	{
+		"moduleId": "ORDERING",
+		"name": "Ordering",
+		"businessPriority": 40,
+		"groups": [
+			{
+				"groupId": "CREATE",
+				"name": "Place new order",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Vytvoření nové objednávky"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Objednávky"
+			]
+		}
+	},
+	{
+		"moduleId": "EMBEDDING",
+		"name": "Embedding",
+		"businessPriority": 50,
+		"groups": [
+			{
+				"groupId": "TOLL_REGISTRATION",
+				"name": "Toll registration",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Registrace mýtného"
+					]
+				}
+			},
+			{
+				"groupId": "VEHICLES_OBU",
+				"name": "List of vehicles",
+				"businessPriority": 2,
+				"attributes": {
+					"translation[cs]": [
+						"Seznam vozidel"
+					]
+				}
+			},
+			{
+				"groupId": "EWMC",
+				"name": "EWMC",
+				"businessPriority": 3,
+				"attributes": {
+					"translation[cs]": [
+						"EWMC"
+					]
+				}
+			},
+			{
+				"groupId": "EWMC_NEWCARD",
+				"name": "EWMC Ordering of new card",
+				"businessPriority": 4,
+				"attributes": {
+					"translation[cs]": [
+						"EWMC objednání nové karty"
+					]
+				}
+			},
+			{
+				"groupId": "EWMC_CARDLIST",
+				"name": "EWMC Card management",
+				"businessPriority": 5,
+				"attributes": {
+					"translation[cs]": [
+						"Správa karet EWMC"
+					]
+				}
+			},
+			{
+				"groupId": "ENERGY",
+				"name": "Energy",
+				"businessPriority": 8,
+				"attributes": {
+					"translation[cs]": [
+						"Energie"
+					]
+				}
+			},			
+			
+			{
+				"groupId": "EWMC_MODE",
+				"name": "EWMC Payment mode",
+				"businessPriority": 6,
+				"attributes": {
+					"translation[cs]": [
+						"Režim platby EWMC"
+					]
+				}
+			},
+			{
+				"groupId": "EWMC_TRANSACTIONS",
+				"name": "EWMC Transactions",
+				"businessPriority": 7,
+				"attributes": {
+					"translation[cs]": [
+						"EWMC transakce"
+					]
+				}
+			},
+			{
+				"groupId": "TOLL",
+				"name": "Toll",
+				"businessPriority": 9,
+				"attributes": {
+					"translation[cs]": [
+						"Mýto"
+					]
+				}
+			},
+			
+			{
+				"groupId": "TELEMATICS",
+				"name": "Telematics",
+				"businessPriority": 10,
+				"attributes": {
+					"translation[cs]": [
+						"Telematika"
+					]
+				}
+			},
+			{
+				"groupId": "TAX_REFUNDS",
+				"name": "Tax refunds",
+				"businessPriority": 11,
+				"attributes": {
+					"translation[cs]": [
+						"Vrácení daní"
+					]
+				}
+			},
+			{
+				"groupId": "WASH",
+				"name": "Wash",
+				"businessPriority": 15,
+				"attributes": {
+					"translation[cs]": [
+						"Myčka"
+					]
+				}
+			},
+			
+			{
+				"groupId": "PARKING",
+				"name": "Parking",
+				"businessPriority": 16,
+				"attributes": {
+					"translation[cs]": [
+						"Parkování"
+					]
+				}
+			},
+			{
+				"groupId": "PARTNER_SERVICES",
+				"name": "Partners services",
+				"businessPriority": 17,
+				"attributes": {
+					"translation[cs]": [
+						"Služby pro partnery"
+					]
+				}
+			},
+			{
+				"groupId": "MINIMAL_WAGES",
+				"name": "Posting of drivers",
+				"businessPriority": 18,
+				"attributes": {
+					"translation[cs]": [
+						"Zveřejňování řidičů"
+					]
+				}
+			},
+			{
+				"groupId": "CARDS",
+				"name": "Cards - EW",
+				"businessPriority": 19,
+				"attributes": {
+					"translation[cs]": [
+						"Karty - EW"
+					]
+				}
+			},
+			{
+				"groupId": "CARD_LIST",
+				"name": "Card list",
+				"businessPriority": 20,
+				"attributes": {
+					"translation[cs]": [
+						"Seznam karet"
+					]
+				}
+			},
+			{
+				"groupId": "CARD_LOCKING",
+				"name": "Card locking system",
+				"translation": "Systém zamykání karet",
+				"businessPriority": 21,
+				"attributes": {
+					"translation[cs]": [
+						"Systém zamykání karet"
+					]
+				}
+			},
+			{
+				"groupId": "CARD_GPS_SECURITY",
+				"name": "GPS Security",
+				"businessPriority": 22,
+				"attributes": {
+					"translation[cs]": [
+						"Zabezpečení GPS"
+					]
+				}
+			},
+			{
+				"groupId": "CARD_ORDER",
+				"name": "Card order",
+				"businessPriority": 25,
+				"attributes": {
+					"translation[cs]": [
+						"Objednávka karty"
+					]
+				}
+			},
+			{
+				"groupId": "CARD_STATUS",
+				"name": "Status of card",
+				"businessPriority": 26,
+				"attributes": {
+					"translation[cs]": [
+						"Stav karty"
+					]
+				}
+			},
+			
+			{
+				"groupId": "DOWNLOADS",
+				"name": "Downloads",
+				"translation": "Stahování",
+				"businessPriority": 28,
+				"attributes": {
+					"translation[cs]": [
+						"Stahování"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Embedding"
+			]
+		}
+	},
+	{
+		"moduleId": "FACTORING",
+		"name": "Factoring",
+		"businessPriority": 60,
+		"groups": [
+			{
+				"groupId": "FACTORING",
+				"name": "Factoring",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Fakturace"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Fakturace"
+			]
+		}
+	},
+	{
+		"moduleId": "REPORTING",
+		"name": "Reporting",
+		"translation": "Přehledy",
+		"businessPriority": 70,
+		"groups": [
+			{
+				"groupId": "REPORTING",
+				"name": "Reporting",
+				"businessPriority": 10,
+				"attributes": {
+					"translation[cs]": [
+						"Přehledy"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Přehledy"
+			]
+		}
+	}
+]

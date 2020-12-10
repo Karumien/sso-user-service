@@ -15,16 +15,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.karumien.cloud.sso.api.entity.CredentialEntity;
-import com.karumien.cloud.sso.api.entity.UserEntity;
 
 /**
- * Repository for operations on {@link UserEntity}.
+ * Repository for operations on {@link CredentialEntity}.
  *
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 9. 12. 2019 19:11:25 
  */
 @Repository
-public interface CredentialRepository extends JpaSpecificationExecutor<UserEntity>, JpaRepository<CredentialEntity, String> {
+public interface CredentialRepository extends JpaSpecificationExecutor<CredentialEntity>, JpaRepository<CredentialEntity, String> {
     
     /**
      * Search credentials by user id and type.

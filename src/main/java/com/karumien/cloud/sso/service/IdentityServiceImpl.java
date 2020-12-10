@@ -22,10 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.validation.constraints.Size;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 
@@ -53,14 +51,15 @@ import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.UserActionType;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
+import com.karumien.cloud.sso.exceptions.ClientNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityDuplicateException;
 import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
-import com.karumien.cloud.sso.exceptions.UnsupportedLocaleException;
 import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
 import com.karumien.cloud.sso.util.ValidationUtil;
+import com.karumien.cloud.sso.api.repository.ClientRepository;
 
 
 /**
@@ -88,6 +87,9 @@ public class IdentityServiceImpl implements IdentityService {
 
     @Autowired
     private SearchService searchService;
+    
+    @Autowired
+    private ClientRepository clientRepository;
     
     /**
      * {@inheritDoc}
@@ -131,9 +133,12 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setLastName(patch(identity.getLastName(), newIdentityInfo.getLastName(), update));
         identity.setEmail(patch(identity.getEmail(), newIdentityInfo.getEmail(), update));
 
-        if (update == UpdateType.UPDATE || update == UpdateType.ADD && newIdentityInfo.isEmailVerified() != null) {
-            identity.setEmailVerified(Boolean.TRUE.equals(newIdentityInfo.isEmailVerified()) && StringUtils.hasText(newIdentityInfo.getEmail()));        
-        }
+//        if (update == UpdateType.UPDATE || update == UpdateType.ADD && newIdentityInfo.isEmailVerified() != null) {
+//            identity.setEmailVerified(Boolean.TRUE.equals(newIdentityInfo.isEmailVerified()) && StringUtils.hasText(newIdentityInfo.getEmail()));        
+//        }
+        
+        // P538-590
+        identity.setEmailVerified(true);
         
         if (!StringUtils.hasText(identity.getEmail()) || Boolean.TRUE.equals(identity.isEmailVerified())) {
             identity.getRequiredActions().remove(UserActionType.VERIFY_EMAIL.name());
@@ -704,9 +709,11 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void resetPasswordUserAction(String contactNumber, ClientRedirect clientRedirect) {
         UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-        if (!StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
+        
+        if (!StringUtils.hasText(user.getEmail()) || ! Boolean.TRUE.equals(user.isEmailVerified())) {
             throw new IdentityEmailNotExistsOrVerifiedException(contactNumber);
         }
+        
         callUserAction(user.getId(), UserActionType.UPDATE_PASSWORD,
             clientRedirect != null ? clientRedirect.getClientId() : null, 
             clientRedirect != null ? clientRedirect.getRedirectUri() : null);
@@ -727,13 +734,17 @@ public class IdentityServiceImpl implements IdentityService {
     }
 
     private void callUserAction(String identityId, UserActionType action, String clientId, String redirectUri) {
-        if (StringUtils.hasText(clientId) && StringUtils.hasText(redirectUri)) {
+
+    	if (clientId == null) {
             keycloak.realm(realm).users().get(identityId).executeActionsEmail(
-                clientId, redirectUri, Arrays.asList(action.name()));
-        } else {
-            keycloak.realm(realm).users().get(identityId).executeActionsEmail(
-                Arrays.asList(action.name()));            
-        }
+                    Arrays.asList(action.name()));                		
+    	}
+    	
+        keycloak.realm(realm).users().get(identityId).executeActionsEmail(
+            clientId, redirectUri == null ? 
+        		clientRepository.findClientByRealmAndClientId(realm, clientId)
+        			.orElseThrow(() -> new ClientNotFoundException(clientId)).getRedirectUri() : null,
+        		Arrays.asList(action.name()));
     }
 
     /**
