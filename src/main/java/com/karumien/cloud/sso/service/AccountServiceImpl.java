@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -392,7 +393,7 @@ public class AccountServiceImpl implements AccountService {
 	 */
     @Override
     public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
-        return groupService.getAccountHierarchy(accountNumber);
+        return groupService.getAccountHierarchy(accountNumber, LocaleContextHolder.getLocale());
     }
     
     /**

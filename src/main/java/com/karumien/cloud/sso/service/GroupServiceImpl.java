@@ -16,6 +16,7 @@ package com.karumien.cloud.sso.service;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.keycloak.admin.client.Keycloak;
@@ -24,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.dto.GroupInfo;
@@ -59,13 +60,16 @@ public class GroupServiceImpl implements GroupService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Value("classpath:json/modules.json")
+	private Resource modulesResource;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Cacheable
 	@Override
-	public List<ModuleInfo> getAccountHierarchy(String accountNumber) {
+	public List<ModuleInfo> getAccountHierarchy(String accountNumber, Locale locale) {
 		return getSelfcareModulesFromResources().stream().map(rawModule -> convertToModuleInfo(rawModule))
 				.collect(Collectors.toList());
 	}
@@ -76,8 +80,8 @@ public class GroupServiceImpl implements GroupService {
 		moduleInfo.setModuleId(rawModule.getModuleId());
 		moduleInfo.setBusinessPriority(rawModule.getBusinessPriority());
 		moduleInfo.setTranslation(localizationService.translate(
-				moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(),
-				rawModule.getAttributes(), LocaleContextHolder.getLocale(), rawModule.getName()));
+			moduleInfo.getModuleId() == null ? null : "module" + "." + moduleInfo.getModuleId().toLowerCase(),
+			rawModule.getAttributes(), LocaleContextHolder.getLocale(), rawModule.getName()));
 
 		moduleInfo.setGroups(rawModule.getGroups() == null ? null
 				: rawModule.getGroups().stream().map(group -> convertToRightGroup(group)).collect(Collectors.toList()));
@@ -100,7 +104,7 @@ public class GroupServiceImpl implements GroupService {
 	private List<GroupInfo> getSelfcareModulesFromResources() {
 		try {
 			return Arrays.asList(
-				mapper.readValue(ResourceUtils.getFile("classpath:json/modules.json"), GroupInfo[].class));
+				mapper.readValue(modulesResource.getInputStream(), GroupInfo[].class));
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}

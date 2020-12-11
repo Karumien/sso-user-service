@@ -7,6 +7,7 @@
 package com.karumien.cloud.sso.service;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.keycloak.representations.idm.RoleRepresentation;
 
@@ -38,7 +39,7 @@ public interface GroupService {
      *            Account CRM ID
      * @return {@link List} of {@link ModuleInfo} with right groups definitions
      */
-    List<ModuleInfo> getAccountHierarchy(String accountNumber);
+    List<ModuleInfo> getAccountHierarchy(String accountNumber, Locale locale);
 
     List<RoleInfo> getAccountRoles(String accountNumber);
 
