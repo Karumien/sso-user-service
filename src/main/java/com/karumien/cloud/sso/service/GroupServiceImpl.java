@@ -13,6 +13,7 @@
  */
 package com.karumien.cloud.sso.service;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,16 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karumien.cloud.sso.api.dto.GroupInfo;
 import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.RightGroup;
 import com.karumien.cloud.sso.api.model.RoleInfo;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation {@link AccountService} for Account Management.
@@ -41,7 +40,6 @@ import lombok.extern.slf4j.Slf4j;
  * @since 1.0, 22. 8. 2019 18:59:57
  */
 @Service
-@Slf4j
 public class GroupServiceImpl implements GroupService {
 
 	@Value("${keycloak.realm}")
@@ -102,10 +100,9 @@ public class GroupServiceImpl implements GroupService {
 	private List<GroupInfo> getSelfcareModulesFromResources() {
 		try {
 			return Arrays.asList(
-					mapper.readValue(new ClassPathResource("json/modulesInfo.json").getFile(), GroupInfo[].class));
-		} catch (Exception ex) {
-			log.error("Exception when reading modulesInfo resource JSON", ex);
-			return List.of();
+				mapper.readValue(ResourceUtils.getFile("classpath:json/modules.json"), GroupInfo[].class));
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 

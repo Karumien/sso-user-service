@@ -164,16 +164,7 @@
 					]
 				}
 			},
-			{
-				"groupId": "ENERGY",
-				"name": "Energy",
-				"businessPriority": 8,
-				"attributes": {
-					"translation[cs]": [
-						"Energie"
-					]
-				}
-			},			
+			
 			
 			{
 				"groupId": "EWMC_MODE",
@@ -195,6 +186,16 @@
 					]
 				}
 			},
+			{
+				"groupId": "ENERGY",
+				"name": "Energy",
+				"businessPriority": 8,
+				"attributes": {
+					"translation[cs]": [
+						"Energie"
+					]
+				}
+			},			
 			{
 				"groupId": "TOLL",
 				"name": "Toll",
