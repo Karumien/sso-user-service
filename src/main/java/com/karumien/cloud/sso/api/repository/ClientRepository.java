@@ -33,7 +33,7 @@ public interface ClientRepository extends JpaSpecificationExecutor<ClientEntity>
      * @param clientId client ID
      * @return {@link List} of credential IDs
      */
-    @Query("select ce.id from ClientEntity ce where ce.realm = :realm and ce.clientId = :clientId")
+    @Query("from ClientEntity ce where ce.realm = :realm and ce.clientId = :clientId")
     Optional<ClientEntity> findClientByRealmAndClientId(@Param("realm") String realm, @Param("clientId") String clientId);
 
 }

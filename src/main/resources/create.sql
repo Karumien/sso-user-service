@@ -128,7 +128,7 @@ where u.user_id = 'f91ebe0e-4bec-4aae-b9fd-21a9da2f2aeb'
 ---
 ALTER TABLE PLUGIN_ACCOUNT
 ADD CREATED timestamp NOT NULL 
-DEFAULT now()
+DEFAULT now();
 
 ALTER TABLE PLUGIN_ACCOUNT
-ADD UPDATED timestamp
+ADD UPDATED timestamp;
