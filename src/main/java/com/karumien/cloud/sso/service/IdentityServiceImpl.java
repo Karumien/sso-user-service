@@ -725,7 +725,7 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public void resetPasswordUserActionNav4(String nav4Id, ClientRedirect clientRedirect) {
         UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
-        if (!StringUtils.hasText(user.getEmail()) || !user.isEmailVerified()) {
+        if (!StringUtils.hasText(user.getEmail()) || ! Boolean.TRUE.equals(user.isEmailVerified())) {
             throw new IdentityEmailNotExistsOrVerifiedException("NAV4 ID: " + nav4Id);
         }
         callUserAction(user.getId(), UserActionType.UPDATE_PASSWORD,

@@ -830,6 +830,11 @@ paths:
       summary: "Check if credentials exists"
       operationId: hasAccountIdentityCredentials
       parameters:
+        - name: accountNumber
+          in: path
+          description: Filtering by Account CRM ID
+          required: true
+          type: string
         - name: contactNumber
           in: path
           description: Filtering by Identity unique CRM Contact Number

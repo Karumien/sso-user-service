@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
 
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.RoleResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,8 +77,8 @@ public class ModuleServiceImpl implements ModuleService {
         }
     }
     
-    public Optional<RoleResource> findModule(String moduleId) {
-        return roleService.findRoleResource(getRoleName(moduleId));
+    public Optional<RoleRepresentation> findModule(String moduleId) {
+        return roleService.findRoleRepresentation(getRoleName(moduleId));
     }
 
     /**
@@ -161,7 +160,7 @@ public class ModuleServiceImpl implements ModuleService {
         
         List<String> modulesToAdd = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
-            .map(module -> getModuleName(module.get().toRepresentation().getName()))
+            .map(module -> getModuleName(module.get().getName()))
             .collect(Collectors.toList());
         
         for (String accountNumber : accountNumbers) {
@@ -191,10 +190,10 @@ public class ModuleServiceImpl implements ModuleService {
     @Override
     @Transactional
     public void deactivateModules(List<String> modules, List<String> accountNumbers) {
-        
+    	
         List<String> modulesToDel = modules.stream().map(moduleId -> findModule(moduleId))
             .filter(module -> module.isPresent())
-            .map(module -> getModuleName(module.get().toRepresentation().getName()))
+            .map(module -> getModuleName(module.get().getName()))
             .collect(Collectors.toList());
         
         for (String accountNumber : accountNumbers) {
@@ -219,7 +218,7 @@ public class ModuleServiceImpl implements ModuleService {
             .map(m -> findModule(m))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .map(role -> mapping(role.toRepresentation()))
+            .map(role -> mapping(role))
             .collect(Collectors.toList());                
     }
 

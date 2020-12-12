@@ -376,12 +376,13 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> hasAccountIdentityCredentials(String contactNumber) {
-        IdentityState state = identityService.getIdentityState(contactNumber);
+    public ResponseEntity<Void> hasAccountIdentityCredentials(String accountNumber, String contactNumber) {
+    	accountService.getAccount(accountNumber);
+    	IdentityState state = identityService.getIdentityState(contactNumber);
         
         return new ResponseEntity<>(
             state == IdentityState.CREDENTIALS_CREATED || state == IdentityState.ACTIVE ?
-                HttpStatus.OK : HttpStatus.NOT_FOUND);  
+                HttpStatus.OK : HttpStatus.GONE);  
     }
     
     /**

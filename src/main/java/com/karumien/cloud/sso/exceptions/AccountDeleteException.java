@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 10. 6. 2019 13:56:31
  */
-@ResponseStatus(HttpStatus.GONE)
+@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 public class AccountDeleteException extends RuntimeException {
     
     private static final long serialVersionUID = 1L;

@@ -108,21 +108,30 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
-    public RoleInfo getRoleBaseOnId(String roleId) {
-        RoleResource role = findRoleResource(roleId).orElseThrow(() -> new RoleNotFoundException(roleId));
-        return transformRoleToBaseRole(role.toRepresentation(), role.getRoleComposites()); //RealmRoleComposites());
+    public RoleInfo getRoleBaseOnId(String roleId) {    	
+        RoleRepresentation role = findRoleRepresentation(roleId).orElseThrow(() -> new RoleNotFoundException(roleId));
+        return transformRoleToBaseRole(role, findRoleResource(roleId).getRoleComposites()); 
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<RoleRepresentation> findRoleRepresentation(String roleId) {
+        try {
+            return Optional.of(keycloak.realm(realm).roles().get(roleId).toRepresentation());
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
+    }
+    
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<RoleResource> findRoleResource(String roleName) {
-        try {
-            return Optional.of(keycloak.realm(realm).roles().get(roleName));
-        } catch (NotFoundException e) {
-            return Optional.empty();
-        }
+    public RoleResource findRoleResource(String roleName) {
+    	return keycloak.realm(realm).roles().get(roleName);
     }
     
     /**

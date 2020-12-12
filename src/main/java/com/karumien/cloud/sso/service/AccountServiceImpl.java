@@ -37,7 +37,6 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,21 +89,26 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional
-    public AccountInfo createAccount(AccountInfo account) {
-        
-        try {
-            
+    public AccountInfo createAccount(AccountInfo account) {    	
+//        try {
+
+        	// FIXME: why exception not work?
+        	if (account == null || accountEntityRepository.existsById(account.getAccountNumber())) {
+        		throw new AccountDuplicateException(account.getAccountNumber());
+        	}
+        	
             AccountEntity accountEntity = new AccountEntity();
             accountEntity.setAccountNumber(account.getAccountNumber());
             accountEntity.setName(account.getName());
             accountEntity.setCompRegNo(account.getCompRegNo());
             accountEntity.setNote(account.getNote());
             accountEntity.setContactEmail(account.getContactEmail());
+            accountEntity.setLocale(account.getLocale());
             
             return mapping(accountEntityRepository.save(accountEntity));
-        } catch (DuplicateKeyException e) {
-            throw new AccountDuplicateException(account.getAccountNumber());
-        }
+//        } catch (Exception e) {
+//            throw new AccountDuplicateException(account.getAccountNumber());
+//        }
     }
     
     private String patch(String oldValue, String newValue, UpdateType update) {
@@ -172,9 +176,12 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public void deleteAccount(String accountNumber) {
+    	findAccount(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber));
+    			
         if (!searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber).isEmpty()) {
             throw new AccountDeleteException(accountNumber);
         }        
+        
         accountEntityRepository.deleteById(accountNumber);
     }
 

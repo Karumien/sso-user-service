@@ -87,7 +87,7 @@ public interface RoleService {
      *            ID of role
      * @return {@link RoleResource} role resource specified by Role ID
      */
-    Optional<RoleResource> findRoleResource(String roleId);
+    RoleResource findRoleResource(String roleId);
 
     /**
      * Return roles binary representation for identity identified by {@code contactNumber}.
@@ -134,5 +134,6 @@ public interface RoleService {
         return !name.endsWith("_R") && !name.endsWith("_W") && !name.endsWith("_D") && !name.endsWith("_IE");
     }
 
+	Optional<RoleRepresentation> findRoleRepresentation(String roleId);
 
 }
