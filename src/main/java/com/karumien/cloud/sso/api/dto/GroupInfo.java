@@ -13,6 +13,9 @@ public class GroupInfo {
 	  @JsonProperty("moduleId")
 	  private String moduleId;
 
+	  @JsonProperty("groupId")
+	  private String groupId;
+
 	  @JsonProperty("name")
 	  private String name;
 	  

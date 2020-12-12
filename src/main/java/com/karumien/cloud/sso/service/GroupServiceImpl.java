@@ -91,7 +91,7 @@ public class GroupServiceImpl implements GroupService {
 	private RightGroup convertToRightGroup(GroupInfo group) {
 		RightGroup rightGroup = new RightGroup();
 		rightGroup.setName(group.getName());
-		rightGroup.setGroupId(group.getModuleId());
+		rightGroup.setGroupId(group.getGroupId());
 		rightGroup.setServiceId(group.getServiceId());
 		rightGroup.setBusinessPriority(group.getBusinessPriority());
 		rightGroup.setTranslation(localizationService.translate(
