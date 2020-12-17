@@ -765,7 +765,7 @@ public class AccountController implements AccountsApi {
                         MDC.put("nav4Id", onBoardingInfo.getIdentity().getNav4Id());                        
                         identity = identityService.findIdentityNav4(onBoardingInfo.getIdentity().getNav4Id());
                     } else {
-                        identity = identityService.findIdentity(onBoardingInfo.getIdentity().getContactNumber());
+                        identity = identityService.findIdentity(onBoardingInfo.getIdentity().getContactNumber(), true);
                     }
                     
                     IdentityInfo identityInfo = null;
@@ -773,7 +773,7 @@ public class AccountController implements AccountsApi {
                     if (identity.isPresent()) {
                         MDC.put("identityId", identity.get().getId());
 
-                        if (onBoardingInfo.isOverwriteIdentity()) {
+                        if (Boolean.TRUE.equals(onBoardingInfo.isOverwriteIdentity())) {
                             identityInfo = identityService.updateIdentity(onBoardingInfo.getIdentity().getContactNumber(), 
                                 onBoardingInfo.getIdentity(), UpdateType.UPDATE);
                         } else {

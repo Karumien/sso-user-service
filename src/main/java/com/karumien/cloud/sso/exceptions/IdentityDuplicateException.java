@@ -21,7 +21,7 @@ public class IdentityDuplicateException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public IdentityDuplicateException(String code) {
-        super("User's username exists: " + code);
+        super(code);
     }
     
 }

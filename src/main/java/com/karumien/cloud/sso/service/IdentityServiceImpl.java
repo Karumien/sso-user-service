@@ -49,6 +49,7 @@ import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityState;
 import com.karumien.cloud.sso.api.model.UserActionType;
+import com.karumien.cloud.sso.api.repository.ClientRepository;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.AttributeNotFoundException;
 import com.karumien.cloud.sso.exceptions.ClientNotFoundException;
@@ -59,7 +60,6 @@ import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
 import com.karumien.cloud.sso.util.ValidationUtil;
-import com.karumien.cloud.sso.api.repository.ClientRepository;
 
 
 /**
@@ -446,6 +446,14 @@ public class IdentityServiceImpl implements IdentityService {
      */
     @Override
     public Optional<UserRepresentation> findIdentity(String contactNumber) {
+    	return findIdentity(contactNumber, false);
+    }
+    
+    /**
+     * {@inheritDoc}  
+     */
+    @Override
+    public Optional<UserRepresentation> findIdentity(String contactNumber, boolean emptyNav4Id) {
     	String searchedUserId = null;
     	
     	if (contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30) {
@@ -453,9 +461,27 @@ public class IdentityServiceImpl implements IdentityService {
     	} else { 
 	        List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
 	        if (userIds.size() > 1) {
-	            throw new IdentityDuplicateException(contactNumber);
+	        	
+	        	// T012-197 : duplicity when no perfect one with nav4id=null;
+	        	// TODO: Performance optimize in DB
+
+	        	List<IdentityInfo> users = userIds.stream().map(id -> mapping(keycloak.realm(realm).users().get(id).toRepresentation(), false))
+	        		.filter(u -> StringUtils.isEmpty(u.getNav4Id()))
+	        		.collect(Collectors.toList());
+	        	
+	        	if (emptyNav4Id && users.isEmpty()) {
+	        		return Optional.empty();
+	        	}
+	        	
+	        	if (users.size() == 1) {
+		        	// TODO: double load  
+	        		searchedUserId = users.get(0).getIdentityId();
+	        	} else {
+	        		throw new IdentityDuplicateException("Identity with same contactNumber = '" + contactNumber + "' and no different nav4id exists");
+	        	}
+	        } else {
+	        	searchedUserId = userIds.stream().findFirst().orElse(null);
 	        }
-	        searchedUserId = userIds.stream().findFirst().orElse(null);
     	} 
         return Optional.ofNullable(searchedUserId == null ? null : keycloak.realm(realm).users().get(searchedUserId).toRepresentation());
     }
@@ -480,7 +506,7 @@ public class IdentityServiceImpl implements IdentityService {
     public Optional<UserRepresentation> findIdentityNav4(String nav4Id) {
         List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, nav4Id);
         if (userIds.size() > 1) {
-            throw new IdentityDuplicateException("nav4Id = " + nav4Id);
+            throw new IdentityDuplicateException("Identity with nav4Id = " + nav4Id + " exists.");
         }
         String userId = userIds.stream().findFirst().orElse(null);
         return Optional.ofNullable(userId == null ? null : keycloak.realm(realm).users().get(userId).toRepresentation());

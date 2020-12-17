@@ -191,6 +191,8 @@ public interface IdentityService {
 
     Optional<UserRepresentation> findIdentity(String contactNumber);
 
+    Optional<UserRepresentation> findIdentity(String contactNumber, boolean emptyNav4Id);
+
     Optional<UserRepresentation> findIdentityNav4(String nav4Id);
 
     Optional<UserRepresentation> findIdentityByUsername(String username);
