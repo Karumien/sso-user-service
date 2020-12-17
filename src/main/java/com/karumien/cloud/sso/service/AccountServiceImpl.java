@@ -93,7 +93,7 @@ public class AccountServiceImpl implements AccountService {
 //        try {
 
         	// FIXME: why exception not work?
-        	if (account == null || accountEntityRepository.existsById(account.getAccountNumber())) {
+        	if (accountEntityRepository.existsById(account.getAccountNumber())) {
         		throw new AccountDuplicateException(account.getAccountNumber());
         	}
         	
@@ -210,18 +210,29 @@ public class AccountServiceImpl implements AccountService {
         }
         throw new IdentityNotFoundException(contactNumber);
     }
+
     
     /**
      * {@inheritDoc}
      */
-    @Override
+	@Override
     @Transactional(readOnly = true)
     public List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers) {
-        List<String> userIds = null;
+		return getAccountIdentitiesIds(accountNumber, contactNumbers, null);
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+    @Transactional(readOnly = true)
+    public List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers, Boolean driver) {
+
+		List<String> userIds = null;
         
         // add all identities from account when no filter specified
         if (CollectionUtils.isEmpty(contactNumbers)) {
-            userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber);
+            userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber, driver);
         } else { 
             userIds = contactNumbers.stream()
                 .map(contactNumber -> searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber))
@@ -232,9 +243,9 @@ public class AccountServiceImpl implements AccountService {
         return userIds;
     }
 
-    private boolean isDriverContactNumber(String contactNumber) {
-		return contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30;
-	}
+//    private boolean isDriverContactNumber(String contactNumber) {
+//		return contactNumber != null && contactNumber.contains("_") && contactNumber.length() > 30;
+//	}
 
 	/**
      * {@inheritDoc}
@@ -243,18 +254,17 @@ public class AccountServiceImpl implements AccountService {
     @Transactional(readOnly = true)
     public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers, boolean withLoginInfo, Boolean driver) {
 
-        List<IdentityInfo> identities = getAccountIdentitiesIds(accountNumber, contactNumbers).stream()
-        	.filter(contactNumber -> driver == null || (driver.booleanValue() == isDriverContactNumber(contactNumber)))
-            .map(identityId -> identityService.findUserRepresentationById(identityId))
+       return getAccountIdentitiesIds(accountNumber, contactNumbers, driver).stream()
+        	//.filter(contactNumber -> driver == null || (driver.booleanValue() == isDriverContactNumber(contactNumber)))
+    		// TODO: DB representation
+    		.map(identityId -> identityService.findUserRepresentationById(identityId))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .filter(u -> searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).isPresent()
-                 && searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).get().equals(accountNumber))
+//            .filter(u -> searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).isPresent()
+//                 && searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).get().equals(accountNumber))
             .filter(u -> !StringUtils.hasText(roleId) || roleService.getIdentityRoles(u).contains(roleId))
             .map(user -> identityService.mapping(user, withLoginInfo))
             .collect(Collectors.toList());
-        
-        return identities;
     }
     
     /**
@@ -416,6 +426,7 @@ public class AccountServiceImpl implements AccountService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true) 
     public AccountState getAccountState(String accountNumber) {
         return mappingAccountState(findAccount(accountNumber).orElse(null));
     }

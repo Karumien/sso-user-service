@@ -67,6 +67,7 @@ public class SearchServiceImpl implements SearchService {
     public List<String> getValueByAttributeOfUserId(IdentityPropertyType attribute, String userId) {
         return userAttributeRepository.findValueByAttributeOfUserId(attribute.getValue(), userId);
     }
+
     
     /**
      * {@inheritDoc}
@@ -74,6 +75,15 @@ public class SearchServiceImpl implements SearchService {
     @Override
     @Transactional(readOnly = true)
     public List<String> findUserIdsByAttribute(IdentityPropertyType attribute, String value) {
+    	return findUserIdsByAttribute(attribute, value, null);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> findUserIdsByAttribute(IdentityPropertyType attribute, String value, Boolean driver) {
 
         if (attribute == IdentityPropertyType.ATTR_HAS_CREDENTIALS) {
             return credentialRepository.findUserIdByCredentialsType("password");
@@ -100,7 +110,9 @@ public class SearchServiceImpl implements SearchService {
             return userEntityRepository.findUserIdsByEmail(realm, value.toLowerCase());
         }
         
-        return userAttributeRepository.findUserIdsByAttribute(attribute.getValue(), value);
+        return driver != null ?
+        	userAttributeRepository.findUserIdsByAttribute(attribute.getValue(), value, driver) :
+    		userAttributeRepository.findUserIdsByAttribute(attribute.getValue(), value);
     }
     
     /**

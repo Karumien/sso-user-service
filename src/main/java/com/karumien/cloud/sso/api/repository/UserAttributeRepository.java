@@ -34,9 +34,23 @@ public interface UserAttributeRepository extends JpaSpecificationExecutor<UserAt
      *            specific value of attribute
      * @return {@link List} of User's IDs
      */
-    @Query("select ua.userId from UserAttribute ua where ua.name = :attribute and ua.value = :value")
+    @Query("select ua.user.id from UserAttribute ua where ua.name = :attribute and ua.value = :value")
     List<String> findUserIdsByAttribute(@Param("attribute") String attribute, @Param("value") String value);
     
+    /**
+     * Search Users by UserAttribute name and value.
+     * 
+     * @param attribute
+     *            name ie contactNumber
+     * @param value
+     *            specific value of attribute
+     * @param driver
+     * 			  specific query for driver
+     * @return {@link List} of User's IDs
+     */
+    @Query("select ua.user.id from UserAttribute ua where ua.name = :attribute and ua.value = :value and (:driver = true and ua.user.username like '%driver\\_%' or :driver = false and ua.user.username not like '%driver\\_%')")
+    List<String> findUserIdsByAttribute(@Param("attribute") String attribute, @Param("value") String value, @Param("driver") boolean driver);
+
     /**
      * Search Users by UserAttribute name and value.
      * 
@@ -46,7 +60,7 @@ public interface UserAttributeRepository extends JpaSpecificationExecutor<UserAt
      *            specific user by id
      * @return {@link List} of attribute values
      */
-    @Query("select ua.value from UserAttribute ua where ua.name = :attribute and ua.userId = :userId")
+    @Query("select ua.value from UserAttribute ua where ua.name = :attribute and ua.user.id = :userId")
     List<String> findValueByAttributeOfUserId(@Param("attribute") String attribute, @Param("userId") String userId);
 
 }

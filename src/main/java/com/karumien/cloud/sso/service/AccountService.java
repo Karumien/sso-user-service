@@ -127,4 +127,6 @@ public interface AccountService {
     AccountState getAccountState(String accountNumber);
 
     AccountInfo updateAccount(String accountNumber, AccountInfo accountInfo, UpdateType update);
+
+	List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers, Boolean driver);
 }

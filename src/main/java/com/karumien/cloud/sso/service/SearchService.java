@@ -35,6 +35,19 @@ public interface SearchService {
     List<String> findUserIdsByAttribute(IdentityPropertyType attribute, String value);
 
     /**
+     * Search Users by UserAttribute name and value.
+     * 
+     * @param attribute
+     *            attribute name ie. contactNumber
+     * @param value
+     *            specific value of attribute
+     * @param driver
+     * 			  specific filter for drivers
+     * @return {@link List} of User's IDs
+     */
+    List<String> findUserIdsByAttribute(IdentityPropertyType attribute, String value, Boolean driver);
+    
+    /**
      * Search Groups by UserAttribute name and value.
      * 
      * @param attribute
