@@ -1,4 +1,27 @@
 [
+
+	{
+		"moduleId": "DASHBOARD",
+		"name": "Dashboard",
+		"businessPriority": 0,
+		"groups": [
+			{
+				"groupId": "OVERVIEW",
+				"name": "Dashboard",
+				"businessPriority": 1,
+				"attributes": {
+					"translation[cs]": [
+						"Nástěnka"
+					]
+				}
+			}
+		],
+		"attributes": {
+			"translation[cs]": [
+				"Nástěnka"
+			]
+		}
+	},
 	{
 		"moduleId": "FINANCE",
 		"name": "Finance",
@@ -88,24 +111,24 @@
 		}
 	},
 	{
-		"moduleId": "ORDERING",
-		"name": "Ordering",
+		"moduleId": "TOLL",
+		"name": "Toll",
 		"businessPriority": 40,
 		"groups": [
 			{
-				"groupId": "CREATE",
-				"name": "Place new order",
+				"groupId": "ORDER",
+				"name": "Order",
 				"businessPriority": 1,
 				"attributes": {
 					"translation[cs]": [
-						"Vytvoření nové objednávky"
+						"Objednávka"
 					]
 				}
 			}
 		],
 		"attributes": {
 			"translation[cs]": [
-				"Objednávky"
+				"Mýto"
 			]
 		}
 	},
