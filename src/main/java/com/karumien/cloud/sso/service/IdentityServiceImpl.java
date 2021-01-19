@@ -134,6 +134,11 @@ public class IdentityServiceImpl implements IdentityService {
         identity.setLastName(patch(identity.getLastName(), newIdentityInfo.getLastName(), update));
         identity.setEmail(patch(identity.getEmail(), newIdentityInfo.getEmail(), update));
 
+        if ((update == UpdateType.ADD || update == UpdateType.UPDATE) 
+        		&& StringUtils.hasText(newIdentityInfo.getContactNumber())) {
+            identity.singleAttribute(ATTR_CONTACT_NUMBER, newIdentityInfo.getContactNumber());
+        }
+        
 //        if (update == UpdateType.UPDATE || update == UpdateType.ADD && newIdentityInfo.isEmailVerified() != null) {
 //            identity.setEmailVerified(Boolean.TRUE.equals(newIdentityInfo.isEmailVerified()) && StringUtils.hasText(newIdentityInfo.getEmail()));        
 //        }
