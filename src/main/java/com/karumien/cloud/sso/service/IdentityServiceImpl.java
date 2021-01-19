@@ -41,6 +41,7 @@ import org.springframework.util.StringUtils;
 
 import com.karumien.cloud.sso.api.UpdateType;
 import com.karumien.cloud.sso.api.entity.AccountEntity;
+import com.karumien.cloud.sso.api.entity.ClientEntity;
 import com.karumien.cloud.sso.api.model.ClientRedirect;
 import com.karumien.cloud.sso.api.model.Credentials;
 import com.karumien.cloud.sso.api.model.DriverPin;
@@ -766,11 +767,12 @@ public class IdentityServiceImpl implements IdentityService {
                     Arrays.asList(action.name()));                		
     	}
     	
+    	ClientEntity client = clientRepository.findClientByRealmAndClientId(realm, clientId)
+			.orElseThrow(() -> new ClientNotFoundException(clientId));
+    	
         keycloak.realm(realm).users().get(identityId).executeActionsEmail(
-            clientId, redirectUri == null ? 
-        		clientRepository.findClientByRealmAndClientId(realm, clientId)
-        			.orElseThrow(() -> new ClientNotFoundException(clientId)).getRedirectUri() : null,
-        		Arrays.asList(action.name()));
+    		client.getClientId(), redirectUri != null ? redirectUri : client.getRedirectUri(),
+    		Arrays.asList(action.name()));
     }
 
     /**
