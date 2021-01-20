@@ -120,11 +120,11 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public IdentityInfo updateIdentityNav4(String nav4Id, IdentityInfo identity, UpdateType update) {
         UserRepresentation user = findIdentityNav4(nav4Id).orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
-        update(user, identity, update);
-        return getIdentityByNav4(nav4Id, false);
+        return mapping(update(user, identity, update), false);
+        //return getIdentityByNav4(nav4Id, false);
     }        
     
-    private void update(UserRepresentation identity, IdentityInfo newIdentityInfo, UpdateType update) {
+    private UserRepresentation update(UserRepresentation identity, IdentityInfo newIdentityInfo, UpdateType update) {
 
         if (StringUtils.hasText(newIdentityInfo.getUsername())) {
             identity.setUsername(newIdentityInfo.getUsername());
@@ -185,6 +185,7 @@ public class IdentityServiceImpl implements IdentityService {
             throw new UpdateIdentityException(e.getMessage());
         }
         
+        return identity;
     }
 
     /**
@@ -193,6 +194,8 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo, UpdateType update) {
 
+    	//String finalContactNumber = contactNumber;
+    	
     	if (update == UpdateType.ADD_CASCADE) {
     		
 	        List<UserRepresentation> identities = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber).stream()
@@ -208,7 +211,8 @@ public class IdentityServiceImpl implements IdentityService {
     	} else {
     	
 	        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-	        update(identity, identityInfo, update);
+	        return mapping(update(identity, identityInfo, update), false);
+	        //finalContactNumber = searchService.getSimpleAttribute(identity.getAttributes(), ATTR_CONTACT_NUMBER).orElse(contactNumber);
 
     	}
     	
