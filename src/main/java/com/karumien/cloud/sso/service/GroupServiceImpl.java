@@ -114,6 +114,7 @@ public class GroupServiceImpl implements GroupService {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Cacheable
 	public List<RoleInfo> getAccountRoles(String accountNumber) {
 		return roleService.getAccountRoles(
 				keycloak.realm(realm).groups().group(searchService.getMasterGroupId(SELFCARE_GROUP)), false);
