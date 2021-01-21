@@ -6,6 +6,8 @@
  */
 package com.karumien.cloud.sso.service;
 
+import static com.karumien.cloud.sso.util.ValidationUtil.validateAndFixLocale;
+
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -60,7 +62,6 @@ import com.karumien.cloud.sso.exceptions.IdentityEmailNotExistsOrVerifiedExcepti
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.exceptions.UpdateIdentityException;
-import com.karumien.cloud.sso.util.ValidationUtil;
 
 
 /**
@@ -169,8 +170,7 @@ public class IdentityServiceImpl implements IdentityService {
         }
 
         if (StringUtils.hasText(newIdentityInfo.getLocale())) {
-        	ValidationUtil.validateLocale(newIdentityInfo.getLocale());
-            identity.singleAttribute(ATTR_LOCALE, newIdentityInfo.getLocale().toLowerCase());
+            identity.singleAttribute(ATTR_LOCALE, validateAndFixLocale(newIdentityInfo.getLocale()));
         } else {
             if (update == UpdateType.UPDATE) {
                 identity.getAttributes().remove(ATTR_LOCALE);
@@ -301,8 +301,7 @@ public class IdentityServiceImpl implements IdentityService {
         }
         if (StringUtils.hasText(identityInfo.getLocale())) {
         	//P538-541
-        	ValidationUtil.validateLocale(identityInfo.getLocale());
-        	identity.singleAttribute(ATTR_LOCALE, identityInfo.getLocale().toLowerCase());
+        	identity.singleAttribute(ATTR_LOCALE, validateAndFixLocale(identityInfo.getLocale()));
         } else {
         	// P538-375
         	identity.singleAttribute(ATTR_LOCALE, account.getLocale());
