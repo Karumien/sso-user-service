@@ -770,17 +770,19 @@ public class IdentityServiceImpl implements IdentityService {
 
     private void callUserAction(String identityId, UserActionType action, String clientId, String redirectUri) {
 
+    	UserResource user = keycloak.realm(realm).users().get(identityId);
+    	List<String> actions = Arrays.asList(action.name());
+    	
     	if (clientId == null) {
-            keycloak.realm(realm).users().get(identityId).executeActionsEmail(
-                    Arrays.asList(action.name()));                		
+            user.executeActionsEmail(actions);
+            return;
     	}
     	
     	ClientEntity client = clientRepository.findClientByRealmAndClientId(realm, clientId)
 			.orElseThrow(() -> new ClientNotFoundException(clientId));
     	
-        keycloak.realm(realm).users().get(identityId).executeActionsEmail(
-    		client.getClientId(), redirectUri != null ? redirectUri : client.getRedirectUri(),
-    		Arrays.asList(action.name()));
+    	String redirect = redirectUri != null ? redirectUri : client.getRedirectUri();
+        user.executeActionsEmail(client.getClientId(), redirect, 86400, actions);
     }
 
     /**
