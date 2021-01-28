@@ -58,7 +58,7 @@ public interface AccountService {
      *            
      * @return {@link List} {@link IdentityInfo} list of identities
      */
-    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber, boolean withLoginInfo, Boolean driver);
+    List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumber, boolean extendedInfo, Boolean driver);
 
     /**
      * Return {@link IdentityInfo} for account and contact ID

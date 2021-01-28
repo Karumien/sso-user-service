@@ -436,21 +436,21 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo getIdentity(String contactNumber, boolean withLoginInfo) {
-        return mapping(findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)), withLoginInfo);
+    public IdentityInfo getIdentity(String contactNumber, boolean extendedInfo) {
+        return mapping(findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)), extendedInfo);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<IdentityInfo> getIdentities(List<String> contactNumbers, boolean withLoginInfo) {
+    public List<IdentityInfo> getIdentities(List<String> contactNumbers, boolean extendedInfo) {
         
         List<IdentityInfo> data = new ArrayList<>();
         
         for (String contactNumber : contactNumbers) {
             searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber)
-                .forEach(userId -> data.add(mapping(keycloak.realm(realm).users().get(userId).toRepresentation(), withLoginInfo)));
+                .forEach(userId -> data.add(mapping(keycloak.realm(realm).users().get(userId).toRepresentation(), extendedInfo)));
         }
         
         return data;
@@ -471,7 +471,7 @@ public class IdentityServiceImpl implements IdentityService {
     public Optional<UserRepresentation> findIdentity(String contactNumber, boolean emptyNav4Id) {
     	String searchedUserId = null;
     	
-    	if (contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30) {
+    	if (isIdentityId(contactNumber)) {
     		searchedUserId = contactNumber; 
     	} else { 
 	        List<String> userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
@@ -500,6 +500,10 @@ public class IdentityServiceImpl implements IdentityService {
     	} 
         return Optional.ofNullable(searchedUserId == null ? null : keycloak.realm(realm).users().get(searchedUserId).toRepresentation());
     }
+
+	private boolean isIdentityId(String contactNumber) {
+		return contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30;
+	}
 
     /**
      * {@inheritDoc}
@@ -531,7 +535,7 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo mapping(UserRepresentation userRepresentation, boolean withLoginInfo) {
+    public IdentityInfo mapping(UserRepresentation userRepresentation, boolean extendedInfo) {
 
         // TODO: Orica Mapper
         IdentityInfo identity = new IdentityInfo();
@@ -553,14 +557,14 @@ public class IdentityServiceImpl implements IdentityService {
             identity.setLocked(true);     
         }
         
-        if (withLoginInfo) {
-            ExtendedInfo extendedInfo = new ExtendedInfo();
+        if (extendedInfo) {
+            ExtendedInfo extendedInfoData = new ExtendedInfo();
             DateFormat dateFormat = new SimpleDateFormat(DEFAULT_DATE_TIME_FORMAT);  
-            extendedInfo.setCreated(offset(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp()))));
-            extendedInfo.setLastLogin(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null)));
-            extendedInfo.setLastLogout(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null)));
-            extendedInfo.setLastLoginError(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null)));
-            identity.setExtendedInfo(extendedInfo);
+            extendedInfoData.setCreated(offset(dateFormat.format(new Date(userRepresentation.getCreatedTimestamp()))));
+            extendedInfoData.setLastLogin(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN).orElse(null)));
+            extendedInfoData.setLastLogout(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGOUT).orElse(null)));
+            extendedInfoData.setLastLoginError(offset(searchService.getSimpleAttribute(userRepresentation.getAttributes(), ATTR_LAST_LOGIN_ERROR).orElse(null)));
+            identity.setExtendedInfo(extendedInfoData);
         }
         
         identity.setState(mappingIdentityState(userRepresentation));
@@ -848,10 +852,10 @@ public class IdentityServiceImpl implements IdentityService {
      * {@inheritDoc}
      */
     @Override
-    public IdentityInfo getIdentityByNav4(String nav4Id, boolean withLoginInfo) {
+    public IdentityInfo getIdentityByNav4(String nav4Id, boolean extendedInfo) {
         String userId = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_NAV4ID, nav4Id).stream().findFirst()
                 .orElseThrow(() -> new IdentityNotFoundException("NAV4 ID: " + nav4Id));
-        return mapping(keycloak.realm(realm).users().get(userId).toRepresentation(), withLoginInfo);
+        return mapping(keycloak.realm(realm).users().get(userId).toRepresentation(), extendedInfo);
     }
 
     /**
@@ -966,6 +970,19 @@ public class IdentityServiceImpl implements IdentityService {
         	user.getAttributes().remove(attributeCode);
             update(user);
         }
+	}
+
+	/**
+     * {@inheritDoc}
+     */
+	@Override
+	public List<IdentityInfo> getIdentityDuplicities(String contactNumber, boolean extendedInfo) {
+		if (isIdentityId(contactNumber)) {
+			return Arrays.asList(getIdentity(contactNumber, extendedInfo));
+		}
+		Map<IdentityPropertyType, String> searchFilter = new HashMap<>();
+		searchFilter.put(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber);
+		return search(searchFilter, extendedInfo);
 	}
     
 }

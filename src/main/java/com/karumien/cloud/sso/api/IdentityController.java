@@ -240,7 +240,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<DriverPin> getDriverPin(String contactNumber) {
-        return new ResponseEntity<>(identityService.getPinOfIdentityDriver(contactNumber), HttpStatus.OK);
+        return ResponseEntity.ok(identityService.getPinOfIdentityDriver(contactNumber));
     }
 
     /**
@@ -336,7 +336,7 @@ public class IdentityController implements IdentitiesApi {
     }
     
     private boolean isDriverContactNumber(String contactNumber) {
-		return contactNumber != null && contactNumber.contains("-") && contactNumber.length() > 30;
+		return contactNumber != null && contactNumber.contains("_") && contactNumber.length() > 10;
 	}
 
     
@@ -373,12 +373,12 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<String>> getIdentityRoleIds(String contactNumber) {
-        return new ResponseEntity<>(roleService.getIdentityRoles(contactNumber), HttpStatus.OK);
+        return ResponseEntity.ok(roleService.getIdentityRoles(contactNumber));
     }
 
     @Override
     public ResponseEntity<List<String>> getIdentityRightIds(String contactNumber) {
-        return new ResponseEntity<>(roleService.getIdentityRights(contactNumber), HttpStatus.OK);
+        return ResponseEntity.ok(roleService.getIdentityRights(contactNumber));
     }
 
     /**
@@ -428,7 +428,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<List<String>> getNav4IdentityRoleIds(String nav4Id) {
-        return new ResponseEntity<>(roleService.getIdentityRolesNav4(nav4Id), HttpStatus.OK);
+        return ResponseEntity.ok(roleService.getIdentityRolesNav4(nav4Id));
     }
     
     /**
@@ -454,7 +454,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<IdentityState> getIdentityState(String contactNumber) {
-        return new ResponseEntity<>(identityService.getIdentityState(contactNumber), HttpStatus.OK);
+        return ResponseEntity.ok(identityService.getIdentityState(contactNumber));
     }
 
     /**
@@ -480,7 +480,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<IdentityState> getNav4IdentityState(String nav4Id) {
-        return new ResponseEntity<>(identityService.getIdentityStateByNav4(nav4Id), HttpStatus.OK);
+        return ResponseEntity.ok(identityService.getIdentityStateByNav4(nav4Id));
     }
     
     /**
@@ -488,7 +488,7 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<String> getIdentityBinaryRights(String contactNumber) {
-        return new ResponseEntity<>(identityService.getSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS), HttpStatus.OK);
+        return ResponseEntity.ok(identityService.getSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS));
     }
 
     /**
@@ -507,6 +507,14 @@ public class IdentityController implements IdentitiesApi {
     public ResponseEntity<Void> deleteIdentityBinaryRights(String contactNumber) {
     	identityService.deleteSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS);
     	return new ResponseEntity<>(HttpStatus.NO_CONTENT);    	
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<List<IdentityInfo>> getIdentityDuplicities(String contactNumber, Boolean extendedInfo) {
+    	return ResponseEntity.ok(identityService.getIdentityDuplicities(contactNumber, Boolean.TRUE.equals(extendedInfo)));
     }
 
 }

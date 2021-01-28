@@ -193,9 +193,9 @@ public class AccountServiceImpl implements AccountService {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public IdentityInfo getAccountIdentity(String accountNumber, String contactNumber, boolean withLoginInfo) {
+	public IdentityInfo getAccountIdentity(String accountNumber, String contactNumber, boolean extendedInfo) {
 		getAccount(accountNumber);
-		IdentityInfo identity = identityService.getIdentity(contactNumber, withLoginInfo);
+		IdentityInfo identity = identityService.getIdentity(contactNumber, extendedInfo);
 		if (accountNumber != null && accountNumber.equals(identity.getAccountNumber())) {
 			return identity;
 		}
@@ -244,7 +244,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<IdentityInfo> getAccountIdentities(String accountNumber, String roleId, List<String> contactNumbers,
-			boolean withLoginInfo, Boolean driver) {
+			boolean extendedInfo, Boolean driver) {
 
 		return getAccountIdentitiesIds(accountNumber, contactNumbers, driver).stream()
 				// .filter(contactNumber -> driver == null || (driver.booleanValue() ==
@@ -255,7 +255,7 @@ public class AccountServiceImpl implements AccountService {
 //            .filter(u -> searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).isPresent()
 //                 && searchService.getSimpleAttribute(u.getAttributes(), IdentityService.ATTR_ACCOUNT_NUMBER).get().equals(accountNumber))
 				.filter(u -> !StringUtils.hasText(roleId) || roleService.getIdentityRoles(u).contains(roleId))
-				.map(user -> identityService.mapping(user, withLoginInfo)).collect(Collectors.toList());
+				.map(user -> identityService.mapping(user, extendedInfo)).collect(Collectors.toList());
 	}
 
 	/**

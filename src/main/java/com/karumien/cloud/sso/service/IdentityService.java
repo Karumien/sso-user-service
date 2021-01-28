@@ -98,11 +98,11 @@ public interface IdentityService {
      * 
      * @param contactNumber
      *            unique Identity CRM ID
-     * @param withLoginInfo
+     * @param extendedInfo
      *            attach login info informations
      * @return {@link IdentityInfo}
      */
-    IdentityInfo getIdentity(String contactNumber, boolean withLoginInfo);
+    IdentityInfo getIdentity(String contactNumber, boolean extendedInfo);
 
     /**
      * Return base information about Identity by {@code contactNumber}.
@@ -218,19 +218,19 @@ public interface IdentityService {
 
     boolean isActiveRole(String roleId, String contactNumber);
 
-    IdentityInfo mapping(UserRepresentation userRepresentation, boolean withLoginInfo);
+    IdentityInfo mapping(UserRepresentation userRepresentation, boolean extendedInfo);
 
     /**
      * Return identity base on nav4Id from request parameter
      * 
      * @param nav4Id
      *            {@link String} nav4Id id of identity we want to find
-     * @param withLoginInfo
+     * @param extendedInfo
      *            attach login info informations
      *            
      * @return {@link IdentityInfo} Identity we want to get
      */
-    IdentityInfo getIdentityByNav4(String nav4Id, boolean withLoginInfo);
+    IdentityInfo getIdentityByNav4(String nav4Id, boolean extendedInfo);
 
     /**
      * Returns list of user's required actions.
@@ -278,7 +278,7 @@ public interface IdentityService {
         }
     }
 
-    List<IdentityInfo> getIdentities(List<String> contactNumbers, boolean withLoginInfo);
+    List<IdentityInfo> getIdentities(List<String> contactNumbers, boolean extendedInfo);
 
     IdentityState getIdentityState(String contactNumber);
 
@@ -297,4 +297,6 @@ public interface IdentityService {
 	void setSimpleAttribute(String contactNumber, String attributeCode, String value);
 
 	void deleteSimpleAttribute(String contactNumber, String attributeCode);
+
+	List<IdentityInfo> getIdentityDuplicities(String contactNumber, boolean extendedInfo);
 }
