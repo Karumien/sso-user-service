@@ -292,4 +292,9 @@ public interface IdentityService {
 
     void deleteIdentityNav4(String nav4Id);
 
+	String getSimpleAttribute(String contactNumber, String attributeCode);
+
+	void setSimpleAttribute(String contactNumber, String attributeCode, String value);
+
+	void deleteSimpleAttribute(String contactNumber, String attributeCode);
 }

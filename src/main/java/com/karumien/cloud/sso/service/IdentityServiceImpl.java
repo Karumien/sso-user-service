@@ -177,7 +177,11 @@ public class IdentityServiceImpl implements IdentityService {
             }
         }
 
-        UserResource userResource = keycloak.realm(realm).users().get(identity.getId());
+        return update(identity);
+    }
+
+	private UserRepresentation update(UserRepresentation identity) {
+		UserResource userResource = keycloak.realm(realm).users().get(identity.getId());
 
         try {
             userResource.update(identity);
@@ -186,7 +190,9 @@ public class IdentityServiceImpl implements IdentityService {
         }
         
         return identity;
-    }
+	}
+    
+    
 
     /**
      * {@inheritDoc}
@@ -931,5 +937,35 @@ public class IdentityServiceImpl implements IdentityService {
     public IdentityState getIdentityStateByNav4(String nav4Id) {
         return mappingIdentityState(findIdentityNav4(nav4Id).orElse(null));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+	@Override
+	public String getSimpleAttribute(String contactNumber, String attributeCode) {		
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        return searchService.getSimpleAttribute(user.getAttributes(), attributeCode).orElse(null);
+	}
+
+	/**
+     * {@inheritDoc}
+     */
+	@Override
+	public void setSimpleAttribute(String contactNumber, String attributeCode, String value) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        update(user.singleAttribute(attributeCode, value));
+	}
+
+	/**
+     * {@inheritDoc}
+     */
+	@Override
+	public void deleteSimpleAttribute(String contactNumber, String attributeCode) {
+        UserRepresentation user = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
+        if (user.getAttributes() != null && user.getAttributes().containsKey(attributeCode)) {
+        	user.getAttributes().remove(attributeCode);
+            update(user);
+        }
+	}
     
 }

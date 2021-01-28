@@ -660,6 +660,7 @@ paths:
           description: Identity Not Found
   /identities/{contactNumber}/roles/binary:
     get:
+      deprecated: true
       summary: "Get assigned Roles on Identity in Binary Representation"
       operationId: "getIdentityRolesBinary"
       parameters:
@@ -763,6 +764,63 @@ paths:
       responses:
         '204':
           description: Successfully unsassigned Roles from Identity
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity Not Found
+  /identities/{contactNumber}/binary:
+    get:
+      summary: "Get Binary Rights of Identity"
+      operationId: getIdentityBinaryRights
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity unique CRM ID
+          required: true
+          type: string       
+      responses:
+        '200':
+          description: Successfully returned Binary Rights of Idenitty
+          schema:
+            type: string
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity Not Found
+    post:
+      summary: "Set Binary Rights to Identity"
+      operationId: "setIdentityBinaryRights"
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+        - in: body
+          name: binaryRights
+          description: Binary Rights for set to Identity
+          schema:
+            type: string
+            minLength: 3
+      responses:
+        '201':
+          description: Successfully set BinaryRights to Identity
+        '409':
+          description: Duplicate Identity with same CRM Contact Number
+        '410':
+          description: Identity Not Found
+    delete:
+      summary: "Remove Binary Rights from Identity"
+      operationId: "deleteIdentityBinaryRights"
+      parameters:
+        - name: contactNumber
+          in: path
+          description: Filtering by Identity CRM ID
+          required: true
+          type: string       
+      responses:
+        '204':
+          description: Successfully deleted Binary Rigths from Identity
         '409':
           description: Duplicate Identity with same CRM Contact Number
         '410':

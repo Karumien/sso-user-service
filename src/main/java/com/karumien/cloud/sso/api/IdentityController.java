@@ -483,4 +483,30 @@ public class IdentityController implements IdentitiesApi {
         return new ResponseEntity<>(identityService.getIdentityStateByNav4(nav4Id), HttpStatus.OK);
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<String> getIdentityBinaryRights(String contactNumber) {
+        return new ResponseEntity<>(identityService.getSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS), HttpStatus.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> setIdentityBinaryRights(String contactNumber, String binaryRights) {
+    	identityService.setSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS, binaryRights);
+    	return new ResponseEntity<>(HttpStatus.CREATED);    	
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ResponseEntity<Void> deleteIdentityBinaryRights(String contactNumber) {
+    	identityService.deleteSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS);
+    	return new ResponseEntity<>(HttpStatus.NO_CONTENT);    	
+    }
+
 }
