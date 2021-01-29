@@ -488,7 +488,8 @@ public class IdentityController implements IdentitiesApi {
      */
     @Override
     public ResponseEntity<String> getIdentityBinaryRights(String contactNumber) {
-        return ResponseEntity.ok(identityService.getSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS));
+    	String binaryRights = identityService.getSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS);
+        return new ResponseEntity<>(binaryRights, StringUtils.isEmpty(binaryRights) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
     }
 
     /**

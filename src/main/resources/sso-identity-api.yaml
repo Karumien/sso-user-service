@@ -808,6 +808,8 @@ paths:
           description: Successfully returned Binary Rights of Idenitty
           schema:
             type: string
+        '204':
+          description: Identity has no Binary Rights
         '409':
           description: Duplicate Identity with same CRM Contact Number
         '410':
