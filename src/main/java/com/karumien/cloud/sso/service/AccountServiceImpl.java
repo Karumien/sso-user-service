@@ -218,8 +218,9 @@ public class AccountServiceImpl implements AccountService {
 	@Transactional(readOnly = true)
 	public List<String> getAccountIdentitiesIds(String accountNumber, List<String> contactNumbers, Boolean driver) {
 
+		getAccount(accountNumber);
+		
 		List<String> userIds = null;
-
 		// add all identities from account when no filter specified
 		if (CollectionUtils.isEmpty(contactNumbers)) {
 			userIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber,
