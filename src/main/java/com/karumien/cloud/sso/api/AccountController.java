@@ -532,6 +532,7 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<List<String>> getAccountIdentityLocales(String accountNumber) {
+    	getAccount(accountNumber);
         return new ResponseEntity<>(accountService.getAccountIdentitiesLocales(accountNumber), HttpStatus.OK);
     }
 
