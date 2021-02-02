@@ -498,7 +498,7 @@ public class IdentityServiceImpl implements IdentityService {
 	        	searchedUserId = userIds.stream().findFirst().orElse(null);
 	        }
     	} 
-        return Optional.ofNullable(searchedUserId == null ? null : keycloak.realm(realm).users().get(searchedUserId).toRepresentation());
+        return findUserRepresentationById(searchedUserId);
     }
 
 	private boolean isIdentityId(String contactNumber) {
