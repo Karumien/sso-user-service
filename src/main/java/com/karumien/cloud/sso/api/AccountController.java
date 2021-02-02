@@ -148,8 +148,6 @@ public class AccountController implements AccountsApi {
 			} catch (IdentityNotFoundException iex) {
 				// do nothing
 			}
-    		
-    		patchAccountIdentity(accountNumber, accountNumber, cascade, identity);
     	}
           		      		
     	return new ResponseEntity<>(account, HttpStatus.ACCEPTED);
