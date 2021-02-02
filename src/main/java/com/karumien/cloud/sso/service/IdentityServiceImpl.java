@@ -480,8 +480,11 @@ public class IdentityServiceImpl implements IdentityService {
 	        	// T012-197 : duplicity when no perfect one with nav4id=null;
 	        	// TODO: Performance optimize in DB
 
-	        	List<IdentityInfo> users = userIds.stream().map(id -> mapping(keycloak.realm(realm).users().get(id).toRepresentation(), false))
-	        		.filter(u -> StringUtils.isEmpty(u.getNav4Id()))
+	        	List<IdentityInfo> users = userIds.stream()
+        			.map(id -> findUserRepresentationById(id))
+        			.filter(Optional::isPresent)
+        			.map(ur -> mapping(ur.get(), false))
+        			.filter(u -> StringUtils.isEmpty(u.getNav4Id()))
 	        		.collect(Collectors.toList());
 	        	
 	        	if (emptyNav4Id && users.isEmpty()) {
