@@ -49,6 +49,7 @@ import com.karumien.cloud.sso.api.model.ModuleInfo;
 import com.karumien.cloud.sso.api.model.OnBoardingInfo;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.IdNotFoundException;
+import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.exceptions.RebirthNotFoundException;
 import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
@@ -135,14 +136,18 @@ public class AccountController implements AccountsApi {
     			identity.setEmail(accountInfo.getContactEmail());
     		}
 
-
     		if (StringUtils.hasText(accountInfo.getName())) {
     			identity.setFirstName(accountInfo.getName());
     			identity.setLastName("");
     		}
     		
-    		// identity.setLocale(accountInfo.getLocale());
-			// identity.setPhone(accountInfo.getContactPhone());
+    		identity.setLocale(accountInfo.getLocale());
+
+			try {
+				patchAccountIdentity(accountNumber, accountNumber, cascade, identity);
+			} catch (IdentityNotFoundException iex) {
+				// do nothing
+			}
     		
     		patchAccountIdentity(accountNumber, accountNumber, cascade, identity);
     	}
