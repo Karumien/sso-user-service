@@ -397,16 +397,8 @@ public class IdentityServiceImpl implements IdentityService {
 
         UserResource userResource = keycloak.realm(realm).users().get(user.getId());
         try {
-
             // TODO: enabled?
             user.setEnabled(true);
-
-            // change when new username ready
-            if (StringUtils.hasText(newCredentials.getUsername())) {
-                // TODO: validate username
-                user.setUsername(newCredentials.getUsername());
-                userResource.update(user);
-            }
 
             // change when new password ready
             if (StringUtils.hasText(newCredentials.getPassword())) {
@@ -426,6 +418,15 @@ public class IdentityServiceImpl implements IdentityService {
                 userResource.resetPassword(credentialRepresentation);
                 userResource.update(user);
             }
+            
+            //T012-226 username only after password ok
+            // change when new username ready
+            if (StringUtils.hasText(newCredentials.getUsername())) {
+                // TODO: validate username
+                user.setUsername(newCredentials.getUsername());
+                userResource.update(user);
+            }
+
 
         } catch (BadRequestException e) {
             throw new PasswordPolicyException(newCredentials.getPassword());
