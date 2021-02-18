@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidationUtil {
 	
-	private static final String DEFAULT_LOCALE = "en";
-    private static final Set<String> SUPPORTED_LOCALES = Set.of("at","bg","cs","de","dk","ee",
+	public static final String DEFAULT_LOCALE = "en";
+    public static final Set<String> SUPPORTED_LOCALES = Set.of("at","bg","cs","de","dk","ee",
     		DEFAULT_LOCALE,"es","fr","hu","it","lt","lv","nl","pl","pt","ro","ru","si","sk","sr","sv","tr");
 
     private static final Map<String, String> FIXED_LOCALES = new HashMap<>();

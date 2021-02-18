@@ -31,6 +31,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -271,11 +272,12 @@ public class RoleServiceImpl implements RoleService {
      * {@inheritDoc}
      */
     @Override
+    @Cacheable
     public List<RoleInfo> getRoles() {
         return keycloak.realm(realm).roles().list().stream()
             .filter(role -> !role.getName().startsWith(ModuleService.MODULE_PREFIX))
             .filter(r -> isRole(r.getName()))
-            .map(role -> transformRoleToBaseRole(role, null))
+            .map(role -> transformRoleToBaseRole(keycloak.realm(realm).rolesById().getRole(role.getId()), null))
             .collect(Collectors.toList());
     }
 

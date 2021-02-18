@@ -13,9 +13,8 @@
  */
 package com.karumien.cloud.sso;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,6 +26,8 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
+import com.karumien.cloud.sso.util.ValidationUtil;
+
 
 /**
  * Prepare locale from X-LOCALE header.
@@ -37,9 +38,6 @@ import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 @Component
 public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {
 
-    private static final List<Locale> SUPPORTED_LOCALES = Arrays.asList(new Locale("en"), new Locale("sk"), new Locale("cs"), 
-            new Locale("de"), new Locale("fr"));
-    
     /**
      * {@inheritDoc}
      */
@@ -55,9 +53,7 @@ public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements 
             headerLang = headerLang.substring(0,2);
         };
         
-        return !StringUtils.hasText(headerLang) || Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES) == null ?
-                Locale.forLanguageTag("en") : 
-                Locale.lookup(Locale.LanguageRange.parse(headerLang), SUPPORTED_LOCALES);
+        return Locale.forLanguageTag(ValidationUtil.validateAndFixLocale(headerLang));
     }
 
     @Bean
@@ -72,8 +68,9 @@ public class HeaderLocaleResolver extends AcceptHeaderLocaleResolver implements 
     @Bean
     public LocaleResolver localeResolver() {
         HeaderLocaleResolver headerLocaleResolver = new HeaderLocaleResolver();
-        headerLocaleResolver.setDefaultLocale(Locale.forLanguageTag("en"));
-        headerLocaleResolver.setSupportedLocales(SUPPORTED_LOCALES);
+        headerLocaleResolver.setDefaultLocale(Locale.forLanguageTag(ValidationUtil.DEFAULT_LOCALE));
+        headerLocaleResolver.setSupportedLocales(ValidationUtil.SUPPORTED_LOCALES.stream()
+        		.map(lng -> Locale.forLanguageTag(lng)).collect(Collectors.toList()));
         return headerLocaleResolver;
     }
 }
