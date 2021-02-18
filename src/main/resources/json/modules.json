@@ -12,6 +12,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Nástěnka"
+					],
+					"translation[ro]": [
+						"Tablou de bord"
+					],
+					"translation[sk]": [
+						"Nástenka"
 					]
 				}
 			}
@@ -19,6 +25,12 @@
 		"attributes": {
 			"translation[cs]": [
 				"Nástěnka"
+			],
+			"translation[ro]": [
+				"Tablou de bord"
+			],
+			"translation[sk]": [
+				"Nástenka"
 			]
 		}
 	},
@@ -35,6 +47,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Transakce"
+					],
+					"translation[ro]": [
+						"Tranzacții"
+					],
+					"translation[sk]": [
+						"Transakcie"
 					]
 				}
 			},
@@ -46,6 +64,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Fakturační dokumenty"
+					],
+					"translation[ro]": [
+						"Facturare"
+					],
+					"translation[sk]": [
+						"Účtovné doklady"
 					]
 				}
 			}
@@ -53,6 +77,12 @@
 		"attributes": {
 			"translation[cs]": [
 				"Finance"
+			],
+			"translation[ro]": [
+				"Finanţa"
+			],
+			"translation[sk]": [
+				"Financie"
 			]
 		}
 	},
@@ -68,6 +98,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Správa uživatelů"
+					],
+					"translation[ro]": [
+						"Utilizatori și roluri"
+					],
+					"translation[sk]": [
+						"Používatelia a role"
 					]
 				}
 			}
@@ -75,6 +111,12 @@
 		"attributes": {
 			"translation[cs]": [
 				"Správa uživatelů"
+			],
+			"translation[ro]": [
+				"Utilizatori și roluri"
+			],
+			"translation[sk]": [
+				"Používatelia a role"
 			]
 		}
 	},
@@ -90,6 +132,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Správa vozidel"
+					],
+					"translation[ro]": [
+						"Vehicule gestionare"
+					],
+					"translation[sk]": [
+						"Spravovanie vozidel"
 					]
 				}
 			},
@@ -100,6 +148,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Správa OBU"
+					],
+					"translation[ro]": [
+						"OBU-uri gestionare"
+					],
+					"translation[sk]": [
+						"Spravovanie OBU"
 					]
 				}
 			}
@@ -107,6 +161,12 @@
 		"attributes": {
 			"translation[cs]": [
 				"Správa vozidel a OBU"
+			],
+			"translation[ro]": [
+				"Vehicule și OBU-uri gestionare"
+			],
+			"translation[sk]": [
+				"Spravovanie vozidel a OBU"
 			]
 		}
 	},
@@ -122,12 +182,24 @@
 				"attributes": {
 					"translation[cs]": [
 						"Objednávka"
+					],
+					"translation[ro]": [
+						"Comandați"
+					],
+					"translation[sk]": [
+						"Objednávka"
 					]
 				}
 			}
 		],
 		"attributes": {
 			"translation[cs]": [
+				"Mýto"
+			],
+			"translation[ro]": [
+				"Taxe de Drum"
+			],
+			"translation[sk]": [
 				"Mýto"
 			]
 		}
@@ -144,6 +216,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Registrace mýtného"
+					],
+					"translation[ro]": [
+						"Înregistrări taxe de drum"
+					],
+					"translation[sk]": [
+						"Registrácia mýta"
 					]
 				}
 			},
@@ -154,6 +232,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Seznam vozidel"
+					],
+					"translation[ro]": [
+						"Lista vehicule"
+					],
+					"translation[sk]": [
+						"Zoznam vozidiel"
 					]
 				}
 			},
@@ -163,6 +247,12 @@
 				"businessPriority": 3,
 				"attributes": {
 					"translation[cs]": [
+						"EWMC"
+					],
+					"translation[ro]": [
+						"EWMC"
+					],
+					"translation[sk]": [
 						"EWMC"
 					]
 				}
@@ -174,6 +264,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"EWMC objednání nové karty"
+					],
+					"translation[ro]": [
+						"EWMC comandați un card nou"
+					],
+					"translation[sk]": [
+						"EWMC žiadosť o novú kartu"
 					]
 				}
 			},
@@ -184,6 +280,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Správa karet EWMC"
+					],
+					"translation[ro]": [
+						"EWMC carduri gestionare"
+					],
+					"translation[sk]": [
+						"Spravovanie kariet EWMC"
 					]
 				}
 			},
@@ -196,6 +298,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Režim platby EWMC"
+					],
+					"translation[ro]": [
+						"Mod de plată EWMC"
+					],
+					"translation[sk]": [
+						"Platobný režim EWMC"
 					]
 				}
 			},
@@ -206,6 +314,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"EWMC transakce"
+					],
+					"translation[ro]": [
+						"Tranzacții EWMC"
+					],
+					"translation[sk]": [
+						"Transakcie EWMC"
 					]
 				}
 			},
@@ -216,6 +330,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Energie"
+					],
+					"translation[ro]": [
+						"Energie"
+					],
+					"translation[sk]": [
+						"Energie"
 					]
 				}
 			},			
@@ -225,6 +345,12 @@
 				"businessPriority": 9,
 				"attributes": {
 					"translation[cs]": [
+						"Mýto"
+					],
+					"translation[ro]": [
+						"Taxe de Drum"
+					],
+					"translation[sk]": [
 						"Mýto"
 					]
 				}
@@ -237,6 +363,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Telematika"
+					],
+					"translation[ro]": [
+						"Telematică"
+					],
+					"translation[sk]": [
+						"Telematika"
 					]
 				}
 			},
@@ -247,6 +379,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Vrácení daní"
+					],
+					"translation[ro]": [
+						"Rambursări Taxe"
+					],
+					"translation[sk]": [
+						"Refundácia daní"
 					]
 				}
 			},
@@ -257,6 +395,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Myčka"
+					],
+					"translation[ro]": [
+						"Spălătorii Auto"
+					],
+					"translation[sk]": [
+						"Autoumývarne"
 					]
 				}
 			},
@@ -268,6 +412,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Parkování"
+					],
+					"translation[ro]": [
+						"Parcare"
+					],
+					"translation[sk]": [
+						"Parkovanie"
 					]
 				}
 			},
@@ -278,6 +428,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Služby pro partnery"
+					],
+					"translation[ro]": [
+						"Servicii parteneri"
+					],
+					"translation[sk]": [
+						"Služby partnerov"
 					]
 				}
 			},
@@ -288,6 +444,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Zveřejňování řidičů"
+					],
+					"translation[ro]": [
+						"Detașarea soferilor"
+					],
+					"translation[sk]": [
+						"Vysielanie vodičov"
 					]
 				}
 			},
@@ -297,6 +459,12 @@
 				"businessPriority": 19,
 				"attributes": {
 					"translation[cs]": [
+						"Karty - EW"
+					],
+					"translation[ro]": [
+						"Carduri - EW"
+					],
+					"translation[sk]": [
 						"Karty - EW"
 					]
 				}
@@ -308,6 +476,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Seznam karet"
+					],
+					"translation[ro]": [
+						"Lista cardurilor"
+					],
+					"translation[sk]": [
+						"Zoznam kariet"
 					]
 				}
 			},
@@ -319,6 +493,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Systém zamykání karet"
+					],
+					"translation[ro]": [
+						"Sistemul de blocare a cardurilor"
+					],
+					"translation[sk]": [
+						"Systém uzamykania kariet"
 					]
 				}
 			},
@@ -329,6 +509,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Zabezpečení GPS"
+					],
+					"translation[ro]": [
+						"Securitate GPS"
+					],
+					"translation[sk]": [
+						"Zabezpečenie GPS"
 					]
 				}
 			},
@@ -339,6 +525,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Objednávka karty"
+					],
+					"translation[ro]": [
+						"Comandă de card"
+					],
+					"translation[sk]": [
+						"Objednávka karty"
 					]
 				}
 			},
@@ -348,6 +540,12 @@
 				"businessPriority": 26,
 				"attributes": {
 					"translation[cs]": [
+						"Stav karty"
+					],
+					"translation[ro]": [
+						"Starea cardului"
+					],
+					"translation[sk]": [
 						"Stav karty"
 					]
 				}
@@ -361,12 +559,24 @@
 				"attributes": {
 					"translation[cs]": [
 						"Stahování"
+					],
+					"translation[ro]": [
+						"Descărcări"
+					],
+					"translation[sk]": [
+						"Na stiahnutie"
 					]
 				}
 			}
 		],
 		"attributes": {
 			"translation[cs]": [
+				"Embedding"
+			],
+			"translation[ro]": [
+				"Embedding"
+			],
+			"translation[sk]": [
 				"Embedding"
 			]
 		}
@@ -383,6 +593,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Fakturace"
+					],
+					"translation[ro]": [
+						"Factorizarea"
+					],
+					"translation[sk]": [
+						"Faktoring"
 					]
 				}
 			}
@@ -390,6 +606,12 @@
 		"attributes": {
 			"translation[cs]": [
 				"Fakturace"
+			],
+			"translation[ro]": [
+				"Factorizarea"
+			],
+			"translation[sk]": [
+				"Faktoring"
 			]
 		}
 	},
@@ -406,6 +628,12 @@
 				"attributes": {
 					"translation[cs]": [
 						"Přehledy"
+					],
+					"translation[ro]": [
+						"Raportare"
+					],
+					"translation[sk]": [
+						"Reporting"
 					]
 				}
 			}
@@ -413,6 +641,12 @@
 		"attributes": {
 			"translation[cs]": [
 				"Přehledy"
+			],
+			"translation[ro]": [
+				"Raportare"
+			],
+			"translation[sk]": [
+				"Reporting"
 			]
 		}
 	}
