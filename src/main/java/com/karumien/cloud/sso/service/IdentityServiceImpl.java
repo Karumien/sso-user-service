@@ -400,6 +400,10 @@ public class IdentityServiceImpl implements IdentityService {
             // TODO: enabled?
             user.setEnabled(true);
 
+            if (StringUtils.hasText(newCredentials.getUsername()) && isIdentityExists(newCredentials.getUsername())) {
+            	throw new IdentityDuplicateException("Identity with same username already exists");
+            }
+
             // change when new password ready
             if (StringUtils.hasText(newCredentials.getPassword())) {
 
@@ -422,11 +426,9 @@ public class IdentityServiceImpl implements IdentityService {
             //T012-226 username only after password ok
             // change when new username ready
             if (StringUtils.hasText(newCredentials.getUsername())) {
-                // TODO: validate username
                 user.setUsername(newCredentials.getUsername());
                 userResource.update(user);
             }
-
 
         } catch (BadRequestException e) {
             throw new PasswordPolicyException(newCredentials.getPassword());
