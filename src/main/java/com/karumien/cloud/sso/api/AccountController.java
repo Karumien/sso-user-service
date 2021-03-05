@@ -367,7 +367,6 @@ public class AccountController implements AccountsApi {
      */
     @Override
     public ResponseEntity<Void> hasAccountIdentityCredentials(String accountNumber, String contactNumber) {
-    	accountService.getAccount(accountNumber);
     	IdentityState state = identityService.getIdentityState(contactNumber);
         
         return new ResponseEntity<>(
