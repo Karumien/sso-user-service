@@ -13,27 +13,26 @@
  */
 package com.karumien.cloud.sso.service;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
-public class IdentityServiceTest {
+@Disabled
+class IdentityServiceTest {
 
     @Autowired
     private IdentityService identityService;
 
     @Test
-    public void createAccount() throws Exception {
+    void createAccount() throws Exception {
         
         IdentityInfo identity = new IdentityInfo();
         identity.setContactNumber("CRM00001");
@@ -42,18 +41,18 @@ public class IdentityServiceTest {
         identity.setEmail("stary@seznam.cz");
         
         IdentityInfo userCreated = identityService.createIdentity(identity);
-        Assert.assertEquals(identity.getFirstName(), userCreated.getFirstName());
-        Assert.assertEquals(identity.getLastName(), userCreated.getLastName());
-        Assert.assertEquals(identity.getEmail(), userCreated.getEmail());
-        Assert.assertNotNull(userCreated.getContactNumber());
-        Assert.assertNotNull(userCreated.getUsername());
-        Assert.assertEquals(userCreated.getEmail(), userCreated.getUsername());
+        assertEquals(identity.getFirstName(), userCreated.getFirstName());
+        assertEquals(identity.getLastName(), userCreated.getLastName());
+        assertEquals(identity.getEmail(), userCreated.getEmail());
+        assertNotNull(userCreated.getContactNumber());
+        assertNotNull(userCreated.getUsername());
+        assertEquals(userCreated.getEmail(), userCreated.getUsername());
         
         identityService.deleteIdentity(identity.getContactNumber());
     }
       
     @Test
-    public void getAllIdentityRoles() throws Exception {
+    void getAllIdentityRoles() throws Exception {
     	identityService.deleteIdentity("CRM00001");
     	IdentityInfo identity = null;
 		try {
@@ -71,5 +70,6 @@ public class IdentityServiceTest {
         //IdentityInfo userCreated = 
         identityService.createIdentity(identity);
         identityService.deleteIdentity(identity.getContactNumber());
+        assertNotNull(identity);
     }
 }

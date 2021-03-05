@@ -56,7 +56,6 @@ import com.karumien.cloud.sso.exceptions.UnsupportedApiOperationException;
 import com.karumien.cloud.sso.service.AccountService;
 import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
-import com.karumien.cloud.sso.service.ModuleService;
 import com.karumien.cloud.sso.service.RebirthService;
 import com.karumien.cloud.sso.service.RoleService;
 import com.karumien.cloud.sso.service.SearchService;
@@ -80,10 +79,7 @@ public class AccountController implements AccountsApi {
     
     @Autowired
     private AccountService accountService;
-
-    @Autowired
-    private ModuleService moduleService;
-
+    
     @Autowired
     private IdentityService identityService;
     
@@ -370,15 +366,6 @@ public class AccountController implements AccountsApi {
      * {@inheritDoc}
      */
     @Override
-    public ResponseEntity<Void> activateAccountModule(String accountNumber, String moduleId, Boolean applyRoles) {
-        moduleService.activateModules(Arrays.asList(moduleId), Arrays.asList(accountNumber), applyRoles);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ResponseEntity<Void> hasAccountIdentityCredentials(String accountNumber, String contactNumber) {
     	accountService.getAccount(accountNumber);
     	IdentityState state = identityService.getIdentityState(contactNumber);
@@ -439,55 +426,12 @@ public class AccountController implements AccountsApi {
         return new ResponseEntity<OnBoardingInfo>(onboarding, HttpStatus.OK);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> activateAccountModules(String accountNumber, @Valid List<String> modules, @Valid Boolean applyRoles) {
-        moduleService.activateModules(modules, Arrays.asList(accountNumber), applyRoles);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> deactivateAccountModules(String accountNumber, List<String> modules) {
-        moduleService.deactivateModules(modules, Arrays.asList(accountNumber));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<List<ModuleInfo>> getAccountModules(String accountNumber) {
-        return new ResponseEntity<>(moduleService.getAccountModules(accountNumber), HttpStatus.OK);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> deactivateAccountModule(String accountNumber, String moduleId) {
-        moduleService.deactivateModules(Arrays.asList(moduleId), Arrays.asList(accountNumber));
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ResponseEntity<Void> getAccountModule(String accountNumber, String moduleId) {
-        return new ResponseEntity<>(moduleService.isActiveModule(moduleId, accountNumber) ? HttpStatus.OK : HttpStatus.UNPROCESSABLE_ENTITY);
-    }
-
     /***
      * {@inheritDoc}
      */
     @Override
     public ResponseEntity<IdentityInfo> createAccountIdentity(String accountNumber, IdentityInfo identity) {
-        //TODO: Access denied when accountNumber != identity.accountNuber
+        identity.setAccountNumber(accountNumber);
         return new ResponseEntity<>(identityService.createIdentity(identity), HttpStatus.CREATED);
     }
     
@@ -725,7 +669,7 @@ public class AccountController implements AccountsApi {
         
             try {
                 // note
-                if (!StringUtils.isEmpty(onBoardingInfo.getNote())) {
+                if (StringUtils.hasText(onBoardingInfo.getNote())) {
                     MDC.put("note_full", onBoardingInfo.getNote());
                 }
                 
@@ -735,15 +679,11 @@ public class AccountController implements AccountsApi {
                     MDC.put("accountNumber", onBoardingInfo.getAccount().getAccountNumber());
 
                     // notes
-                    if (StringUtils.isEmpty(onBoardingInfo.getAccount().getNote())) {
+                    if (!StringUtils.hasText(onBoardingInfo.getAccount().getNote())) {
                         onBoardingInfo.getAccount().setNote(onBoardingInfo.getNote());
                     }
                     
-                    if (accountService.findAccount(onBoardingInfo.getAccount().getAccountNumber()).isPresent()) {                        
-                        // TODO: accountService.update
-                        if (onBoardingInfo.isOverwriteAccount()) {
-                        }
-                    } else {
+                    if (!accountService.findAccount(onBoardingInfo.getAccount().getAccountNumber()).isPresent()) {                        
                         accountService.createAccount(onBoardingInfo.getAccount());
                     }
                 }
@@ -759,7 +699,7 @@ public class AccountController implements AccountsApi {
                     MDC.put("contactNumber", onBoardingInfo.getIdentity().getContactNumber());
 
                     // notes
-                    if (StringUtils.isEmpty(onBoardingInfo.getIdentity().getNote())) {
+                    if (!StringUtils.hasText(onBoardingInfo.getIdentity().getNote())) {
                         onBoardingInfo.getIdentity().setNote(onBoardingInfo.getNote());
                     }
 

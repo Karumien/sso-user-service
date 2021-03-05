@@ -132,3 +132,7 @@ DEFAULT now();
 
 ALTER TABLE PLUGIN_ACCOUNT
 ADD UPDATED timestamp;
+
+---
+DROP TABLE plugin_account_module;
+delete  from keycloak_role where name like 'MODULE%';

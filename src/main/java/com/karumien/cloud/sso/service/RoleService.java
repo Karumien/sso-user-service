@@ -90,15 +90,6 @@ public interface RoleService {
     RoleResource findRoleResource(String roleId);
 
     /**
-     * Return roles binary representation for identity identified by {@code contactNumber}.
-     * 
-     * @param userRepresentation
-     *            user representation
-     * @return {@link String} binary representation of roles of specified identity
-     */
-    String getRolesBinary(UserRepresentation userRepresentation);
-
-    /**
      * Returns all roles that account have assigned.
      * 
      * @param groupResource

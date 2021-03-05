@@ -71,10 +71,7 @@ public class AuthServiceImpl implements AuthService {
     
     @Autowired
     private IdentityService identityService;
-
-    @Autowired
-    private RoleService roleService;
-   
+ 
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
     
@@ -217,7 +214,7 @@ public class AuthServiceImpl implements AuthService {
         
         if (pin.equalsIgnoreCase(pinStored)) {
             IdentityInfo identityInfo = identityService.mapping(user, false);
-            identityInfo.setBinaryRights(roleService.getRolesBinary(user));        	
+            identityInfo.setBinaryRights(searchService.getSimpleAttribute(user.getAttributes(), IdentityService.ATTR_BINARY_RIGHTS).orElse(null));        	
             return identityInfo;
         } 
         

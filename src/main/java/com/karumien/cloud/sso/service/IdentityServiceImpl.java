@@ -200,8 +200,6 @@ public class IdentityServiceImpl implements IdentityService {
     @Override
     public IdentityInfo updateIdentity(String contactNumber, IdentityInfo identityInfo, UpdateType update) {
 
-    	//String finalContactNumber = contactNumber;
-    	
     	if (update == UpdateType.ADD_CASCADE) {
     		
 	        List<UserRepresentation> identities = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, contactNumber).stream()
@@ -218,7 +216,6 @@ public class IdentityServiceImpl implements IdentityService {
     	
 	        UserRepresentation identity = findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
 	        return mapping(update(identity, identityInfo, update), false);
-	        //finalContactNumber = searchService.getSimpleAttribute(identity.getAttributes(), ATTR_CONTACT_NUMBER).orElse(contactNumber);
 
     	}
     	
@@ -487,7 +484,7 @@ public class IdentityServiceImpl implements IdentityService {
         			.map(id -> findUserRepresentationById(id))
         			.filter(Optional::isPresent)
         			.map(ur -> mapping(ur.get(), false))
-        			.filter(u -> StringUtils.isEmpty(u.getNav4Id()))
+        			.filter(u -> !StringUtils.hasText(u.getNav4Id()))
 	        		.collect(Collectors.toList());
 	        	
 	        	if (emptyNav4Id && users.isEmpty()) {
@@ -716,22 +713,6 @@ public class IdentityServiceImpl implements IdentityService {
             userResource.roles().realmLevel().remove(getListOfRoleReprasentationBaseOnIds(roles));
         }
 
-        refreshBinaryRoles(userResource);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void refreshBinaryRoles(UserResource userResource) {
-        UserRepresentation userRepresentation = userResource.toRepresentation();
-        String binaryRoles = roleService.getRolesBinary(userRepresentation);
-        if (!StringUtils.hasText(binaryRoles)) {
-            userRepresentation.getAttributes().remove(IdentityPropertyType.ATTR_BINARY_RIGHTS.getValue());
-        } else {
-            userRepresentation.getAttributes().put(IdentityPropertyType.ATTR_BINARY_RIGHTS.getValue(), Arrays.asList(binaryRoles));
-        }
-        userResource.update(userRepresentation);
     }
 
     /**

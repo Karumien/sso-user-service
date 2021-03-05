@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
@@ -35,13 +35,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
-public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
+public class LoggingRequestInterceptor implements HandlerInterceptor {
 
-    protected final static List<String> MDC_HEADERS_CONTEXT = 
+    protected static final List<String> MDC_HEADERS_CONTEXT = 
         Arrays.asList("x-locale", "x-real-ip", "x-request-id", "x-forwarded-for", "x-forwarded-for",
             "x-original-forwarded-for", "x-trackingid", "user-agent");
 
-    private ThreadLocal<Long> startTime = new ThreadLocal<Long>();
+    private ThreadLocal<Long> startTime = new ThreadLocal<>();
     
     @Value("${spring.application.env:dev}")
     private String env;
@@ -108,7 +108,6 @@ public class LoggingRequestInterceptor extends HandlerInterceptorAdapter {
     }
 
     protected String toJson(HttpHeaders headers) {
-//      return headers.toString();
 
         StringBuilder sb = new StringBuilder();
         for (String key : headers.keySet()) {

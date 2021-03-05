@@ -30,7 +30,7 @@ public class ValidationUtil {
     
     public static String validateAndFixLocale(@Size(max = 10) String locale) {
     	
-    	if (StringUtils.isEmpty(locale)) {
+    	if (!StringUtils.hasText(locale)) {
 			return DEFAULT_LOCALE;
 		}
     	

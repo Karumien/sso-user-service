@@ -30,7 +30,6 @@ import com.karumien.cloud.sso.api.model.ErrorMessage;
 import com.karumien.cloud.sso.api.model.IdentityInfo;
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.IdentityState;
-import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
 import com.karumien.cloud.sso.exceptions.PasswordPolicyException;
 import com.karumien.cloud.sso.service.AuthService;
 import com.karumien.cloud.sso.service.IdentityService;
@@ -241,17 +240,6 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<DriverPin> getDriverPin(String contactNumber) {
         return ResponseEntity.ok(identityService.getPinOfIdentityDriver(contactNumber));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public ResponseEntity<Void> getIdentityRolesBinary(String contactNumber) {
-        String binaryRoles = roleService
-                .getRolesBinary(identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber)));
-        return new ResponseEntity(binaryRoles, HttpStatus.OK);
     }
 
     /**
@@ -489,7 +477,7 @@ public class IdentityController implements IdentitiesApi {
     @Override
     public ResponseEntity<String> getIdentityBinaryRights(String contactNumber) {
     	String binaryRights = identityService.getSimpleAttribute(contactNumber, IdentityService.ATTR_BINARY_RIGHTS);
-        return new ResponseEntity<>(binaryRights, StringUtils.isEmpty(binaryRights) ? HttpStatus.NO_CONTENT : HttpStatus.OK);
+        return new ResponseEntity<>(binaryRights, StringUtils.hasText(binaryRights) ? HttpStatus.OK : HttpStatus.NO_CONTENT);
     }
 
     /**

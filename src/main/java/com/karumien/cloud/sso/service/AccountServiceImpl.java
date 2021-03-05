@@ -48,6 +48,7 @@ import com.karumien.cloud.sso.exceptions.AccountDeleteException;
 import com.karumien.cloud.sso.exceptions.AccountDuplicateException;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
+import com.karumien.cloud.sso.util.ValidationUtil;
 
 /**
  * Implementation {@link AccountService} for Account Management.
@@ -79,7 +80,6 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional
 	public AccountInfo createAccount(AccountInfo account) {
-//        try {
 
 		// FIXME: why exception not work?
 		if (accountEntityRepository.existsById(account.getAccountNumber())) {
@@ -95,9 +95,7 @@ public class AccountServiceImpl implements AccountService {
 		accountEntity.setLocale(validateAndFixLocale(account.getLocale()));
 
 		return mapping(accountEntityRepository.save(accountEntity));
-//        } catch (Exception e) {
-//            throw new AccountDuplicateException(account.getAccountNumber());
-//        }
+
 	}
 
 	private String patch(String oldValue, String newValue, UpdateType update) {
@@ -158,7 +156,7 @@ public class AccountServiceImpl implements AccountService {
 		accountInfo.setCompRegNo(accountEntity.getCompRegNo());
 		accountInfo.setNote(accountEntity.getNote());
 		accountInfo.setContactEmail(accountEntity.getContactEmail());
-		accountInfo.setLocale(StringUtils.isEmpty(accountEntity.getLocale()) ? "en" : accountEntity.getLocale());
+		accountInfo.setLocale(!StringUtils.hasText(accountEntity.getLocale()) ? ValidationUtil.DEFAULT_LOCALE : accountEntity.getLocale());
 		return accountInfo;
 	}
 
@@ -168,7 +166,7 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional
 	public void deleteAccount(String accountNumber) {
-		findAccount(accountNumber).orElseThrow(() -> new AccountNotFoundException(accountNumber));
+		getAccount(accountNumber);
 
 		if (!searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_ACCOUNT_NUMBER, accountNumber).isEmpty()) {
 			throw new AccountDeleteException(accountNumber);

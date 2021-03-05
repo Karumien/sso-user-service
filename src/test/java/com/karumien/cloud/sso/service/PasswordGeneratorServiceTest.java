@@ -6,25 +6,22 @@
  */
 package com.karumien.cloud.sso.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.karumien.cloud.sso.api.model.PasswordPolicy;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class PasswordGeneratorServiceTest {
+class PasswordGeneratorServiceTest {
 
     @Autowired
     private PasswordGeneratorService passwordGeneratorService;
 
     @Test
-    public void testMinLength() {
+    void testMinLength() {
         
         PasswordPolicy policy = new PasswordPolicy();
         assertEquals(passwordGeneratorService.generate(policy).length(), 6);        
@@ -34,7 +31,7 @@ public class PasswordGeneratorServiceTest {
     }
 
     @Test
-    public void testFullPolicy() {
+    void testFullPolicy() {
         
         PasswordPolicy policy = new PasswordPolicy();
         policy.setMinLength(12);

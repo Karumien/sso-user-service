@@ -13,11 +13,8 @@
  */
 package com.karumien.cloud.sso.service;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,7 +33,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 import com.karumien.cloud.sso.api.model.RoleInfo;
 import com.karumien.cloud.sso.exceptions.ClientNotFoundException;
 import com.karumien.cloud.sso.exceptions.IdentityNotFoundException;
@@ -50,7 +46,7 @@ import com.karumien.cloud.sso.exceptions.RoleNotFoundException;
  */
 @Service
 public class RoleServiceImpl implements RoleService {
-
+	
     @Value("${keycloak.realm}")
     private String realm;
 
@@ -62,13 +58,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private IdentityService identityService;
-
-    @Autowired
-    private ModuleService moduleService;
     
-    @Autowired
-    private SearchService searchService;
-
     @Autowired
     private LocalizationService localizationService;
 
@@ -205,49 +195,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-	 * {@inheritDoc}
-	 */
-    @Override
-    public String getRolesBinary(UserRepresentation userRepresentation) {
-
-        StringBuilder binaryRule = new StringBuilder();
-        Optional<String> accountNumber = searchService.getSimpleAttribute(userRepresentation.getAttributes(), IdentityPropertyType.ATTR_ACCOUNT_NUMBER.getValue());
-
-        if (!accountNumber.isPresent()) {
-            return binaryRule.toString();
-        }
-
-        Map<String, Integer> maskMap = new HashMap<String, Integer>();
-        
-        keycloak.realm(realm).users().get(userRepresentation.getId()).roles().realmLevel().listEffective().stream()
-                .filter(r -> !isRole(r.getName()))
-                .forEach(role -> {
-            Optional<String> stringMask = searchService.findBinaryMaskForRole(role.getId());            
-            if (stringMask.isPresent()) {
-                Integer binaryMask = Integer.valueOf(stringMask.get().substring(0, stringMask.get().length() - 2), 2);
-    
-                // TODO: use attribute module - no split?
-                String[] splitName = role.getName().split("_");
-                if (splitName[0].equals("ROLE")) {
-                    Integer rigtValue = maskMap.get(splitName[1]) != null ? maskMap.get(splitName[1]) + binaryMask : binaryMask;
-                    maskMap.put(splitName[1], rigtValue);
-                }
-            }
-        });
-
-        List<String> modules = moduleService.getAccountModulesSimple(accountNumber.get());
-
-        for (Entry<String, Integer> entry : maskMap.entrySet()) {
-            String key = entry.getKey();
-            if (modules.contains(key)) {
-                binaryRule.append(key + ":" + Integer.toHexString(entry.getValue()) + " ");
-            }
-        }
-
-        return binaryRule.toString();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -275,7 +222,6 @@ public class RoleServiceImpl implements RoleService {
     @Cacheable
     public List<RoleInfo> getRoles() {
         return keycloak.realm(realm).roles().list().stream()
-            .filter(role -> !role.getName().startsWith(ModuleService.MODULE_PREFIX))
             .filter(r -> isRole(r.getName()))
             .map(role -> transformRoleToBaseRole(keycloak.realm(realm).rolesById().getRole(role.getId()), null))
             .collect(Collectors.toList());
@@ -287,7 +233,6 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleInfo> getRights() {
         return keycloak.realm(realm).roles().list().stream()
-            .filter(role -> !role.getName().startsWith(ModuleService.MODULE_PREFIX))
             .filter(r -> !isRole(r.getName()))
             .map(role -> transformRoleToBaseRole(role, null))
             .collect(Collectors.toList());
@@ -316,13 +261,6 @@ public class RoleServiceImpl implements RoleService {
             .forEach(role -> rights.addAll(role.getRights()));
         return rights.stream().collect(Collectors.toList());
         
-//        UserRepresentation userRepresentation = identityService.findIdentity(contactNumber).orElseThrow(() -> new IdentityNotFoundException(contactNumber));
-//        MappingsRepresentation cm = keycloak.realm(realm).users().get(userRepresentation.getId()).roles().getAll();
-//        return keycloak.realm(realm).users().get(userRepresentation.getId()).roles().getAll()
-//            .getClientMappings().get("selfcare").getMappings().stream()
-//            //.filter(r -> isRole(r.getName())
-//            .map(r -> r.getName())
-//            .collect(Collectors.toList());
     }
     
 }

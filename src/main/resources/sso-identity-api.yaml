@@ -683,26 +683,6 @@ paths:
           description: Duplicate Identity with same CRM Contact Number
         '410':
           description: Identity Not Found
-  /identities/{contactNumber}/roles/binary:
-    get:
-      deprecated: true
-      summary: "Get assigned Roles on Identity in Binary Representation"
-      operationId: "getIdentityRolesBinary"
-      parameters:
-        - name: contactNumber
-          in: path
-          description: Filtering by Identity CRM ID
-          required: true
-          type: string   
-      produces:
-        - text/plain
-      responses:
-        '200':
-          description: Identity's assigned Roles in Binary Representation 
-        '409':
-          description: Duplicate Identity with same CRM Contact Number
-        '410':
-          description: Identity Not Found  
   /identities/{contactNumber}/roles:
     get:
       summary: "Get Identity's Roles Ids"

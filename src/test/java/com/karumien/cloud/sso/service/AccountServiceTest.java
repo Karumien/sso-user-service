@@ -13,40 +13,41 @@
  */
 package com.karumien.cloud.sso.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
 
 import com.karumien.cloud.sso.api.model.AccountInfo;
 import com.karumien.cloud.sso.exceptions.AccountNotFoundException;
 import com.karumien.cloud.sso.util.PageableUtils;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
-public class AccountServiceTest {
+@Disabled
+class AccountServiceTest {
 
     @Autowired
     private AccountService accountService;
     
     private static String accountNumber;
     
-    @BeforeClass
+    @BeforeTestClass
     public static void beforeClass() {
         accountNumber = "999" + new Random().nextInt(100);
     }
     
     @Test
-    public void crudAccount() {
+    void crudAccount() {
         
         AccountInfo account = new AccountInfo();
         account.setAccountNumber(accountNumber);
@@ -55,36 +56,34 @@ public class AccountServiceTest {
         account.setContactEmail("info@firma.cz");
         
         AccountInfo accountCreated = accountService.createAccount(account);
-        Assert.assertEquals(accountCreated.getAccountNumber(), accountNumber);
-        Assert.assertEquals(accountCreated.getName(), "TEST_COMPANY_" + accountNumber);
-        Assert.assertEquals(accountCreated.getCompRegNo(), "60255523");
-        Assert.assertEquals(accountCreated.getContactEmail(), "info@firma.cz");
+        assertEquals(accountCreated.getAccountNumber(), accountNumber);
+        assertEquals(accountCreated.getName(), "TEST_COMPANY_" + accountNumber);
+        assertEquals(accountCreated.getCompRegNo(), "60255523");
+        assertEquals(accountCreated.getContactEmail(), "info@firma.cz");
 
 //        AccountInfo AccountUpdated = AccountService.udateAccount(Account);
-//        Assert.assertEquals(Account.getAccountId(), "TEST" + id);
-//        Assert.assertEquals(Account.getDescription(), "TEST-Account");
+//        assertEquals(Account.getAccountId(), "TEST" + id);
+//        assertEquals(Account.getDescription(), "TEST-Account");
                 
         List<AccountInfo> accounts = accountService.getAccounts(null, PageableUtils.getRequest(0, 100, Arrays.asList("name,ASC"), Arrays.asList("name")));
-        Assert.assertNotNull(accounts);
-        Assert.assertFalse(accounts.isEmpty());
+        assertNotNull(accounts);
+        assertFalse(accounts.isEmpty());
         
         AccountInfo accountFound = accountService.getAccount(accountNumber);
-        Assert.assertEquals(accountFound.getAccountNumber(), accountNumber);
-        Assert.assertEquals(accountFound.getName(), "TEST_COMPANY_" + accountNumber);
-        Assert.assertEquals(accountFound.getCompRegNo(), "60255523");
-        Assert.assertEquals(accountFound.getContactEmail(), "info@firma.cz");
+        assertEquals(accountFound.getAccountNumber(), accountNumber);
+        assertEquals(accountFound.getName(), "TEST_COMPANY_" + accountNumber);
+        assertEquals(accountFound.getCompRegNo(), "60255523");
+        assertEquals(accountFound.getContactEmail(), "info@firma.cz");
 
         accountService.deleteAccount(accountNumber);
     }
     
-    @Test(expected = AccountNotFoundException.class)
-    public void unexistedAccountForFind() {
-        accountService.getAccount("QWESS342343ADSDAS");
-    }    
-
-    @Test(expected = AccountNotFoundException.class)
-    public void unexistedAccountForDelete() {
-        accountService.deleteAccount("QWESS342343ADSDAS");
+    @Test
+    void unexistedAccountForFind() {
+    	Exception exception = assertThrows(AccountNotFoundException.class, () -> {    	
+    		accountService.getAccount("QWESS342343ADSDAS");
+    	});
+    	assertNotNull(exception);
     }    
     
 }

@@ -5,7 +5,7 @@
 	<parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.4.RELEASE</version>
+        <version>2.4.3</version>
         <relativePath/>
     </parent>
 	
@@ -29,7 +29,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         
         <def-api-swagger.input>src/main/resources/sso-def-api.yaml</def-api-swagger.input>
-        <module-api-swagger.input>src/main/resources/sso-module-api.yaml</module-api-swagger.input>
         <identity-api-swagger.input>src/main/resources/sso-identity-api.yaml</identity-api-swagger.input>
         <auth-api-swagger.input>src/main/resources/sso-auth-api.yaml</auth-api-swagger.input>
         <role-api-swagger.input>src/main/resources/sso-role-api.yaml</role-api-swagger.input>
@@ -237,6 +236,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
 		</dependency>
         
         <dependency>
@@ -325,32 +335,6 @@
                         </goals>
                         <configuration>
                             <inputSpec>${def-api-swagger.input}</inputSpec>
-                            <language>spring</language>
-                            <library>spring-mvc</library>
-                            <configOptions>
-                                <interfaceOnly>true</interfaceOnly>
-                                <generateSupportingFiles>false</generateSupportingFiles>
-                                <java8>true</java8>
-                                <useTags>false</useTags>
-                                <apiPackage>${swagger.package}.handler</apiPackage>
-                                <modelPackage>${swagger.package}.model</modelPackage>
-                                <invokerPackage>${swagger.package}.handler</invokerPackage>
-                                <dateLibrary>java8</dateLibrary>
-                                <serializableModel>true</serializableModel>
-                                <verbose>true</verbose>
-                                <debugOperations>true</debugOperations>
-                                <useBeanValidation>true</useBeanValidation>
-                                <hasMore>true</hasMore>
-                            </configOptions>
-                        </configuration>
-                    </execution>
-                    <execution> 
-                        <id>module-api-swagger</id>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <inputSpec>${module-api-swagger.input}</inputSpec>
                             <language>spring</language>
                             <library>spring-mvc</library>
                             <configOptions>

@@ -6,17 +6,15 @@
  */
 package com.karumien.cloud.sso.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.karumien.cloud.sso.api.model.IdentityPropertyType;
 
@@ -26,16 +24,15 @@ import com.karumien.cloud.sso.api.model.IdentityPropertyType;
  * @author <a href="miroslav.svoboda@karumien.com">Miroslav Svoboda</a>
  * @since 1.0, 4. 10. 2019 11:35:53 
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class SearchServiceTest {
+class SearchServiceTest {
 
     @Autowired
     private SearchService searchService;
 
     @Test
-    @Ignore
-    public void findUserIdsByAttribute() {
+    @Disabled
+    void findUserIdsByAttribute() {
         
         List<String> usersIds = searchService.findUserIdsByAttribute(IdentityPropertyType.ATTR_CONTACT_NUMBER, "11714");
         assertNotNull(usersIds);
