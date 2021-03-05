@@ -10,92 +10,16 @@
     
     <springProperty scope="context" name="application_name" source="spring.application.name"/>
     
-    <!-- Logstash-Configuration -->
-    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <!-- destination>ew-elk.westeurope.cloudapp.azure.com:5010</destination-->
-        <destination>elk.elk:5010</destination>
-        <!-- encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <customFields>{ "service_name":"sso-user-service" }</customFields>
-            <fieldNames>
-                <message>log_message</message>
-            </fieldNames>
-        </encoder-->
-        <keepAliveDuration>5 minutes</keepAliveDuration>
-        <encoder
-            class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-              <providers>
-                <timestamp>
-                    <timeZone>UTC</timeZone>
-                </timestamp>
-                <version/>
-                <logLevel/>
-                <message/>
-                <loggerName/>
-                <threadName/>
-                <context/>
-                <pattern>
-                    <omitEmptyFields>true</omitEmptyFields>
-                    <pattern>
-                        {
-                            "trace": {
-                                "trace_id": "%mdc{X-B3-TraceId}",
-                                "span_id": "%mdc{X-B3-SpanId}",
-                                "parent_span_id": "%mdc{X-B3-ParentSpanId}",
-                                "exportable": "%mdc{X-Span-Export}"
-                            },
-                            "service_name": "sso-service",
-                            "context": {
-                                "account_number": "%mdc{accountNumber}",
-                                "contact_number": "%mdc{contactNumber}",
-                                "client_id": "%mdc{clientId}",
-                                "nav4_id": "%mdc{nav4Id}",
-                                "module_id": "%mdc{moduleId}",
-                                "username": "%mdc{usr}",
-                                "identity_id": "%mdc{identityId}"                                
-                            },
-                            "jwt": "#tryJson{%mdc{access_token}}",
-                            "note": "%mdc{note_full}",
-                            "duration": "#asLong{%mdc{duration_ms}}"
-                        }
-                    </pattern>
-                </pattern>
-                <mdc>
-                    <excludeMdcKeyName>identityId</excludeMdcKeyName>
-                    <excludeMdcKeyName>usr</excludeMdcKeyName>
-                    <excludeMdcKeyName>traceId</excludeMdcKeyName>
-                    <excludeMdcKeyName>clientId</excludeMdcKeyName>
-                    <excludeMdcKeyName>duration_ms</excludeMdcKeyName>
-                    <excludeMdcKeyName>moduleId</excludeMdcKeyName>
-                    <excludeMdcKeyName>accountNumber</excludeMdcKeyName>
-                    <excludeMdcKeyName>access_token</excludeMdcKeyName>
-                    <excludeMdcKeyName>headers</excludeMdcKeyName>
-                    <excludeMdcKeyName>note_full</excludeMdcKeyName>
-                    <excludeMdcKeyName>contactNumber</excludeMdcKeyName>
-                    <excludeMdcKeyName>nav4Id</excludeMdcKeyName>
-                    <excludeMdcKeyName>spanId</excludeMdcKeyName>
-                    <excludeMdcKeyName>parentId</excludeMdcKeyName>
-                    <excludeMdcKeyName>spanExportable</excludeMdcKeyName>
-                    <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
-                    <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
-                    <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
-                    <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
-                </mdc>
-                <logstashMarkers />
-                <stackTrace>
-                    <fieldName>stackTrace</fieldName>
-                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
-                        <exclude>net\.sf\.cglib\..*</exclude>
-                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
-                        <rootCauseFirst>true</rootCauseFirst>
-                    </throwableConverter>
-                </stackTrace>
-                
-            </providers>
-        </encoder>        
-    </appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>    
 
-    <root level="INFO">
-        <appender-ref ref="logstash" />
+    <root level="debug">
+        <appender-ref ref="CONSOLE" />
     </root>
 
 </configuration>
