@@ -787,47 +787,47 @@
     },
     {
         "moduleId": "FACTORING",
-        "name": "Factoring",
+        "name": "Eurowag Cash",
         "businessPriority": 60,
         "groups": [
             {
                 "groupId": "FACTORING",
-                "name": "Factoring",
+                "name": "Eurowag Cash",
                 "businessPriority": 1,
                 "attributes": {
                     "translation[cs]": [
-                        "Fakturace"
+                        "Eurowag Cash"
                     ],
                     "translation[ro]": [
-                        "Factoring"
+                        "Eurowag Cash"
                     ],
                     "translation[sk]": [
-                        "Faktoring"
+                        "Eurowag Cash"
                     ],
                     "translation[pl]": [
-                        "Faktoring"
+                        "Eurowag Cash"
                     ],
                     "translation[hu]": [
-                        "Faktoring"
+                        "Eurowag Cash"
                     ]
                 }
             }
         ],
         "attributes": {
             "translation[cs]": [
-                "Fakturace"
+                "Eurowag Cash"
             ],
             "translation[ro]": [
-                "Factoring"
+                "Eurowag Cash"
             ],
             "translation[sk]": [
-                "Faktoring"
+                "Eurowag Cash"
             ],
             "translation[pl]": [
-                "Faktoring"
+                "Eurowag Cash"
             ],
             "translation[hu]": [
-                "Faktoring"
+                "Eurowag Cash"
             ]
         }
     },
