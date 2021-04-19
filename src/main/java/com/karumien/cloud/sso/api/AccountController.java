@@ -60,7 +60,6 @@ import com.karumien.cloud.sso.service.RebirthService;
 import com.karumien.cloud.sso.service.RoleService;
 import com.karumien.cloud.sso.service.SearchService;
 import com.karumien.cloud.sso.util.PageableUtils;
-import com.karumien.cloud.sso.util.TrippleDes;
 
 import io.swagger.annotations.Api;
 
@@ -212,29 +211,11 @@ public class AccountController implements AccountsApi {
     }
 
     private OnBoardingInfo getOnboarding(String nav4Id, boolean maskPassword) throws IOException {
-        RebirthEntity rebirth = rebirthService.getRebirth(nav4Id);
+        
+    	RebirthEntity rebirth = rebirthService.getRebirth(nav4Id);
         
         OnBoardingInfo onboarding = mapper.readValue(rebirth.getValue(), OnBoardingInfo.class);
-        
-        if (StringUtils.hasText(rebirth.getPassword())) {
-            Credentials credentials = onboarding.getCredentials();
-            if (credentials == null) {
-                credentials = new Credentials();
-            }
-            
-            String password;
-            try {
-                password = new TrippleDes(secret).decrypt(rebirth.getPassword());
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
 
-            if (StringUtils.hasText(password)) {
-                credentials.setPassword(maskPassword ? "*****" : password);
-            }
-            onboarding.setCredentials(credentials);
-        }
-        
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         onboarding.setNote((StringUtils.hasText(onboarding.getNote()) ? onboarding.getNote() + ", " : "")
     		+ LocalDateTime.now().format(formatter) + "-RBRTH");
@@ -382,25 +363,9 @@ public class AccountController implements AccountsApi {
         if (!StringUtils.hasText(onBoardingInfos.getIdentity().getNav4Id())) {
             throw new IdNotFoundException("NAV4 ID");
         }
-
-        String password = null;
-        
-        if (onBoardingInfos.getCredentials() != null) {
-            password = onBoardingInfos.getCredentials().getPassword();    
-            if (StringUtils.hasText(password)) {
-                onBoardingInfos.getCredentials().setPassword(null);
-                try {
-                    password = new TrippleDes(secret).encrypt(password);
-                } catch (Exception e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-        }
-        
         try {
             rebirthService.createRebirth(RebirthEntity.builder()
                 .nav4Id(onBoardingInfos.getIdentity().getNav4Id())
-                .password(password)
                 .value(mapper.writeValueAsString(onBoardingInfos))
                 .build());
         } catch (IOException e) {

@@ -1,3 +1,7 @@
+SET search_path =  keycloak;
+
+-- dev_svc_deploy
+ALTER DEFAULT PRIVILEGES IN SCHEMA keycloak GRANT SELECT,INSERT,UPDATE,DELETE ON TABLES TO dev_role_app_keycloak;
 
 CREATE TABLE PLUGIN_ACCOUNT
 (

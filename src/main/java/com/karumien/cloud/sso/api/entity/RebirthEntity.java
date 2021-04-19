@@ -41,10 +41,7 @@ public class RebirthEntity implements Serializable {
     private String nav4Id;
 
     @Column(name = "VALUE", length = 3000)
-    private String value;
-
-    @Column(name = "PASSWORD", length = 512)
-    private String password;
+    private String value; 
 
 }
 
