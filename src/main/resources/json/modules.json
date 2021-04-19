@@ -1,653 +1,881 @@
 [
-
-	{
-		"moduleId": "DASHBOARD",
-		"name": "Dashboard",
-		"businessPriority": 0,
-		"groups": [
-			{
-				"groupId": "OVERVIEW",
-				"name": "Dashboard",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Nástěnka"
-					],
-					"translation[ro]": [
-						"Tablou de bord"
-					],
-					"translation[sk]": [
-						"Nástenka"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Nástěnka"
-			],
-			"translation[ro]": [
-				"Tablou de bord"
-			],
-			"translation[sk]": [
-				"Nástenka"
-			]
-		}
-	},
-	{
-		"moduleId": "FINANCE",
-		"name": "Finance",
-		"businessPriority": 10,
-		"groups": [
-			{
-				"groupId": "TRANSACTION",
-				"name": "Transactions",
-				"serviceId": "SERVICE_FINANCE",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Transakce"
-					],
-					"translation[ro]": [
-						"Tranzacții"
-					],
-					"translation[sk]": [
-						"Transakcie"
-					]
-				}
-			},
-			{
-				"groupId": "BILLINGDOC",
-				"name": "Billing Documents",
-				"serviceId": "SERVICE_FINANCE",
-				"businessPriority": 2,
-				"attributes": {
-					"translation[cs]": [
-						"Fakturační dokumenty"
-					],
-					"translation[ro]": [
-						"Facturare"
-					],
-					"translation[sk]": [
-						"Účtovné doklady"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Finance"
-			],
-			"translation[ro]": [
-				"Finanţa"
-			],
-			"translation[sk]": [
-				"Financie"
-			]
-		}
-	},
-	{
-		"moduleId": "USER",
-		"name": "User management",
-		"businessPriority": 20,
-		"groups": [
-			{
-				"groupId": "MANAGEMENT",
-				"name": "User management",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Správa uživatelů"
-					],
-					"translation[ro]": [
-						"Utilizatori și roluri"
-					],
-					"translation[sk]": [
-						"Používatelia a role"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Správa uživatelů"
-			],
-			"translation[ro]": [
-				"Utilizatori și roluri"
-			],
-			"translation[sk]": [
-				"Používatelia a role"
-			]
-		}
-	},
-	{
-		"moduleId": "VEHICLES",
-		"name": "Vehicle and OBU management",
-		"businessPriority": 30,
-		"groups": [
-			{
-				"groupId": "MANAGEMENT",
-				"name": "Vehicle management",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Správa vozidel"
-					],
-					"translation[ro]": [
-						"Vehicule gestionare"
-					],
-					"translation[sk]": [
-						"Spravovanie vozidel"
-					]
-				}
-			},
-			{
-				"groupId": "OBU",
-				"name": "OBU management",
-				"businessPriority": 2,
-				"attributes": {
-					"translation[cs]": [
-						"Správa OBU"
-					],
-					"translation[ro]": [
-						"OBU-uri gestionare"
-					],
-					"translation[sk]": [
-						"Spravovanie OBU"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Správa vozidel a OBU"
-			],
-			"translation[ro]": [
-				"Vehicule și OBU-uri gestionare"
-			],
-			"translation[sk]": [
-				"Spravovanie vozidel a OBU"
-			]
-		}
-	},
-	{
-		"moduleId": "TOLL",
-		"name": "Toll",
-		"businessPriority": 40,
-		"groups": [
-			{
-				"groupId": "ORDER",
-				"name": "Order",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Objednávka"
-					],
-					"translation[ro]": [
-						"Comandați"
-					],
-					"translation[sk]": [
-						"Objednávka"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Mýto"
-			],
-			"translation[ro]": [
-				"Taxe de Drum"
-			],
-			"translation[sk]": [
-				"Mýto"
-			]
-		}
-	},
-	{
-		"moduleId": "EMBEDDING",
-		"name": "Embedding",
-		"businessPriority": 50,
-		"groups": [
-			{
-				"groupId": "TOLL_REGISTRATION",
-				"name": "Toll registration",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Registrace mýtného"
-					],
-					"translation[ro]": [
-						"Înregistrări taxe de drum"
-					],
-					"translation[sk]": [
-						"Registrácia mýta"
-					]
-				}
-			},
-			{
-				"groupId": "VEHICLES_OBU",
-				"name": "List of vehicles",
-				"businessPriority": 2,
-				"attributes": {
-					"translation[cs]": [
-						"Seznam vozidel"
-					],
-					"translation[ro]": [
-						"Lista vehicule"
-					],
-					"translation[sk]": [
-						"Zoznam vozidiel"
-					]
-				}
-			},
-			{
-				"groupId": "EWMC",
-				"name": "EWMC",
-				"businessPriority": 3,
-				"attributes": {
-					"translation[cs]": [
-						"EWMC"
-					],
-					"translation[ro]": [
-						"EWMC"
-					],
-					"translation[sk]": [
-						"EWMC"
-					]
-				}
-			},
-			{
-				"groupId": "EWMC_NEWCARD",
-				"name": "EWMC Ordering of new card",
-				"businessPriority": 4,
-				"attributes": {
-					"translation[cs]": [
-						"EWMC objednání nové karty"
-					],
-					"translation[ro]": [
-						"EWMC comandați un card nou"
-					],
-					"translation[sk]": [
-						"EWMC žiadosť o novú kartu"
-					]
-				}
-			},
-			{
-				"groupId": "EWMC_CARDLIST",
-				"name": "EWMC Card management",
-				"businessPriority": 5,
-				"attributes": {
-					"translation[cs]": [
-						"Správa karet EWMC"
-					],
-					"translation[ro]": [
-						"EWMC carduri gestionare"
-					],
-					"translation[sk]": [
-						"Spravovanie kariet EWMC"
-					]
-				}
-			},
-			
-			
-			{
-				"groupId": "EWMC_MODE",
-				"name": "EWMC Payment mode",
-				"businessPriority": 6,
-				"attributes": {
-					"translation[cs]": [
-						"Režim platby EWMC"
-					],
-					"translation[ro]": [
-						"Mod de plată EWMC"
-					],
-					"translation[sk]": [
-						"Platobný režim EWMC"
-					]
-				}
-			},
-			{
-				"groupId": "EWMC_TRANSACTIONS",
-				"name": "EWMC Transactions",
-				"businessPriority": 7,
-				"attributes": {
-					"translation[cs]": [
-						"EWMC transakce"
-					],
-					"translation[ro]": [
-						"Tranzacții EWMC"
-					],
-					"translation[sk]": [
-						"Transakcie EWMC"
-					]
-				}
-			},
-			{
-				"groupId": "ENERGY",
-				"name": "Energy",
-				"businessPriority": 8,
-				"attributes": {
-					"translation[cs]": [
-						"Energie"
-					],
-					"translation[ro]": [
-						"Energie"
-					],
-					"translation[sk]": [
-						"Energie"
-					]
-				}
-			},			
-			{
-				"groupId": "TOLL",
-				"name": "Toll",
-				"businessPriority": 9,
-				"attributes": {
-					"translation[cs]": [
-						"Mýto"
-					],
-					"translation[ro]": [
-						"Taxe de Drum"
-					],
-					"translation[sk]": [
-						"Mýto"
-					]
-				}
-			},
-			
-			{
-				"groupId": "TELEMATICS",
-				"name": "Telematics",
-				"businessPriority": 10,
-				"attributes": {
-					"translation[cs]": [
-						"Telematika"
-					],
-					"translation[ro]": [
-						"Telematică"
-					],
-					"translation[sk]": [
-						"Telematika"
-					]
-				}
-			},
-			{
-				"groupId": "TAX_REFUNDS",
-				"name": "Tax refunds",
-				"businessPriority": 11,
-				"attributes": {
-					"translation[cs]": [
-						"Vrácení daní"
-					],
-					"translation[ro]": [
-						"Rambursări Taxe"
-					],
-					"translation[sk]": [
-						"Refundácia daní"
-					]
-				}
-			},
-			{
-				"groupId": "WASH",
-				"name": "Wash",
-				"businessPriority": 15,
-				"attributes": {
-					"translation[cs]": [
-						"Myčka"
-					],
-					"translation[ro]": [
-						"Spălătorii Auto"
-					],
-					"translation[sk]": [
-						"Autoumývarne"
-					]
-				}
-			},
-			
-			{
-				"groupId": "PARKING",
-				"name": "Parking",
-				"businessPriority": 16,
-				"attributes": {
-					"translation[cs]": [
-						"Parkování"
-					],
-					"translation[ro]": [
-						"Parcare"
-					],
-					"translation[sk]": [
-						"Parkovanie"
-					]
-				}
-			},
-			{
-				"groupId": "PARTNER_SERVICES",
-				"name": "Partners services",
-				"businessPriority": 17,
-				"attributes": {
-					"translation[cs]": [
-						"Služby pro partnery"
-					],
-					"translation[ro]": [
-						"Servicii parteneri"
-					],
-					"translation[sk]": [
-						"Služby partnerov"
-					]
-				}
-			},
-			{
-				"groupId": "MINIMAL_WAGES",
-				"name": "Posting of drivers",
-				"businessPriority": 18,
-				"attributes": {
-					"translation[cs]": [
-						"Zveřejňování řidičů"
-					],
-					"translation[ro]": [
-						"Detașarea soferilor"
-					],
-					"translation[sk]": [
-						"Vysielanie vodičov"
-					]
-				}
-			},
-			{
-				"groupId": "CARDS",
-				"name": "Cards - EW",
-				"businessPriority": 19,
-				"attributes": {
-					"translation[cs]": [
-						"Karty - EW"
-					],
-					"translation[ro]": [
-						"Carduri - EW"
-					],
-					"translation[sk]": [
-						"Karty - EW"
-					]
-				}
-			},
-			{
-				"groupId": "CARD_LIST",
-				"name": "Card list",
-				"businessPriority": 20,
-				"attributes": {
-					"translation[cs]": [
-						"Seznam karet"
-					],
-					"translation[ro]": [
-						"Lista cardurilor"
-					],
-					"translation[sk]": [
-						"Zoznam kariet"
-					]
-				}
-			},
-			{
-				"groupId": "CARD_LOCKING",
-				"name": "Card locking system",
-				"translation": "Systém zamykání karet",
-				"businessPriority": 21,
-				"attributes": {
-					"translation[cs]": [
-						"Systém zamykání karet"
-					],
-					"translation[ro]": [
-						"Sistemul de blocare a cardurilor"
-					],
-					"translation[sk]": [
-						"Systém uzamykania kariet"
-					]
-				}
-			},
-			{
-				"groupId": "CARD_GPS_SECURITY",
-				"name": "GPS Security",
-				"businessPriority": 22,
-				"attributes": {
-					"translation[cs]": [
-						"Zabezpečení GPS"
-					],
-					"translation[ro]": [
-						"Securitate GPS"
-					],
-					"translation[sk]": [
-						"Zabezpečenie GPS"
-					]
-				}
-			},
-			{
-				"groupId": "CARD_ORDER",
-				"name": "Card order",
-				"businessPriority": 25,
-				"attributes": {
-					"translation[cs]": [
-						"Objednávka karty"
-					],
-					"translation[ro]": [
-						"Comandă de card"
-					],
-					"translation[sk]": [
-						"Objednávka karty"
-					]
-				}
-			},
-			{
-				"groupId": "CARD_STATUS",
-				"name": "Status of card",
-				"businessPriority": 26,
-				"attributes": {
-					"translation[cs]": [
-						"Stav karty"
-					],
-					"translation[ro]": [
-						"Starea cardului"
-					],
-					"translation[sk]": [
-						"Stav karty"
-					]
-				}
-			},
-			
-			{
-				"groupId": "DOWNLOADS",
-				"name": "Downloads",
-				"translation": "Stahování",
-				"businessPriority": 28,
-				"attributes": {
-					"translation[cs]": [
-						"Stahování"
-					],
-					"translation[ro]": [
-						"Descărcări"
-					],
-					"translation[sk]": [
-						"Na stiahnutie"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Embedding"
-			],
-			"translation[ro]": [
-				"Embedding"
-			],
-			"translation[sk]": [
-				"Embedding"
-			]
-		}
-	},
-	{
-		"moduleId": "FACTORING",
-		"name": "Factoring",
-		"businessPriority": 60,
-		"groups": [
-			{
-				"groupId": "FACTORING",
-				"name": "Factoring",
-				"businessPriority": 1,
-				"attributes": {
-					"translation[cs]": [
-						"Fakturace"
-					],
-					"translation[ro]": [
-						"Factorizarea"
-					],
-					"translation[sk]": [
-						"Faktoring"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Fakturace"
-			],
-			"translation[ro]": [
-				"Factorizarea"
-			],
-			"translation[sk]": [
-				"Faktoring"
-			]
-		}
-	},
-	{
-		"moduleId": "REPORTING",
-		"name": "Reporting",
-		"translation": "Přehledy",
-		"businessPriority": 70,
-		"groups": [
-			{
-				"groupId": "REPORTING",
-				"name": "Reporting",
-				"businessPriority": 10,
-				"attributes": {
-					"translation[cs]": [
-						"Přehledy"
-					],
-					"translation[ro]": [
-						"Raportare"
-					],
-					"translation[sk]": [
-						"Reporting"
-					]
-				}
-			}
-		],
-		"attributes": {
-			"translation[cs]": [
-				"Přehledy"
-			],
-			"translation[ro]": [
-				"Raportare"
-			],
-			"translation[sk]": [
-				"Reporting"
-			]
-		}
-	}
+    {
+        "moduleId": "DASHBOARD",
+        "name": "Dashboard",
+        "businessPriority": 0,
+        "groups": [
+            {
+                "groupId": "OVERVIEW",
+                "name": "Dashboard",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Nástěnka"
+                    ],
+                    "translation[ro]": [
+                        "Tablou de bord"
+                    ],
+                    "translation[sk]": [
+                        "Nástenka"
+                    ],
+                    "translation[pl]": [
+                        "Panel"
+                    ],
+                    "translation[hu]": [
+                        "Irányítópult"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Nástěnka"
+            ],
+            "translation[ro]": [
+                "Tablou de bord"
+            ],
+            "translation[sk]": [
+                "Nástenka"
+            ],
+            "translation[pl]": [
+                "Panel"
+            ],
+            "translation[hu]": [
+                "Irányítópult"
+            ]
+        }
+    },
+    {
+        "moduleId": "FINANCE",
+        "name": "Finance",
+        "businessPriority": 10,
+        "groups": [
+            {
+                "groupId": "TRANSACTION",
+                "name": "Transactions",
+                "serviceId": "SERVICE_FINANCE",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Transakce"
+                    ],
+                    "translation[ro]": [
+                        "Tranzacții"
+                    ],
+                    "translation[sk]": [
+                        "Transakcie"
+                    ],
+                    "translation[pl]": [
+                        "Transakcje"
+                    ],
+                    "translation[hu]": [
+                        "Ügyletek"
+                    ]
+                }
+            },
+            {
+                "groupId": "BILLINGDOC",
+                "name": "Billing Documents",
+                "serviceId": "SERVICE_FINANCE",
+                "businessPriority": 2,
+                "attributes": {
+                    "translation[cs]": [
+                        "Účetní doklady"
+                    ],
+                    "translation[ro]": [
+                        "Facturare"
+                    ],
+                    "translation[sk]": [
+                        "Účtovné doklady"
+                    ],
+                    "translation[pl]": [
+                        "Dokumenty rozliczeniowe"
+                    ],
+                    "translation[hu]": [
+                        "Bizonylatok"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Finance"
+            ],
+            "translation[ro]": [
+                "Financiar"
+            ],
+            "translation[sk]": [
+                "Financie"
+            ],
+            "translation[pl]": [
+                "Finanse"
+            ],
+            "translation[hu]": [
+                "Pénzügyek"
+            ]
+        }
+    },
+    {
+        "moduleId": "USER",
+        "name": "User management",
+        "businessPriority": 20,
+        "groups": [
+            {
+                "groupId": "MANAGEMENT",
+                "name": "User management",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Správa uživatelů"
+                    ],
+                    "translation[ro]": [
+                        "Utilizatori și roluri"
+                    ],
+                    "translation[sk]": [
+                        "Správa užívateľov"
+                    ],
+                    "translation[pl]": [
+                        "Zarządzanie użytkownikami"
+                    ],
+                    "translation[hu]": [
+                        "Felhasználókezelés"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Správa uživatelů"
+            ],
+            "translation[ro]": [
+                "Utilizatori și roluri"
+            ],
+            "translation[sk]": [
+                "Správa užívateľov"
+            ],
+            "translation[pl]": [
+                "Zarządzanie użytkownikami"
+            ],
+            "translation[hu]": [
+                "Felhasználókezelés"
+            ]
+        }
+    },
+    {
+        "moduleId": "VEHICLES",
+        "name": "Vehicle and OBU management",
+        "businessPriority": 30,
+        "groups": [
+            {
+                "groupId": "MANAGEMENT",
+                "name": "Vehicle management",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Správa vozidel"
+                    ],
+                    "translation[ro]": [
+                        "Gestionare vehicule"
+                    ],
+                    "translation[sk]": [
+                        "Správa vozidiel"
+                    ],
+                    "translation[pl]": [
+                        "Zarządzanie pojazdem"
+                    ],
+                    "translation[hu]": [
+                        "Járműkezelés"
+                    ]
+                }
+            },
+            {
+                "groupId": "OBU",
+                "name": "OBU management",
+                "businessPriority": 2,
+                "attributes": {
+                    "translation[cs]": [
+                        "Správa OBU"
+                    ],
+                    "translation[ro]": [
+                        "Gestionare OBU-uri"
+                    ],
+                    "translation[sk]": [
+                        "Správa OBU"
+                    ],
+                    "translation[pl]": [
+                        "Zarządzanie OBU"
+                    ],
+                    "translation[hu]": [
+                        "OBU egységek kezelése"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Správa vozidel a OBU"
+            ],
+            "translation[ro]": [
+                "Gestionare vehicule și OBU-uri"
+            ],
+            "translation[sk]": [
+                "Správa vozidiel a OBU"
+            ],
+            "translation[pl]": [
+                "Zarządzanie pojazdem i OBU"
+            ],
+            "translation[hu]": [
+                "Jármű- és OBU-kezelés"
+            ]
+        }
+    },
+    {
+        "moduleId": "TOLL",
+        "name": "Toll",
+        "businessPriority": 40,
+        "groups": [
+            {
+                "groupId": "ORDER",
+                "name": "Order",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Objednávka"
+                    ],
+                    "translation[ro]": [
+                        "Comandați"
+                    ],
+                    "translation[sk]": [
+                        "Objednávka"
+                    ],
+                    "translation[pl]": [
+                        "Zamówienie"
+                    ],
+                    "translation[hu]": [
+                        "Rendelés"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Mýto"
+            ],
+            "translation[ro]": [
+                "Taxe de Drum"
+            ],
+            "translation[sk]": [
+                "Mýto"
+            ],
+            "translation[pl]": [
+                "Myto"
+            ],
+            "translation[hu]": [
+                "Útdíj"
+            ]
+        }
+    },
+    {
+        "moduleId": "EMBEDDING",
+        "name": "Embedding",
+        "businessPriority": 50,
+        "groups": [
+            {
+                "groupId": "TOLL_REGISTRATION",
+                "name": "Toll registration",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Registrace mýtného"
+                    ],
+                    "translation[ro]": [
+                        "Înregistrări taxe de drum"
+                    ],
+                    "translation[sk]": [
+                        "Registrácia mýta"
+                    ],
+                    "translation[pl]": [
+                        "Rejestracja opłat"
+                    ],
+                    "translation[hu]": [
+                        "Útdíj regisztráció"
+                    ]
+                }
+            },
+            {
+                "groupId": "VEHICLES_OBU",
+                "name": "List of vehicles",
+                "businessPriority": 2,
+                "attributes": {
+                    "translation[cs]": [
+                        "Seznam vozidel"
+                    ],
+                    "translation[ro]": [
+                        "Listă vehicule"
+                    ],
+                    "translation[sk]": [
+                        "Zoznam vozidiel"
+                    ],
+                    "translation[pl]": [
+                        "Lista pojazdów"
+                    ],
+                    "translation[hu]": [
+                        "Járművek listája"
+                    ]
+                }
+            },
+            {
+                "groupId": "EWMC",
+                "name": "Eurowag MasterCard",
+                "businessPriority": 3,
+                "attributes": {
+                    "translation[cs]": [
+                        "Eurowag MasterCard"
+                    ],
+                    "translation[ro]": [
+                        "Eurowag MasterCard"
+                    ],
+                    "translation[sk]": [
+                        "Eurowag MasterCard"
+                    ],
+                    "translation[pl]": [
+                        "Eurowag MasterCard"
+                    ],
+                    "translation[hu]": [
+                        "Eurowag MasterCard"
+                    ]
+                }
+            },
+            {
+                "groupId": "EWMC_NEWCARD",
+                "name": "EWMC Order a new card",
+                "businessPriority": 4,
+                "attributes": {
+                    "translation[cs]": [
+                        "Objednání nové EWMC karty"
+                    ],
+                    "translation[ro]": [
+                        "EWMC Comandați un card nou"
+                    ],
+                    "translation[sk]": [
+                        "EWMC žiadosť o novú kartu"
+                    ],
+                    "translation[pl]": [
+                        "EWMC Zamów nową kartę"
+                    ],
+                    "translation[hu]": [
+                        "EWMC Rendeljen új kártyát"
+                    ]
+                }
+            },
+            {
+                "groupId": "EWMC_CARDLIST",
+                "name": "EWMC Card management",
+                "businessPriority": 5,
+                "attributes": {
+                    "translation[cs]": [
+                        "Správa EWMC karet"
+                    ],
+                    "translation[ro]": [
+                        "EWMC Gestionare carduri"
+                    ],
+                    "translation[sk]": [
+                        "Správa kariet EWMC"
+                    ],
+                    "translation[pl]": [
+                        "Zarządzanie kartami EWMC"
+                    ],
+                    "translation[hu]": [
+                        "EWMC Kártyák kezelése"
+                    ]
+                }
+            },
+            {
+                "groupId": "EWMC_MODE",
+                "name": "EWMC Payment mode",
+                "businessPriority": 6,
+                "attributes": {
+                    "translation[cs]": [
+                        "Režim EWMC platby"
+                    ],
+                    "translation[ro]": [
+                        "Mod de plată EWMC"
+                    ],
+                    "translation[sk]": [
+                        "Platobný režim EWMC"
+                    ],
+                    "translation[pl]": [
+                        "Tryb płatności EWMC"
+                    ],
+                    "translation[hu]": [
+                        "EWMC Fizetési mód"
+                    ]
+                }
+            },
+            {
+                "groupId": "EWMC_TRANSACTIONS",
+                "name": "EWMC Transactions",
+                "businessPriority": 7,
+                "attributes": {
+                    "translation[cs]": [
+                        "EWMC transakce"
+                    ],
+                    "translation[ro]": [
+                        "Tranzacții EWMC"
+                    ],
+                    "translation[sk]": [
+                        "Transakcie EWMC"
+                    ],
+                    "translation[pl]": [
+                        "Transakcje EWMC"
+                    ],
+                    "translation[hu]": [
+                        "EWMC Ügyletek"
+                    ]
+                }
+            },
+            {
+                "groupId": "ENERGY",
+                "name": "Energy",
+                "businessPriority": 8,
+                "attributes": {
+                    "translation[cs]": [
+                        "Energie"
+                    ],
+                    "translation[ro]": [
+                        "Energie"
+                    ],
+                    "translation[sk]": [
+                        "Energie"
+                    ],
+                    "translation[pl]": [
+                        "Energia"
+                    ],
+                    "translation[hu]": [
+                        "Energia"
+                    ]
+                }
+            },
+            {
+                "groupId": "TOLL",
+                "name": "Toll",
+                "businessPriority": 9,
+                "attributes": {
+                    "translation[cs]": [
+                        "Mýto"
+                    ],
+                    "translation[ro]": [
+                        "Taxe de Drum"
+                    ],
+                    "translation[sk]": [
+                        "Mýto"
+                    ],
+                    "translation[pl]": [
+                        "Myto"
+                    ],
+                    "translation[hu]": [
+                        "Útdíj"
+                    ]
+                }
+            },
+            {
+                "groupId": "TELEMATICS",
+                "name": "Telematics",
+                "businessPriority": 10,
+                "attributes": {
+                    "translation[cs]": [
+                        "Telematika"
+                    ],
+                    "translation[ro]": [
+                        "Telematică"
+                    ],
+                    "translation[sk]": [
+                        "Telematika"
+                    ],
+                    "translation[pl]": [
+                        "Telematyka"
+                    ],
+                    "translation[hu]": [
+                        "Telematika"
+                    ]
+                }
+            },
+            {
+                "groupId": "TAX_REFUNDS",
+                "name": "Tax refunds",
+                "businessPriority": 11,
+                "attributes": {
+                    "translation[cs]": [
+                        "Vrácení daní"
+                    ],
+                    "translation[ro]": [
+                        "Rambursări Taxe"
+                    ],
+                    "translation[sk]": [
+                        "Refundácia daní"
+                    ],
+                    "translation[pl]": [
+                        "Zwroty podatku"
+                    ],
+                    "translation[hu]": [
+                        "Adó-visszatérítés"
+                    ]
+                }
+            },
+            {
+                "groupId": "WASH",
+                "name": "Wash",
+                "businessPriority": 15,
+                "attributes": {
+                    "translation[cs]": [
+                        "Myčka"
+                    ],
+                    "translation[ro]": [
+                        "Spălătorii Auto"
+                    ],
+                    "translation[sk]": [
+                        "Autoumývarne"
+                    ],
+                    "translation[pl]": [
+                        "Myjnia"
+                    ],
+                    "translation[hu]": [
+                        "Mosás"
+                    ]
+                }
+            },
+            {
+                "groupId": "PARKING",
+                "name": "Parking",
+                "businessPriority": 16,
+                "attributes": {
+                    "translation[cs]": [
+                        "Parkování"
+                    ],
+                    "translation[ro]": [
+                        "Parcare"
+                    ],
+                    "translation[sk]": [
+                        "Parkoviská"
+                    ],
+                    "translation[pl]": [
+                        "Parking"
+                    ],
+                    "translation[hu]": [
+                        "Parkolás"
+                    ]
+                }
+            },
+            {
+                "groupId": "PARTNER_SERVICES",
+                "name": "Partner services",
+                "businessPriority": 17,
+                "attributes": {
+                    "translation[cs]": [
+                        "Služby pro partnery"
+                    ],
+                    "translation[ro]": [
+                        "Servicii parteneri"
+                    ],
+                    "translation[sk]": [
+                        "Služby pre partnerov"
+                    ],
+                    "translation[pl]": [
+                        "Usługi partnerskie"
+                    ],
+                    "translation[hu]": [
+                        "Partner szolgáltatások"
+                    ]
+                }
+            },
+            {
+                "groupId": "MINIMAL_WAGES",
+                "name": "Posting of drivers",
+                "businessPriority": 18,
+                "attributes": {
+                    "translation[cs]": [
+                        "Vyslání řidičů"
+                    ],
+                    "translation[ro]": [
+                        "Detașare șoferi"
+                    ],
+                    "translation[sk]": [
+                        "Vysielanie vodičov"
+                    ],
+                    "translation[pl]": [
+                        "Delegowanie kierowców"
+                    ],
+                    "translation[hu]": [
+                        "A járművezetők kiküldetése"
+                    ]
+                }
+            },
+            {
+                "groupId": "CARDS",
+                "name": "Cards",
+                "businessPriority": 19,
+                "attributes": {
+                    "translation[cs]": [
+                        "Karty"
+                    ],
+                    "translation[ro]": [
+                        "Carduri"
+                    ],
+                    "translation[sk]": [
+                        "Karty"
+                    ],
+                    "translation[pl]": [
+                        "Karty"
+                    ],
+                    "translation[hu]": [
+                        "Kártyák"
+                    ]
+                }
+            },
+            {
+                "groupId": "CARD_LIST",
+                "name": "Card list",
+                "businessPriority": 20,
+                "attributes": {
+                    "translation[cs]": [
+                        "Seznam karet"
+                    ],
+                    "translation[ro]": [
+                        "Lista cardurilor"
+                    ],
+                    "translation[sk]": [
+                        "Zoznam kariet"
+                    ],
+                    "translation[pl]": [
+                        "Lista kart"
+                    ],
+                    "translation[hu]": [
+                        "Kártyák jegyzéke"
+                    ]
+                }
+            },
+            {
+                "groupId": "CARD_LOCKING",
+                "name": "Card locking system",
+                "translation": "Systém zamykání karet",
+                "businessPriority": 21,
+                "attributes": {
+                    "translation[cs]": [
+                        "Systém zamykání karet"
+                    ],
+                    "translation[ro]": [
+                        "Sistemul de blocare a cardurilor"
+                    ],
+                    "translation[sk]": [
+                        "Systém uzamykania kariet"
+                    ],
+                    "translation[pl]": [
+                        "System blokowania karty"
+                    ],
+                    "translation[hu]": [
+                        "A kártyák lezárási rendszere"
+                    ]
+                }
+            },
+            {
+                "groupId": "CARD_GPS_SECURITY",
+                "name": "GPS Security",
+                "businessPriority": 22,
+                "attributes": {
+                    "translation[cs]": [
+                        "Zabezpečení GPS"
+                    ],
+                    "translation[ro]": [
+                        "Securitate GPS"
+                    ],
+                    "translation[sk]": [
+                        "Zabezpečenie GPS"
+                    ],
+                    "translation[pl]": [
+                        "Bezpieczeństwo GPS"
+                    ],
+                    "translation[hu]": [
+                        "GPS Biztonság"
+                    ]
+                }
+            },
+            {
+                "groupId": "CARD_ORDER",
+                "name": "Card order",
+                "businessPriority": 25,
+                "attributes": {
+                    "translation[cs]": [
+                        "Objednávka karty"
+                    ],
+                    "translation[ro]": [
+                        "Comandă card"
+                    ],
+                    "translation[sk]": [
+                        "Objednávka karty"
+                    ],
+                    "translation[pl]": [
+                        "Zamówienie karty"
+                    ],
+                    "translation[hu]": [
+                        "Kártyák rendelése"
+                    ]
+                }
+            },
+            {
+                "groupId": "CARD_STATUS",
+                "name": "Status of card",
+                "businessPriority": 26,
+                "attributes": {
+                    "translation[cs]": [
+                        "Stav karty"
+                    ],
+                    "translation[ro]": [
+                        "Starea cardului"
+                    ],
+                    "translation[sk]": [
+                        "Stav karty"
+                    ],
+                    "translation[pl]": [
+                        "Status karty"
+                    ],
+                    "translation[hu]": [
+                        "A kártya állapota"
+                    ]
+                }
+            },
+            {
+                "groupId": "DOWNLOADS",
+                "name": "Downloads",
+                "translation": "Stahování",
+                "businessPriority": 28,
+                "attributes": {
+                    "translation[cs]": [
+                        "Stahování"
+                    ],
+                    "translation[ro]": [
+                        "Descărcări"
+                    ],
+                    "translation[sk]": [
+                        "Na stiahnutie"
+                    ],
+                    "translation[pl]": [
+                        "Pliki do pobrania"
+                    ],
+                    "translation[hu]": [
+                        "Letöltések"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Embedding"
+            ],
+            "translation[ro]": [
+                "Embedding"
+            ],
+            "translation[sk]": [
+                "Ostatné"
+            ],
+            "translation[pl]": [
+                "Osadzanie"
+            ],
+            "translation[hu]": [
+                "Egyéb"
+            ]
+        }
+    },
+    {
+        "moduleId": "FACTORING",
+        "name": "Factoring",
+        "businessPriority": 60,
+        "groups": [
+            {
+                "groupId": "FACTORING",
+                "name": "Factoring",
+                "businessPriority": 1,
+                "attributes": {
+                    "translation[cs]": [
+                        "Fakturace"
+                    ],
+                    "translation[ro]": [
+                        "Factoring"
+                    ],
+                    "translation[sk]": [
+                        "Faktoring"
+                    ],
+                    "translation[pl]": [
+                        "Faktoring"
+                    ],
+                    "translation[hu]": [
+                        "Faktoring"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Fakturace"
+            ],
+            "translation[ro]": [
+                "Factoring"
+            ],
+            "translation[sk]": [
+                "Faktoring"
+            ],
+            "translation[pl]": [
+                "Faktoring"
+            ],
+            "translation[hu]": [
+                "Faktoring"
+            ]
+        }
+    },
+    {
+        "moduleId": "REPORTING",
+        "name": "Reporting",
+        "translation": "Přehledy",
+        "businessPriority": 70,
+        "groups": [
+            {
+                "groupId": "REPORTING",
+                "name": "Reporting",
+                "businessPriority": 10,
+                "attributes": {
+                    "translation[cs]": [
+                        "Přehledy"
+                    ],
+                    "translation[ro]": [
+                        "Raportare"
+                    ],
+                    "translation[sk]": [
+                        "Reporting"
+                    ],
+                    "translation[pl]": [
+                        "Raportowanie"
+                    ],
+                    "translation[hu]": [
+                        "Jelentés"
+                    ]
+                }
+            }
+        ],
+        "attributes": {
+            "translation[cs]": [
+                "Přehledy"
+            ],
+            "translation[ro]": [
+                "Raportare"
+            ],
+            "translation[sk]": [
+                "Reporting"
+            ],
+            "translation[pl]": [
+                "Raportowanie"
+            ],
+            "translation[hu]": [
+                "Jelentés"
+            ]
+        }
+    }
 ]
