@@ -40,7 +40,7 @@
 		
         <keycloak.version>9.0.3</keycloak.version>
 		<logstash-logback.version>6.2</logstash-logback.version>
-		<commons-io.version>2.6</commons-io.version>
+		<commons-io.version>2.7</commons-io.version>
 		<azure-applicationinsights.version>2.6.1</azure-applicationinsights.version>
 		<jboss-resteasy.version>3.6.3.Final</jboss-resteasy.version>
 		
