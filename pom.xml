@@ -42,7 +42,7 @@
 		<logstash-logback.version>6.2</logstash-logback.version>
 		<commons-io.version>2.6</commons-io.version>
 		<azure-applicationinsights.version>2.6.1</azure-applicationinsights.version>
-		<jboss-resteasy.version>3.6.3.Final</jboss-resteasy.version>
+		<jboss-resteasy.version>4.5.7.Final</jboss-resteasy.version>
 		
 		<maven-bundle-plugin.version>4.2.0</maven-bundle-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
